@@ -1,0 +1,103 @@
+<template>
+  <div
+    class="mb-4"
+    style="width: 150px; height: 150px;"
+  >
+    <!-- Simple SVG/Placeholder Illustration -->
+    <svg
+      width="100%"
+      height="100%"
+      viewBox="0 0 200 200"
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <rect
+        x="50"
+        y="30"
+        width="100"
+        height="130"
+        rx="10"
+        ry="10"
+        fill="#FFF5E5"
+        stroke="#F0CCB0"
+        stroke-width="2"
+      />
+      <line
+        x1="65"
+        y1="50"
+        x2="135"
+        y2="50"
+        stroke="#F0CCB0"
+        stroke-width="1"
+      />
+      <line
+        x1="65"
+        y1="65"
+        x2="135"
+        y2="65"
+        stroke="#F0CCB0"
+        stroke-width="1"
+      />
+      <line
+        x1="65"
+        y1="80"
+        x2="135"
+        y2="80"
+        stroke="#F0CCB0"
+        stroke-width="1"
+      />
+      <line
+        x1="65"
+        y1="95"
+        x2="135"
+        y2="95"
+        stroke="#F0CCB0"
+        stroke-width="1"
+      />
+      <rect
+        x="110"
+        y="100"
+        width="45"
+        height="10"
+        rx="5"
+        ry="5"
+        transform="rotate(-30 132.5 105)"
+        fill="#F9A825"
+      />
+      <polygon
+        points="155,105 165,100 165,110"
+        transform="rotate(-30 132.5 105)"
+        fill="#6D4C41"
+      />
+      <circle
+        cx="140"
+        cy="80"
+        r="18"
+        fill="#FFC1C1"
+        stroke="#E53935"
+        stroke-width="2"
+      />
+      <line
+        x1="130"
+        y1="70"
+        x2="150"
+        y2="90"
+        stroke="#E53935"
+        stroke-width="3"
+        stroke-linecap="round"
+      />
+      <line
+        x1="150"
+        y1="70"
+        x2="130"
+        y2="90"
+        stroke="#E53935"
+        stroke-width="3"
+        stroke-linecap="round"
+      />
+    </svg>
+  </div>
+</template>
+
+<script setup>
+// No script logic needed for static illustration
+</script>

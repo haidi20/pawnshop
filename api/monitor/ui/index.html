@@ -1,0 +1,79 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>pawnshop Monitor</title>
+  <style>
+    body { font-family: Inter, Arial, sans-serif; margin: 18px; background:#0f1720; color:#e6eef6 }
+    .row { display:flex; gap:16px; margin-bottom:16px }
+    .card { background:linear-gradient(180deg,#11182766,#0b1220); padding:12px; border-radius:8px; box-shadow:0 6px 18px rgba(2,6,23,.6); flex:1 }
+    .small { font-size:12px; color:#9fb0c9 }
+    canvas { width:100% !important; height:300px !important }
+  </style>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+</head>
+<body>
+  <h2>pawnshop Monitoring</h2>
+  <div class="row">
+    <div class="card">
+      <div class="small">Goroutines</div>
+      <h1 id="goroutines">-</h1>
+    </div>
+    <div class="card">
+      <div class="small">Socket.IO Clients</div>
+      <h1 id="clients">-</h1>
+    </div>
+    <div class="card">
+      <div class="small">Requests / sec (1m avg)</div>
+      <h1 id="rps">-</h1>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="card">
+      <canvas id="chartReq"></canvas>
+    </div>
+    <div class="card">
+      <canvas id="chartDur"></canvas>
+    </div>
+  </div>
+
+<script>
+const ctxReq = document.getElementById('chartReq');
+const ctxDur = document.getElementById('chartDur');
+let chartReq = new Chart(ctxReq, {type:'line', data:{labels:[], datasets:[{label:'requests/sec', data:[], borderColor:'#60a5fa', backgroundColor:'rgba(96,165,250,0.06)', tension:0.2}]}, options:{scales:{x:{display:false}}}})
+let chartDur = new Chart(ctxDur, {type:'line', data:{labels:[], datasets:[{label:'avg latency (ms)', data:[], borderColor:'#f472b6', backgroundColor:'rgba(244,114,182,0.06)', tension:0.2}]}, options:{scales:{x:{display:false}}}})
+
+async function fetchData(){
+  try{
+    const res = await fetch('/monitor/json');
+    const j = await res.json();
+    document.getElementById('goroutines').innerText = j.goroutines;
+    document.getElementById('clients').innerText = j.clients;
+    // compute rps (sum of last 60 seconds / 60)
+    const counts = j.counts || [];
+    const last60 = counts.slice(-60);
+    const sum = last60.reduce((a,b)=>a+b,0);
+    const rps = (sum/Math.max(1,last60.length)).toFixed(2);
+    document.getElementById('rps').innerText = rps;
+
+    // update charts
+    const labels = j.ts.map(t => new Date(t*1000).toLocaleTimeString());
+    const reqData = j.counts.map(x=>x);
+    const durData = j.avg_dur.map(x=>Math.round(x*1000));
+    chartReq.data.labels = labels;
+    chartReq.data.datasets[0].data = reqData;
+    chartReq.update();
+    chartDur.data.labels = labels;
+    chartDur.data.datasets[0].data = durData;
+    chartDur.update();
+  }catch(e){
+    console.error(e);
+  }
+}
+
+fetchData();
+setInterval(fetchData, 2000);
+</script>
+</body>
+</html>

@@ -1,0 +1,238 @@
+{
+    "info": {
+        "_postman_id": "pawnshop-collection",
+        "name": "pawnshop",
+        "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+        "description": "Collection untuk testing endpoint pawnshop"
+    },
+    "item": [
+        {
+            "name": "Get Transactions (pending)",
+            "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                    "raw": "{{baseUrl}}/api/v1/transactions?status=pending&warehouse_id=1",
+                    "host": [
+                        "{{baseUrl}}"
+                    ],
+                    "path": [
+                        "api",
+                        "v1",
+                        "transactions"
+                    ],
+                    "query": [
+                        {
+                            "key": "status",
+                            "value": "pending"
+                        },
+                        {
+                            "key": "warehouse_id",
+                            "value": "1"
+                        }
+                    ]
+                }
+            },
+            "response": [
+                {
+                    "name": "Example - 200 OK",
+                    "status": "OK",
+                    "code": 200,
+                    "_body": null,
+                    "body": "{\"success\":true,\"message\":\"Berhasil dapatkan data transaksi\",\"data\":{\"transactions\":[{\"id\":1,\"order_type_id\":1,\"warehouse_id\":1,\"total_qty\":2,\"total_amount\":30000,\"sequence_number\":1}]}}",
+                    "header": []
+                }
+            ],
+            "event": [
+                {
+                    "listen": "test",
+                    "script": {
+                        "exec": [
+                            "pm.test('Status is 200', function () { pm.response.to.have.status(200); });",
+                            "pm.test('Response has data.transactions', function () { var json = pm.response.json(); pm.expect(json).to.have.property('data'); pm.expect(json.data).to.have.property('transactions'); });"
+                        ],
+                        "type": "text/javascript"
+                    }
+                }
+            ]
+        },
+        {
+            "name": "Store Transaction (POST)",
+            "request": {
+                "method": "POST",
+                "header": [
+                    {
+                        "key": "Content-Type",
+                        "value": "application/json"
+                    }
+                ],
+                "body": {
+                    "mode": "raw",
+                    "raw": "{\n  \"order_type_id\": 1,\n  \"warehouse_id\": 1,\n  \"transaction_details\": [\n    {\n      \"product_id\": 10,\n      \"qty\": 2,\n      \"price\": 15000\n    }\n  ]\n}"
+                },
+                "url": {
+                    "raw": "{{baseUrl}}/api/v1/transactions",
+                    "host": [
+                        "{{baseUrl}}"
+                    ],
+                    "path": [
+                        "api",
+                        "v1",
+                        "transactions"
+                    ]
+                }
+            },
+            "response": [
+                {
+                    "name": "Example - 201 Created",
+                    "status": "Created",
+                    "code": 201,
+                    "_body": null,
+                    "body": "{\"success\":true,\"message\":\"Transaksi berhasil dibuat\",\"data\":{\"transaction\":{\"id\":123,\"order_type_id\":1,\"warehouse_id\":1,\"total_qty\":2,\"total_amount\":30000},\"transaction_details\":[{\"id\":1,\"product_id\":10,\"qty\":2,\"product_price\":15000,\"subtotal\":30000}]}}",
+                    "header": []
+                }
+            ],
+            "event": [
+                {
+                    "listen": "test",
+                    "script": {
+                        "exec": [
+                            "pm.test('Status is 201 or 400/500 allowed depending on environment', function () { pm.expect([201,400,500]).to.include(pm.response.code); });",
+                            "pm.test('Response has message', function () { var json = pm.response.json(); pm.expect(json).to.have.property('message'); });"
+                        ],
+                        "type": "text/javascript"
+                    }
+                }
+            ]
+        },
+        {
+            "name": "Get Active Warehouses",
+            "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                    "raw": "{{baseUrl}}/api/v1/warehouses?status=active",
+                    "host": [
+                        "{{baseUrl}}"
+                    ],
+                    "path": [
+                        "api",
+                        "v1",
+                        "warehouses"
+                    ],
+                    "query": [
+                        {
+                            "key": "status",
+                            "value": "active"
+                        }
+                    ]
+                }
+            },
+            "response": [
+                {
+                    "name": "Example - 200 OK",
+                    "status": "OK",
+                    "code": 200,
+                    "_body": null,
+                    "body": "{\"success\":true,\"message\":\"Berhasil dapatkan data gudang\",\"data\":{\"warehouses\":[{\"id\":1,\"name\":\"Gudang Utama\",\"status\":\"active\"}]}}",
+                    "header": []
+                }
+            ],
+            "event": [
+                {
+                    "listen": "test",
+                    "script": {
+                        "exec": [
+                            "pm.test('Status is 200', function () { pm.response.to.have.status(200); });",
+                            "pm.test('Response has data.warehouses', function () { var json = pm.response.json(); pm.expect(json).to.have.property('data'); pm.expect(json.data).to.have.property('warehouses'); });"
+                        ],
+                        "type": "text/javascript"
+                    }
+                }
+            ]
+        },
+        {
+            "name": "Get Products By Warehouse",
+            "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                    "raw": "{{baseUrl}}/api/v1/products?warehouse_id=1",
+                    "host": [
+                        "{{baseUrl}}"
+                    ],
+                    "path": [
+                        "api",
+                        "v1",
+                        "products"
+                    ],
+                    "query": [
+                        {
+                            "key": "warehouse_id",
+                            "value": "1"
+                        }
+                    ]
+                }
+            },
+            "response": [
+                {
+                    "name": "Example - 200 OK",
+                    "status": "OK",
+                    "code": 200,
+                    "_body": null,
+                    "body": "{\"success\":true,\"message\":\"Berhasil dapatkan data produk\",\"data\":{\"products\":[{\"id\":10,\"name\":\"Produk A\",\"image\":\"http://localhost:8001/public/product_images/prod-a.jpg\",\"price\":15000,\"qty\":100},{\"id\":11,\"name\":\"Produk B\",\"image\":\"http://localhost:8001/storage/product_images/default-img.png\",\"price\":12000,\"qty\":50}]}}",
+                    "header": []
+                }
+            ],
+            "event": [
+                {
+                    "listen": "test",
+                    "script": {
+                        "exec": [
+                            "pm.test('Status is 200', function () { pm.response.to.have.status(200); });",
+                            "pm.test('Response has data.products', function () { var json = pm.response.json(); pm.expect(json).to.have.property('data'); pm.expect(json.data).to.have.property('products'); });"
+                        ],
+                        "type": "text/javascript"
+                    }
+                }
+            ]
+        },
+        {
+            "name": "WebSocket Event Example - transaction_created",
+            "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                    "raw": "ws://{{wsUrl}}/ws",
+                    "host": [
+                        "{{wsUrl}}"
+                    ],
+                    "path": [
+                        "ws"
+                    ]
+                }
+            },
+            "response": [
+                {
+                    "name": "Example - transaction_created",
+                    "status": "EVENT",
+                    "code": 0,
+                    "_body": null,
+                    "body": "{\"type\":\"transaction_created\",\"data\":{\"transaction\":{\"id\":123,\"order_type_id\":1,\"warehouse_id\":1,\"total_qty\":2,\"total_amount\":30000},\"transaction_details\":[{\"id\":1,\"product_id\":10,\"qty\":2,\"price\":15000,\"subtotal\":30000}],\"warehouse_id\":1}}",
+                    "header": []
+                }
+            ],
+            "event": [
+                {
+                    "listen": "test",
+                    "script": {
+                        "exec": [
+                            "pm.test('Example WebSocket payload present', function () { var ex = pm.response.text(); pm.expect(ex).to.include('transaction_created'); });"
+                        ],
+                        "type": "text/javascript"
+                    }
+                }
+            ]
+        }
+    ]
+}

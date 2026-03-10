@@ -1,0 +1,81 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <title>Socket.IO Test</title>
+  <style>
+    body { font-family: Arial, sans-serif; padding: 20px }
+    #log { white-space: pre-wrap; border: 1px solid #ddd; padding: 10px; height: 300px; overflow: auto }
+  </style>
+</head>
+<body>
+  <h3>Socket.IO client test</h3>
+  <label>Server URL: <input id="url" value="http://localhost:8001" style="width:220px"/></label>
+  <button id="connect">Connect</button>
+  <button id="disconnect">Disconnect</button>
+  <p>
+    Listening for event: <code>transaction_created</code>
+  </p>
+  <div id="log"></div>
+
+  <script src="https://cdn.socket.io/4.6.1/socket.io.min.js"></script>
+  <script>
+    const logEl = document.getElementById('log')
+    const urlEl = document.getElementById('url')
+    let socket = null
+
+    function log(msg) {
+      const t = new Date().toISOString()
+      logEl.textContent = `[${t}] ${msg}\n` + logEl.textContent
+    }
+
+    document.getElementById('connect').addEventListener('click', () => {
+      if (socket && socket.connected) {
+        log('Already connected')
+        return
+      }
+      const url = urlEl.value.trim()
+      // default path is /socket.io which matches backend mount
+      // Prefer polling first to avoid environments where websocket handshake fails.
+      socket = io(url, {
+        path: '/socket.io',
+        transports: ['polling', 'websocket'],
+        withCredentials: true,
+        reconnectionAttempts: 3,
+        timeout: 5000
+      })
+
+      socket.on('connect', () => {
+        log('connected, id=' + socket.id)
+      })
+
+      socket.on('disconnect', (reason) => {
+        log('disconnected: ' + reason)
+      })
+
+      socket.on('connect_error', (err) => {
+        log('connect_error: ' + err)
+      })
+
+      socket.on('transaction_created', (payload) => {
+        try {
+          const s = typeof payload === 'object' ? JSON.stringify(payload, null, 2) : String(payload)
+          log('transaction_created:\n' + s)
+        } catch (e) { log('payload error: ' + e) }
+      })
+
+      // generic message event
+      socket.on('message', (payload) => {
+        log('message: ' + JSON.stringify(payload))
+      })
+    })
+
+    document.getElementById('disconnect').addEventListener('click', () => {
+      if (!socket) return
+      socket.disconnect()
+      socket = null
+      log('manual disconnect')
+    })
+  </script>
+</body>
+</html>

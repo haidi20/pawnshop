@@ -1,0 +1,25 @@
+.env
+.codex/*
+!.codex/config.toml
+*.exe
+
+# Dependency Management
+node_modules/
+.npm
+.yarn
+
+# Logs and Data
+*.log
+*.sqlite
+/tmp
+coverage
+coverage.out
+storage/logs/*.bak
+
+# Operating System Files
+.DS_Store
+Thumbs.db
+
+# Build Artifacts
+/dist
+/build

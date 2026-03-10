@@ -1,0 +1,553 @@
+basePath: /api/v1
+definitions:
+  controller.GetPendingTransactionsErrorResponse:
+    properties:
+      data:
+        $ref: '#/definitions/controller.getPendingTransactionsErrorData'
+      message:
+        example: error message description
+        type: string
+      success:
+        example: false
+        type: boolean
+    type: object
+  controller.GetPendingTransactionsResponse:
+    properties:
+      data:
+        $ref: '#/definitions/controller.getPendingTransactionsData'
+      message:
+        type: string
+      success:
+        type: boolean
+    type: object
+  controller.GetProductsByWarehouseErrorResponse:
+    properties:
+      message:
+        example: error message description
+        type: string
+      success:
+        example: false
+        type: boolean
+    type: object
+  controller.GetProductsByWarehouseResponse:
+    properties:
+      data:
+        $ref: '#/definitions/controller.getProductsByWarehouseData'
+      message:
+        type: string
+      success:
+        type: boolean
+    type: object
+  controller.GetWarehouseActiveErrorResponse:
+    properties:
+      data:
+        $ref: '#/definitions/controller.getWarehouseActiveErrorData'
+      message:
+        example: error message description
+        type: string
+      success:
+        example: false
+        type: boolean
+    type: object
+  controller.GetWarehouseActiveResponse:
+    properties:
+      data:
+        $ref: '#/definitions/controller.getWarehouseActiveData'
+      message:
+        type: string
+      success:
+        type: boolean
+    type: object
+  controller.ProductResponse:
+    properties:
+      alert_quantity:
+        type: number
+      barcode_symbology:
+        type: string
+      business_id:
+        type: integer
+      category_id:
+        type: integer
+      code:
+        type: string
+      cost:
+        type: number
+      created_at:
+        type: string
+      id:
+        type: integer
+      image:
+        type: string
+      is_active:
+        type: boolean
+      is_diff_price:
+        type: boolean
+      name:
+        type: string
+      price:
+        type: number
+      product_details:
+        type: string
+      qty:
+        type: number
+      slug:
+        type: string
+      type:
+        type: string
+      unit_id:
+        type: integer
+      updated_at:
+        type: string
+    type: object
+  controller.StoreTransactionErrorResponse:
+    properties:
+      data:
+        $ref: '#/definitions/controller.storeTransactionErrorData'
+      message:
+        example: error message description
+        type: string
+      success:
+        example: false
+        type: boolean
+    type: object
+  controller.StoreTransactionResponse:
+    properties:
+      data:
+        $ref: '#/definitions/controller.storeTransactionData'
+      message:
+        type: string
+      success:
+        type: boolean
+    type: object
+  controller.getPendingTransactionsData:
+    properties:
+      transactions:
+        items:
+          $ref: '#/definitions/model.Transaction'
+        type: array
+    type: object
+  controller.getPendingTransactionsErrorData:
+    properties:
+      transactions:
+        items:
+          $ref: '#/definitions/model.Transaction'
+        type: array
+    type: object
+  controller.getProductsByWarehouseData:
+    properties:
+      products:
+        items:
+          $ref: '#/definitions/controller.ProductResponse'
+        type: array
+      warehouse:
+        $ref: '#/definitions/model.Warehouse'
+    type: object
+  controller.getWarehouseActiveData:
+    properties:
+      warehouses:
+        items:
+          $ref: '#/definitions/model.Warehouse'
+        type: array
+    type: object
+  controller.getWarehouseActiveErrorData:
+    properties:
+      warehouses:
+        items:
+          $ref: '#/definitions/model.Warehouse'
+        type: array
+    type: object
+  controller.storeTransactionData:
+    properties:
+      transaction:
+        $ref: '#/definitions/model.Transaction'
+      transaction_details:
+        items:
+          $ref: '#/definitions/model.StoreTransactionDetailRequest'
+        type: array
+    type: object
+  controller.storeTransactionErrorData:
+    properties:
+      transaction:
+        $ref: '#/definitions/model.Transaction'
+      transaction_details:
+        items:
+          $ref: '#/definitions/model.StoreTransactionDetailRequest'
+        type: array
+    type: object
+  model.Product:
+    properties:
+      alert_quantity:
+        type: number
+      barcode_symbology:
+        type: string
+      business_id:
+        type: integer
+      category_id:
+        type: integer
+      code:
+        type: string
+      cost:
+        type: number
+      created_at:
+        type: string
+      deleted_at:
+        type: string
+      id:
+        type: integer
+      image:
+        type: string
+      is_active:
+        type: boolean
+      is_diff_price:
+        type: boolean
+      name:
+        type: string
+      price:
+        type: number
+      product_details:
+        type: string
+      qty:
+        type: number
+      slug:
+        type: string
+      type:
+        type: string
+      unit_id:
+        type: integer
+      updated_at:
+        type: string
+    type: object
+  model.StoreTransactionDetailRequest:
+    properties:
+      product_id:
+        example: 1
+        type: integer
+      product_price:
+        example: 15000
+        type: integer
+      qty:
+        example: 2
+        type: integer
+      user_id:
+        example: 1
+        type: integer
+    type: object
+  model.StoreTransactionRequest:
+    properties:
+      category_order:
+        example: Dine In
+        type: string
+      notes:
+        example: Jangan pedas, kurangi es
+        type: string
+      order_type_id:
+        example: 1
+        type: integer
+      transaction_details:
+        items:
+          $ref: '#/definitions/model.StoreTransactionDetailRequest'
+        type: array
+      user_id:
+        example: 1
+        type: integer
+      warehouse_id:
+        example: 1
+        type: integer
+    type: object
+  model.Transaction:
+    properties:
+      category_order:
+        description: string + nullable
+        type: string
+      change_money:
+        description: bigInteger + default 0
+        type: integer
+      created_at:
+        type: string
+      date:
+        description: date
+        type: string
+      deleted_at:
+        description: Soft Deletes & Timestamps
+        type: string
+      id:
+        type: integer
+      notes:
+        description: text + nullable
+        type: string
+      order_type_id:
+        description: unsignedBigInteger
+        type: integer
+      paid_amount:
+        description: bigInteger + nullable
+        type: integer
+      payment_method:
+        description: string + nullable
+        type: string
+      sequence_number:
+        description: bigInteger + nullable
+        type: integer
+      shift_id:
+        description: unsignedBigInteger + nullable
+        type: integer
+      status:
+        description: string
+        type: string
+      total_amount:
+        description: bigInteger
+        type: integer
+      total_qty:
+        description: bigInteger
+        type: integer
+      updated_at:
+        type: string
+      user_id:
+        description: unsignedBigInteger
+        type: integer
+      warehouse_id:
+        description: unsignedBigInteger
+        type: integer
+    type: object
+  model.Warehouse:
+    properties:
+      address:
+        type: string
+      business_id:
+        type: integer
+      created_at:
+        type: string
+      deleted_at:
+        type: string
+      id:
+        type: integer
+      is_active:
+        type: boolean
+      logo:
+        type: string
+      name:
+        type: string
+      updated_at:
+        type: string
+    type: object
+host: localhost:8001
+info:
+  contact:
+    email: support@pawnshop.com
+    name: API Support
+  description: API untuk sistem Point of Sale (POS) pawnshop
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+  termsOfService: http://swagger.io/terms/
+  title: pawnshop
+  version: "2.0"
+paths:
+  /products:
+    get:
+      consumes:
+      - application/json
+      description: Mengembalikan daftar produk yang tersedia di warehouse (opsional
+        filter `warehouse_id`)
+      parameters:
+      - description: Warehouse ID
+        in: query
+        name: warehouse_id
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/controller.GetProductsByWarehouseResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/controller.GetProductsByWarehouseErrorResponse'
+      summary: Get products by warehouse
+      tags:
+      - Product
+    post:
+      consumes:
+      - application/json
+      description: Jika `:id` diberikan maka lakukan update, jika tidak maka buat
+        baru.
+      parameters:
+      - description: Product payload
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/model.Product'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/controller.ProductResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/controller.GetProductsByWarehouseErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/controller.GetProductsByWarehouseErrorResponse'
+      summary: Simpan produk (create or update)
+      tags:
+      - Product
+  /products/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Menghapus produk (soft delete) berdasarkan ID
+      parameters:
+      - description: Product ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/controller.GetProductsByWarehouseErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/controller.GetProductsByWarehouseErrorResponse'
+      summary: Hapus produk
+      tags:
+      - Product
+    post:
+      consumes:
+      - application/json
+      description: Jika `:id` diberikan maka lakukan update, jika tidak maka buat
+        baru.
+      parameters:
+      - description: Product ID
+        in: path
+        name: id
+        type: integer
+      - description: Product payload
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/model.Product'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/controller.ProductResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/controller.GetProductsByWarehouseErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/controller.GetProductsByWarehouseErrorResponse'
+      summary: Simpan produk (create or update)
+      tags:
+      - Product
+  /transactions:
+    get:
+      consumes:
+      - application/json
+      description: Mendapatkan daftar transaksi dengan status pending berdasarkan
+        warehouse ID
+      parameters:
+      - description: Warehouse ID
+        in: query
+        name: warehouse_id
+        required: true
+        type: integer
+      - description: Transaction status filter (e.g. pending)
+        in: query
+        name: status
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 'data: array of transactions'
+          schema:
+            $ref: '#/definitions/controller.GetPendingTransactionsResponse'
+        "400":
+          description: 'error: warehouse_id invalid (transactions=[])'
+          schema:
+            $ref: '#/definitions/controller.GetPendingTransactionsErrorResponse'
+        "500":
+          description: 'error: internal server error (transactions=[])'
+          schema:
+            $ref: '#/definitions/controller.GetPendingTransactionsErrorResponse'
+      summary: Get transactions
+      tags:
+      - Transaction
+    post:
+      consumes:
+      - application/json
+      description: Membuat transaksi baru dan memicu update WebSocket
+      parameters:
+      - description: Data transaksi
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/model.StoreTransactionRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: 'message: success, data: full object'
+          schema:
+            $ref: '#/definitions/controller.StoreTransactionResponse'
+        "400":
+          description: 'error: bad request (transaction={}, details=[])'
+          schema:
+            $ref: '#/definitions/controller.StoreTransactionErrorResponse'
+        "500":
+          description: 'error: internal server error (transaction={}, details=[])'
+          schema:
+            $ref: '#/definitions/controller.StoreTransactionErrorResponse'
+      summary: Buat data baru transaksi
+      tags:
+      - Transaction
+  /warehouses:
+    get:
+      consumes:
+      - application/json
+      description: Mendapatkan daftar warehouse yang `is_active = true` dan memiliki
+        setidaknya satu shift
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/controller.GetWarehouseActiveResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/controller.GetWarehouseActiveErrorResponse'
+      summary: Get active warehouses that have shifts
+      tags:
+      - Warehouse
+securityDefinitions:
+  BearerAuth:
+    description: Type "Bearer" followed by a space and JWT token.
+    in: header
+    name: Authorization
+    type: apiKey
+swagger: "2.0"

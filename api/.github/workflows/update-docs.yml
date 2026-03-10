@@ -1,0 +1,58 @@
+name: Regenerate Swagger Docs
+
+on:
+  push:
+    branches: [ master ]
+  workflow_dispatch:
+
+jobs:
+  regen-swagger:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: true
+
+      - name: Set up Go
+        uses: actions/setup-go@v4
+        with:
+          go-version: '1.20'
+
+      - name: Install swag
+        run: |
+          go env -w GOPROXY=https://proxy.golang.org
+          go install github.com/swaggo/swag/cmd/swag@latest
+
+      - name: Regenerate swagger
+        run: swag init -g main.go -o docs
+
+      - name: Sync Postman examples from swagger (if possible)
+        run: |
+          python3 scripts/sync_postman_from_swagger.py || python scripts/sync_postman_from_swagger.py || echo "sync script failed"
+
+      - name: Commit and push docs and postman if changed
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add docs postman || true
+          git add docs/swagger.json docs/swagger.yaml postman/pawnshop.postman_collection.json || true
+          if ! git diff --staged --quiet; then
+            git commit -m "chore(docs): regenerate swagger and sync postman examples [skip ci]" || echo "no commit"
+            git push
+          else
+            echo "No changes to docs or postman"
+          fi
+
+      - name: Commit and push docs if changed
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add docs || true
+          git add docs/swagger.json docs/swagger.yaml || true
+          if ! git diff --staged --quiet; then
+            git commit -m "chore(docs): regenerate swagger docs [skip ci]" || echo "no commit"
+            git push
+          else
+            echo "No changes to docs"
+          fi

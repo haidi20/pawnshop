@@ -1,0 +1,109 @@
+{
+    "annotations": {
+        "list": []
+    },
+    "editable": true,
+    "gnetId": null,
+    "graphTooltip": 0,
+    "id": null,
+    "links": [],
+    "panels": [
+        {
+            "type": "stat",
+            "title": "Goroutines",
+            "datasource": null,
+            "targets": [
+                {
+                    "expr": "go_goroutines",
+                    "refId": "A"
+                }
+            ],
+            "gridPos": {
+                "x": 0,
+                "y": 0,
+                "w": 6,
+                "h": 4
+            }
+        },
+        {
+            "type": "timeseries",
+            "title": "CPU (process)",
+            "targets": [
+                {
+                    "expr": "process_cpu_seconds_total",
+                    "refId": "A"
+                }
+            ],
+            "gridPos": {
+                "x": 6,
+                "y": 0,
+                "w": 6,
+                "h": 4
+            }
+        },
+        {
+            "type": "timeseries",
+            "title": "Heap Alloc (bytes)",
+            "targets": [
+                {
+                    "expr": "go_memstats_heap_alloc_bytes",
+                    "refId": "A"
+                }
+            ],
+            "gridPos": {
+                "x": 0,
+                "y": 4,
+                "w": 6,
+                "h": 4
+            }
+        },
+        {
+            "type": "timeseries",
+            "title": "HTTP Requests (total)",
+            "targets": [
+                {
+                    "expr": "sum(rate(http_requests_total[1m])) by (path)",
+                    "refId": "A"
+                }
+            ],
+            "gridPos": {
+                "x": 6,
+                "y": 4,
+                "w": 6,
+                "h": 4
+            }
+        },
+        {
+            "type": "stat",
+            "title": "Socket.IO Clients",
+            "targets": [
+                {
+                    "expr": "socketio_connected_clients",
+                    "refId": "A"
+                }
+            ],
+            "gridPos": {
+                "x": 0,
+                "y": 8,
+                "w": 6,
+                "h": 4
+            }
+        }
+    ],
+    "refresh": "5s",
+    "schemaVersion": 27,
+    "style": "dark",
+    "tags": [],
+    "templating": {
+        "list": []
+    },
+    "time": {
+        "from": "now-5m",
+        "to": "now"
+    },
+    "timepicker": {},
+    "timezone": "browser",
+    "title": "pawnshop Monitoring",
+    "uid": null,
+    "version": 1
+}

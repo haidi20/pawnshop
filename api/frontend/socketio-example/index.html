@@ -1,0 +1,93 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <title>Vue 3 Socket.IO Example</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <style>
+    body { font-family: Arial, sans-serif; padding: 20px }
+    #app { max-width: 800px }
+    .log { white-space: pre-wrap; background:#f7f7f7; padding:10px; border:1px solid #eee; height:240px; overflow:auto }
+    .controls { margin-bottom: 8px }
+  </style>
+</head>
+<body>
+  <div id="app">
+    <h2>Vue 3 + Socket.IO client</h2>
+    <div class="controls">
+      <label>Server URL: <input v-model="serverUrl" style="width:240px" /></label>
+      <button @click="connect" :disabled="connected">Connect</button>
+      <button @click="disconnect" :disabled="!connected">Disconnect</button>
+    </div>
+
+    <div>
+      <strong>Connected:</strong> {{ connected }} | <strong>ID:</strong> {{ socketId }}
+    </div>
+
+    <h4>Events</h4>
+    <div class="log">{{ log }}</div>
+  </div>
+
+  <!-- Vue 3 (CDN) -->
+  <script src="https://unpkg.com/vue@3/dist/vue.global.prod.js"></script>
+  <!-- socket.io-client (CDN) -->
+  <script src="https://cdn.socket.io/4.6.1/socket.io.min.js"></script>
+  <script>
+    const { createApp, ref } = Vue
+
+    createApp({
+      setup() {
+        const serverUrl = ref('http://localhost:8001')
+        const connected = ref(false)
+        const socketId = ref('')
+        const log = ref('')
+        let socket = null
+
+        function append(msg) {
+          const time = new Date().toISOString()
+          log.value = `[${time}] ${msg}\n` + log.value
+        }
+
+        function connect() {
+          if (socket && socket.connected) return
+          // prefer polling first to avoid immediate websocket handshake failures
+          socket = io(serverUrl.value, { path: '/socket.io', transports: ['polling','websocket'], withCredentials: true, reconnectionAttempts: 3, timeout: 5000 })
+
+          socket.on('connect', () => {
+            connected.value = true
+            socketId.value = socket.id
+            append('connected id=' + socket.id)
+          })
+
+          socket.on('disconnect', (reason) => {
+            connected.value = false
+            append('disconnected: ' + reason)
+          })
+
+          socket.on('connect_error', (err) => {
+            append('connect_error: ' + err)
+          })
+
+          socket.on('transaction_created', (payload) => {
+            append('transaction_created:\n' + JSON.stringify(payload, null, 2))
+          })
+
+          socket.on('message', (payload) => {
+            append('message: ' + JSON.stringify(payload))
+          })
+        }
+
+        function disconnect() {
+          if (!socket) return
+          socket.disconnect()
+          socket = null
+          connected.value = false
+          socketId.value = ''
+        }
+
+        return { serverUrl, connected, socketId, log, connect, disconnect }
+      }
+    }).mount('#app')
+  </script>
+</body>
+</html>

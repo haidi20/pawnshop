@@ -1,0 +1,12 @@
+jika di vue muncul error not found module, maka solusinya disable vetur nyalakan volar.
+https://stackoverflow.com/a/71461358
+
+# konsesp mvvm
+- relasi secara vertical
+- View/Component→VM/Store→UseCase→Repository→Data Source
+    - VM/Store: Memanggil UseCase untuk mendapatkan data.
+    - UseCase: Menjalankan logika bisnis (misalnya, validasi input, pemrosesan data sederhana).
+    - Repository: Mengambil atau menyimpan data ke Remote/Local Data Source (lapisan API, database lokal, dll.).
+- relasi secara horizontal
+    - View/Component->VM/StoreA->service->VM/StoreB
+    - VM/StoreA memanggil service yang ada di VM/StoreB untuk mendapatkan data dari VM/StoreB.

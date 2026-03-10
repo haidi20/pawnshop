@@ -1,0 +1,40 @@
+{
+  "extends": "@vue/tsconfig/tsconfig.json",
+  "compilerOptions": {
+    "ignoreDeprecations": "6.0",
+    "composite": true,
+    "tsBuildInfoFile": "./node_modules/.tmp/tsconfig.app.tsbuildinfo",
+
+    // PERBAIKAN PENTING UNTUK 'import.meta':
+    // Menggunakan NodeNext memastikan TypeScript mengizinkan sintaks modern
+    // "module": "NodeNext",
+    // "moduleResolution": "NodeNext",
+    // "allowImportingTsExtensions": true,
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+
+    "jsx": "preserve",
+    // Opsi 'jsx' diatur ke 'preserve' karena Vue SFC mungkin memerlukan rendering via TS/JSX,
+    // tetapi hanya untuk file .vue, bukan .tsx terpisah.
+
+    "baseUrl": ".",
+    "paths": {
+      // Alias yang sudah ada
+      "@/*": ["./src/*"],
+      // Alias eksplisit untuk arsitektur Core-Features Anda
+      "@core/*": ["./src/core/*"],
+      "@feature/*": ["./src/feature/*"]
+    }
+  },
+  // MENGHAPUS .tsx: Memastikan compiler hanya melihat file Vue dan TypeScript murni
+  "include": [
+    "src/**/*.ts",
+    "src/**/*.vue",
+    "src/**/*.css",
+    "src/**/*.scss",
+    "src/env.d.ts",
+    "src/types/*.d.ts"
+  ],
+
+  "exclude": ["node_modules"]
+}
