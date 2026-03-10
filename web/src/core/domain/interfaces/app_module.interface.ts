@@ -2,6 +2,14 @@ export type AppModuleStatus = 'foundation_ready' | 'in_progress' | 'planned';
 
 export type AppModuleEntityRole = 'primary' | 'child' | 'support';
 
+export interface AppNavigationItem {
+    key: string;
+    label: string;
+    route: string;
+    icon: string;
+    caption: string;
+}
+
 export interface AppModuleEntityBlueprint {
     key: string;
     label: string;

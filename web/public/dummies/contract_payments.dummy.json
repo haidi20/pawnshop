@@ -3,24 +3,48 @@
     "id": 1,
     "contract_id": 1,
     "payment_type": "interest_payment",
-    "payment_reference": "PMT-20260310-001",
-    "amount": 250000,
-    "payment_date": "2026-02-19 11:00:00",
-    "notes": "Catatan contoh untuk Contract Payments 1.",
+    "payment_reference": "PMT-20260301-001",
+    "amount": 210000,
+    "payment_date": "2026-03-01 09:00:00",
+    "notes": "Pembayaran bunga periode pertama.",
     "created_by_user_id": 1,
-    "created_at": "2026-02-19 09:00:00",
-    "updated_at": "2026-02-19 09:00:00"
+    "created_at": "2026-03-01 09:00:00",
+    "updated_at": "2026-03-01 09:00:00"
   },
   {
     "id": 2,
     "contract_id": 2,
     "payment_type": "partial_payment",
-    "payment_reference": "PMT-20260309-002",
-    "amount": 500000,
-    "payment_date": "2026-02-18 11:00:00",
-    "notes": null,
+    "payment_reference": "PMT-20260304-002",
+    "amount": 450000,
+    "payment_date": "2026-03-04 13:30:00",
+    "notes": "Pembayaran sebagian pokok pinjaman.",
     "created_by_user_id": 2,
-    "created_at": "2026-02-18 09:00:00",
-    "updated_at": "2026-02-18 09:00:00"
+    "created_at": "2026-03-04 13:30:00",
+    "updated_at": "2026-03-04 13:30:00"
+  },
+  {
+    "id": 3,
+    "contract_id": 1,
+    "payment_type": "interest_payment",
+    "payment_reference": "PMT-20260307-003",
+    "amount": 280000,
+    "payment_date": "2026-03-07 10:15:00",
+    "notes": "Pembayaran bunga lanjutan.",
+    "created_by_user_id": 1,
+    "created_at": "2026-03-07 10:15:00",
+    "updated_at": "2026-03-07 10:15:00"
+  },
+  {
+    "id": 4,
+    "contract_id": 2,
+    "payment_type": "full_payment",
+    "payment_reference": "PMT-20260310-004",
+    "amount": 650000,
+    "payment_date": "2026-03-10 15:40:00",
+    "notes": "Pelunasan kontrak aktif.",
+    "created_by_user_id": 2,
+    "created_at": "2026-03-10 15:40:00",
+    "updated_at": "2026-03-10 15:40:00"
   }
 ]

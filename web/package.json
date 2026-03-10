@@ -5,6 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
+    "watch": "vite",
     "dev:local": "vite --mode dev-local",
     "dev:local-public": "vite --host --mode dev-local-public",
     "dev:dev": "vite --mode dev",

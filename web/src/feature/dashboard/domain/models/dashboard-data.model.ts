@@ -1,18 +1,39 @@
-import type { DashboardModuleModel } from '@feature/dashboard/domain/models/dashboard-module.model';
-
-export interface DashboardDataModel {
-    modules: DashboardModuleModel[];
-    totalModules: number;
-    totalPrimaryTables: number;
-    totalChildResources: number;
+export interface DashboardChartItemModel {
+    key: string;
+    label: string;
+    count: number;
 }
 
-export const createDashboardDataModel = (modules: DashboardModuleModel[]): DashboardDataModel => ({
-    modules,
-    totalModules: modules.length,
-    totalPrimaryTables: modules.reduce(
-        (total, module) => total + module.entities.filter((entity) => entity.role === 'primary').length,
-        0
-    ),
-    totalChildResources: modules.reduce((total, module) => total + module.childResources.length, 0)
+export interface DashboardRecentTransactionModel {
+    key: string;
+    type: 'Pembayaran' | 'Perpanjangan' | 'Lelang';
+    reference: string;
+    contractId: number;
+    amount: number;
+    transactionDate: string;
+    description: string;
+}
+
+export interface DashboardLinePointModel {
+    key: string;
+    type: 'Pembayaran' | 'Perpanjangan' | 'Lelang';
+    label: string;
+    amount: number;
+    transactionDate: string;
+}
+
+export interface DashboardDataModel {
+    chartItems: DashboardChartItemModel[];
+    lineSeries: DashboardLinePointModel[];
+    recentTransactions: DashboardRecentTransactionModel[];
+}
+
+export const createDashboardDataModel = (params: {
+    chartItems: DashboardChartItemModel[];
+    lineSeries: DashboardLinePointModel[];
+    recentTransactions: DashboardRecentTransactionModel[];
+}): DashboardDataModel => ({
+    chartItems: params.chartItems,
+    lineSeries: params.lineSeries,
+    recentTransactions: params.recentTransactions
 });

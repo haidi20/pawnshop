@@ -1,0 +1,22 @@
+.feature-data-page {
+    display: grid;
+    gap: 24px;
+}
+
+.feature-data-page__tables {
+    display: grid;
+    gap: 24px;
+}
+
+.feature-data-page__table-section {
+    display: grid;
+    gap: 14px;
+}
+
+.feature-data-page__table-head {
+    margin-bottom: 2px;
+}
+
+.feature-data-page__table-meta {
+    min-width: 0;
+}

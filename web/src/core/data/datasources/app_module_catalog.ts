@@ -1,4 +1,14 @@
-import type { AppModuleSummary } from '@core/domain/interfaces/app_module.interface';
+import type { AppModuleSummary, AppNavigationItem } from '@core/domain/interfaces/app_module.interface';
+
+export const appNavigationItems: AppNavigationItem[] = [
+    {
+        key: 'dashboard',
+        label: 'Dashboard',
+        route: '/dashboard',
+        icon: 'bi-grid-1x2-fill',
+        caption: 'Ringkasan data & transaksi'
+    }
+];
 
 export const appModules: AppModuleSummary[] = [
     {
@@ -469,6 +479,8 @@ export const appModules: AppModuleSummary[] = [
 
 export const getAppModules = (): AppModuleSummary[] => appModules;
 
+export const getAppNavigationItems = (): AppNavigationItem[] => appNavigationItems;
+
 export const getAppModuleByKey = (key: string): AppModuleSummary => {
     const module = appModules.find((item) => item.key === key);
     if (!module) {
@@ -479,3 +491,6 @@ export const getAppModuleByKey = (key: string): AppModuleSummary => {
 
 export const getAppModuleByRoute = (path: string): AppModuleSummary | undefined =>
     appModules.find((item) => path === item.route || path.startsWith(`${item.route}/`));
+
+export const getAppNavigationItemByRoute = (path: string): AppNavigationItem | undefined =>
+    appNavigationItems.find((item) => path === item.route || path.startsWith(`${item.route}/`));
