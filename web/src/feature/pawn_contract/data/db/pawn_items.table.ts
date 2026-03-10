@@ -1,4 +1,6 @@
 import { createFeatureDbTable } from '@core/data/datasources/db/feature_db.types';
+import type { PawnItemLocationStatusModel } from '@core/util/helpers';
+import type { PawnItemSpecificationModel } from '@feature/pawn_contract/domain/models';
 
 export interface PawnItemsRow {
     id: number;
@@ -16,9 +18,9 @@ export interface PawnItemsRow {
     disbursed_value: number;
     condition_notes: string | null;
     missing_notes: string | null;
-    specification_json: Record<string, unknown> | null;
+    specification_json: PawnItemSpecificationModel | null;
     current_location_id: number | null;
-    current_location_status: string;
+    current_location_status: PawnItemLocationStatusModel;
     created_at: string | null;
     updated_at: string | null;
 }

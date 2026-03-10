@@ -1,5 +1,14 @@
-// D:\projects\web\tsconfig.json
 {
+  "compilerOptions": {
+    "baseUrl": ".",
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "paths": {
+      "@/*": ["./src/*"],
+      "@core/*": ["./src/core/*"],
+      "@feature/*": ["./src/feature/*"]
+    }
+  },
   "files": [],
   "references": [
     {

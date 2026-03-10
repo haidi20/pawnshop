@@ -8,8 +8,10 @@ export interface IPawnContractState {
     error: Ref<string | null>;
 }
 
-export const pawnContractState = (): IPawnContractState => ({
+export const createPawnContractState = (): IPawnContractState => ({
     data: ref(null),
     isLoading: ref(false),
     error: ref(null)
 });
+
+export const pawnContractState = createPawnContractState;

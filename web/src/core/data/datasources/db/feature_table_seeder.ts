@@ -1,8 +1,14 @@
-import { FeatureTableDao } from '@core/data/datasources/db/feature_table.dao';
+interface SeedableFeatureTableDao {
+    seedIfEmpty(): Promise<boolean>;
+    getTable(): {
+        tableName: string;
+        seedPath?: string;
+    };
+}
 
 export const seedFeatureTablesIfEmpty = async (
     featureName: string,
-    daos: Array<FeatureTableDao<any>>
+    daos: SeedableFeatureTableDao[]
 ): Promise<void> => {
     for (const dao of daos) {
         const seeded = await dao.seedIfEmpty();

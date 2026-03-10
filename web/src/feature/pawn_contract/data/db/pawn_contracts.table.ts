@@ -1,4 +1,9 @@
 import { createFeatureDbTable } from '@core/data/datasources/db/feature_db.types';
+import {
+    PawnContractPaymentOptionDaysEnum,
+    PawnContractTermDaysEnum
+} from '@core/domain/models/pawn-contract-form-enum.model';
+import type { PawnContractStatusModel } from '@core/util/helpers';
 
 export interface PawnContractsRow {
     id: number;
@@ -7,14 +12,14 @@ export interface PawnContractsRow {
     customer_id: number;
     contract_date: string;
     maturity_date: string;
-    term_days: number;
+    term_days: PawnContractTermDaysEnum;
     appraised_value: number;
     disbursed_value: number;
     storage_fee_amount: number;
     administration_fee_amount: number;
-    payment_option_days: number | null;
+    payment_option_days: PawnContractPaymentOptionDaysEnum | null;
     amount_in_words: string | null;
-    contract_status: string;
+    contract_status: PawnContractStatusModel;
     maintenance_required: number;
     maintenance_report: string | null;
     notes: string | null;

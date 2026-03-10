@@ -1,30 +1,29 @@
-import type { EnumOptionModel } from '@core/domain/models/enum-option.model';
+import type { PawnItemLocationStatusModel } from '@core/util/helpers';
+import type { PawnContractItemKindModel } from '@feature/pawn_contract/domain/models/pawn-contract-form.model';
 
-export type PawnItemLocationStatusModel =
-    | 'in_office'
-    | 'in_warehouse'
-    | 'released'
-    | 'auctioned'
-    | 'returned'
-    | 'other';
+export {
+    pawnItemLocationStatusLabelMap,
+    pawnItemLocationStatusOptions,
+    type PawnItemLocationStatusModel
+} from '@core/util/helpers';
 
-export const pawnItemLocationStatusLabelMap: Record<PawnItemLocationStatusModel, string> = {
-    in_office: 'Di kantor',
-    in_warehouse: 'Di gudang',
-    released: 'Dikeluarkan',
-    auctioned: 'Dilelang',
-    returned: 'Dikembalikan',
-    other: 'Lainnya'
-};
+export interface PawnItemSpecificationDetailValueModel {
+    first?: string;
+    second?: string;
+    third?: string;
+}
 
-export const pawnItemLocationStatusOptions: EnumOptionModel<PawnItemLocationStatusModel>[] = [
-    { value: 'in_office', label: pawnItemLocationStatusLabelMap.in_office },
-    { value: 'in_warehouse', label: pawnItemLocationStatusLabelMap.in_warehouse },
-    { value: 'released', label: pawnItemLocationStatusLabelMap.released },
-    { value: 'auctioned', label: pawnItemLocationStatusLabelMap.auctioned },
-    { value: 'returned', label: pawnItemLocationStatusLabelMap.returned },
-    { value: 'other', label: pawnItemLocationStatusLabelMap.other }
-];
+export interface PawnItemSpecificationModel {
+    customer_lookup_key?: string;
+    item_kind?: PawnContractItemKindModel | null;
+    item_detail_type?: string;
+    item_detail_values?: PawnItemSpecificationDetailValueModel;
+    prepaid_storage_periods?: number;
+    prepaid_storage_amount?: number;
+    prepaid_storage_label?: string;
+    branch_margin_rate?: number | null;
+    branch_deduction_rate?: number | null;
+}
 
 export interface PawnItemModel {
     id: number;
@@ -42,7 +41,7 @@ export interface PawnItemModel {
     disbursedValue: number;
     conditionNotes: string | null;
     missingNotes: string | null;
-    specificationJson: Record<string, unknown> | null;
+    specificationJson: PawnItemSpecificationModel | null;
     currentLocationId: number | null;
     currentLocationStatus: PawnItemLocationStatusModel;
     createdAt: string | null;

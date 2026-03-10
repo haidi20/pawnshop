@@ -33,7 +33,7 @@
     <button
       class="btn btn-primary"
       type="button"
-      @click="vm.getPawnContractData()"
+      @click="vm.loadData()"
     >
       Muat ulang
     </button>
@@ -121,7 +121,7 @@ const { data, isLoading, error } = storeToRefs(vm);
 const featureTables = useFeatureTableSections(data);
 
 onMounted(() => {
-  void vm.getPawnContractData();
+  void vm.loadData();
 });
 </script>
 

@@ -3,6 +3,6 @@ import { PawnContractRepositoryImpl } from '@feature/pawn_contract/data/reposito
 import { GetPawnContractDataUsecase } from '@feature/pawn_contract/domain/usecases/get_pawn_contract_data.usecase';
 
 const pawnContractLocalDatasource = new PawnContractLocalDatasource();
-const pawnContractRepository = new PawnContractRepositoryImpl(pawnContractLocalDatasource);
+export const pawnContractRepository = new PawnContractRepositoryImpl(pawnContractLocalDatasource);
 
 export const getPawnContractDataUsecase = new GetPawnContractDataUsecase(pawnContractRepository);

@@ -5,9 +5,10 @@ export type AppModuleEntityRole = 'primary' | 'child' | 'support';
 export interface AppNavigationItem {
     key: string;
     label: string;
-    route: string;
     icon: string;
     caption: string;
+    route?: string;
+    children?: AppNavigationItem[];
 }
 
 export interface AppModuleEntityBlueprint {

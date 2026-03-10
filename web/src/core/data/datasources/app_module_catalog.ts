@@ -7,8 +7,33 @@ export const appNavigationItems: AppNavigationItem[] = [
         route: '/dashboard',
         icon: 'bi-grid-1x2-fill',
         caption: 'Ringkasan data & transaksi'
+    },
+    {
+        key: 'gadai',
+        label: 'Gadai',
+        icon: 'bi-safe2',
+        caption: 'Kelola data gadai',
+        children: [
+            {
+                key: 'gadai-buat-data',
+                label: 'Buat Data',
+                route: '/pawn-contracts/create',
+                icon: 'bi-pencil-square',
+                caption: 'Buka formulir gadai baru'
+            },
+            {
+                key: 'gadai-lihat-data',
+                label: 'Lihat Data',
+                route: '/pawn-contracts/list',
+                icon: 'bi-table',
+                caption: 'Lihat daftar data gadai'
+            }
+        ]
     }
 ];
+
+const flattenNavigationItems = (items: AppNavigationItem[]): AppNavigationItem[] =>
+    items.flatMap((item) => (item.children?.length ? [item, ...flattenNavigationItems(item.children)] : [item]));
 
 export const appModules: AppModuleSummary[] = [
     {
@@ -493,4 +518,6 @@ export const getAppModuleByRoute = (path: string): AppModuleSummary | undefined 
     appModules.find((item) => path === item.route || path.startsWith(`${item.route}/`));
 
 export const getAppNavigationItemByRoute = (path: string): AppNavigationItem | undefined =>
-    appNavigationItems.find((item) => path === item.route || path.startsWith(`${item.route}/`));
+    flattenNavigationItems(appNavigationItems).find(
+        (item) => item.route !== undefined && (path === item.route || path.startsWith(`${item.route}/`))
+    );

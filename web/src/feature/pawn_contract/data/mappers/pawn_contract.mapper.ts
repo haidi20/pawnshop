@@ -10,11 +10,9 @@ import {
     createPawnContractDataModel,
     type PawnContractDataModel,
     type PawnContractModel,
-    type PawnContractStatusModel,
     type PawnItemAccessoryModel,
     type PawnItemIssueModel,
     type PawnItemLocationMovementModel,
-    type PawnItemLocationStatusModel,
     type PawnItemModel
 } from '@feature/pawn_contract/domain/models';
 
@@ -32,7 +30,7 @@ export const mapPawnContractRowToModel = (row: PawnContractsRow): PawnContractMo
     administrationFeeAmount: row.administration_fee_amount,
     paymentOptionDays: row.payment_option_days,
     amountInWords: row.amount_in_words,
-    contractStatus: row.contract_status as PawnContractStatusModel,
+    contractStatus: row.contract_status,
     maintenanceRequired: row.maintenance_required === 1,
     maintenanceReport: row.maintenance_report,
     notes: row.notes,
@@ -59,7 +57,7 @@ export const mapPawnItemRowToModel = (row: PawnItemsRow): PawnItemModel => ({
     missingNotes: row.missing_notes,
     specificationJson: row.specification_json,
     currentLocationId: row.current_location_id,
-    currentLocationStatus: row.current_location_status as PawnItemLocationStatusModel,
+    currentLocationStatus: row.current_location_status,
     createdAt: row.created_at,
     updatedAt: row.updated_at
 });

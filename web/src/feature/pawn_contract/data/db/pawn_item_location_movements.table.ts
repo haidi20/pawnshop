@@ -1,12 +1,13 @@
 import { createFeatureDbTable } from '@core/data/datasources/db/feature_db.types';
+import type { PawnItemLocationStatusModel } from '@core/util/helpers';
 
 export interface PawnItemLocationMovementsRow {
     id: number;
     pawn_item_id: number;
     from_location_id: number | null;
     to_location_id: number | null;
-    from_status: string | null;
-    to_status: string | null;
+    from_status: PawnItemLocationStatusModel | null;
+    to_status: PawnItemLocationStatusModel | null;
     moved_at: string;
     moved_by_user_id: number | null;
     notes: string | null;

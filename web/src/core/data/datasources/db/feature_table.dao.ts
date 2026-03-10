@@ -1,14 +1,14 @@
 import type {
     FeatureDbLookupKey,
-    FeatureDbRecord,
+    FeatureDbRecordConstraint,
     FeatureDbScalar,
     FeatureDbTableDefinition
 } from '@core/data/datasources/db/feature_db.types';
 
-const cloneRows = <TRecord extends FeatureDbRecord>(rows: TRecord[]): TRecord[] =>
+const cloneRows = <TRecord extends FeatureDbRecordConstraint<TRecord>>(rows: TRecord[]): TRecord[] =>
     JSON.parse(JSON.stringify(rows)) as TRecord[];
 
-export class FeatureTableDao<TRecord extends FeatureDbRecord> {
+export class FeatureTableDao<TRecord extends FeatureDbRecordConstraint<TRecord>> {
     private memoryRows: TRecord[] | null = null;
     private seedCache: TRecord[] | null = null;
 

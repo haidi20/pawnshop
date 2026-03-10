@@ -5,3 +5,4 @@ export * from './pawn-item-issue.model';
 export * from './pawn-item-location-movement.model';
 export * from './pawn-contract-detail.model';
 export * from './pawn-contract-data.model';
+export * from './pawn-contract-form.model';
