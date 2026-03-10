@@ -1,0 +1,494 @@
+.ps-field {
+  width: 100%;
+  border: 1.5px solid #e2e8f0;
+  border-radius: var(--radius-input);
+  background: rgba(255, 255, 255, 0.98);
+  color: var(--text-dark);
+  font-size: 0.95rem;
+  font-weight: 500;
+  transition:
+    border-color var(--transition-soft),
+    box-shadow var(--transition-soft),
+    background var(--transition-soft);
+}
+
+.ps-field:focus {
+  outline: none;
+  border-color: var(--primary-blue);
+  box-shadow: 0 0 0 0.25rem rgba(0, 94, 170, 0.14);
+}
+
+.ps-field:disabled {
+  background: #f8fafc;
+  color: var(--text-muted);
+  cursor: not-allowed;
+}
+
+.ps-datatable {
+  overflow: hidden;
+}
+
+.ps-datatable__toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 22px 24px 18px;
+  border-bottom: 1px solid rgba(217, 231, 242, 0.9);
+}
+
+.ps-datatable__toolbar-left,
+.ps-datatable__toolbar-right,
+.ps-datatable__entries {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.ps-datatable__entries {
+  flex-wrap: wrap;
+  color: var(--text-muted);
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+.ps-datatable__entries select {
+  width: 92px;
+  min-width: 92px;
+  padding: 0.55rem 0.9rem;
+}
+
+.ps-datatable__search {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: min(100%, 360px);
+  padding: 6px 8px 6px 14px;
+  border: 1.5px solid #e2e8f0;
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.98);
+  transition:
+    border-color var(--transition-soft),
+    box-shadow var(--transition-soft),
+    transform var(--transition-soft);
+}
+
+.ps-datatable__search:focus-within {
+  border-color: var(--primary-blue);
+  box-shadow: 0 0 0 0.25rem rgba(0, 94, 170, 0.12);
+  transform: translateY(-1px);
+}
+
+.ps-datatable__search-icon {
+  color: var(--primary-blue);
+  font-size: 1rem;
+}
+
+.ps-datatable__search-input {
+  flex: 1;
+  min-width: 0;
+  border: none;
+  background: transparent;
+  color: var(--text-dark);
+  font-size: 0.95rem;
+  font-weight: 500;
+}
+
+.ps-datatable__search-input:focus {
+  outline: none;
+}
+
+.ps-datatable__search-input::placeholder {
+  color: var(--text-muted);
+}
+
+.ps-datatable__search-submit {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding-inline: 16px;
+  white-space: nowrap;
+}
+
+.ps-datatable__surface {
+  position: relative;
+  padding: 18px 24px 0;
+}
+
+.ps-datatable__table-wrap {
+  position: relative;
+  overflow: auto;
+  border: 1px solid rgba(217, 231, 242, 0.95);
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.98);
+}
+
+.ps-datatable__table {
+  width: 100%;
+  margin: 0;
+  --bs-table-hover-bg: rgba(0, 94, 170, 0.04);
+}
+
+.ps-datatable__table thead th {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  padding: 16px 18px;
+  border-bottom: 1px solid rgba(217, 231, 242, 0.9);
+  background: #f8fafc;
+  color: var(--primary-blue);
+  font-size: 0.76rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.ps-datatable__table tbody td {
+  padding: 16px 18px;
+  border-color: rgba(226, 232, 240, 0.7);
+  color: var(--text-dark);
+  font-size: 0.92rem;
+  vertical-align: middle;
+}
+
+.ps-datatable__table tbody tr {
+  transition:
+    background var(--transition-soft),
+    transform var(--transition-soft);
+}
+
+.ps-datatable__table tbody tr:hover {
+  transform: translateY(-1px);
+}
+
+.ps-datatable__empty-cell {
+  padding: 0;
+}
+
+.ps-datatable__empty-state {
+  display: grid;
+  place-items: center;
+  gap: 10px;
+  min-height: 240px;
+  padding: 32px 20px;
+  color: var(--text-muted);
+  text-align: center;
+}
+
+.ps-datatable__empty-icon {
+  display: inline-grid;
+  place-items: center;
+  width: 56px;
+  height: 56px;
+  border-radius: 18px;
+  background: rgba(0, 94, 170, 0.08);
+  color: var(--primary-blue);
+  font-size: 1.35rem;
+}
+
+.ps-datatable__empty-title {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--text-dark);
+}
+
+.ps-datatable__empty-note {
+  max-width: 360px;
+  margin: 0;
+}
+
+.ps-datatable__overlay {
+  position: absolute;
+  inset: 18px 24px 0;
+  z-index: 3;
+  display: grid;
+  place-items: center;
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.78);
+  backdrop-filter: blur(6px);
+}
+
+.ps-datatable__overlay-card {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 16px 18px;
+  border: 1px solid rgba(217, 231, 242, 0.95);
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.96);
+  box-shadow: var(--shadow-card);
+}
+
+.ps-datatable__overlay-copy {
+  display: grid;
+  gap: 2px;
+  color: var(--text-muted);
+}
+
+.ps-datatable__overlay-title {
+  font-weight: 700;
+  color: var(--text-dark);
+}
+
+.ps-datatable__footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 18px 24px 24px;
+}
+
+.ps-datatable__summary {
+  color: var(--text-muted);
+  font-size: 0.88rem;
+  font-weight: 600;
+}
+
+.ps-datatable__pagination {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+.ps-datatable__page-btn {
+  min-width: 40px;
+  height: 40px;
+  padding: 0 12px;
+  border: 1px solid rgba(217, 231, 242, 0.95);
+  border-radius: 12px;
+  background: #ffffff;
+  color: var(--text-muted);
+  font-size: 0.9rem;
+  font-weight: 700;
+  transition:
+    border-color var(--transition-soft),
+    color var(--transition-soft),
+    background var(--transition-soft),
+    transform var(--transition-soft),
+    box-shadow var(--transition-soft);
+}
+
+.ps-datatable__page-btn:hover:not(:disabled) {
+  border-color: rgba(0, 94, 170, 0.28);
+  color: var(--primary-blue);
+  background: rgba(0, 94, 170, 0.06);
+  transform: translateY(-1px);
+}
+
+.ps-datatable__page-btn.is-active {
+  border-color: transparent;
+  background: linear-gradient(135deg, rgba(0, 94, 170, 0.94), rgba(6, 132, 219, 0.92));
+  color: #ffffff;
+  box-shadow: 0 14px 28px rgba(0, 94, 170, 0.18);
+}
+
+.ps-datatable__page-btn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+  box-shadow: none;
+  transform: none;
+}
+
+.ps-datatable__page-btn.is-gap {
+  pointer-events: none;
+  background: transparent;
+}
+
+.ps-select {
+  position: relative;
+}
+
+.ps-select .vs__dropdown-toggle {
+  min-height: 48px;
+  padding: 6px 14px;
+  border: 1.5px solid #e2e8f0;
+  border-radius: var(--radius-input);
+  background: rgba(255, 255, 255, 0.98);
+  transition:
+    border-color var(--transition-soft),
+    box-shadow var(--transition-soft),
+    transform var(--transition-soft);
+}
+
+.ps-select.vs--open .vs__dropdown-toggle,
+.ps-select:focus-within .vs__dropdown-toggle {
+  border-color: var(--primary-blue);
+  box-shadow: 0 0 0 0.25rem rgba(0, 94, 170, 0.12);
+  transform: translateY(-1px);
+}
+
+.ps-select .vs__selected {
+  margin: 0;
+  padding: 0;
+  color: var(--text-dark);
+  font-size: 0.95rem;
+  font-weight: 500;
+}
+
+.ps-select .vs__selected-options {
+  gap: 6px;
+  padding: 0;
+}
+
+.ps-select .vs__search,
+.ps-select .vs__search::placeholder {
+  color: var(--text-muted);
+  font-size: 0.95rem;
+  font-weight: 500;
+}
+
+.ps-select .vs__dropdown-menu {
+  margin-top: 10px;
+  padding: 8px;
+  border: 1px solid rgba(217, 231, 242, 0.95);
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.98);
+  box-shadow: var(--shadow-card);
+}
+
+.ps-select .vs__dropdown-option {
+  padding: 12px 14px;
+  border-radius: 12px;
+  color: var(--text-dark);
+  font-size: 0.92rem;
+  font-weight: 500;
+}
+
+.ps-select .vs__dropdown-option--highlight,
+.ps-select .vs__dropdown-option:hover {
+  background: rgba(0, 94, 170, 0.08);
+  color: var(--primary-blue);
+}
+
+.ps-select .vs__clear,
+.ps-select .vs__open-indicator {
+  fill: var(--text-muted);
+}
+
+.ps-select .vs__clear:hover,
+.ps-select .vs__open-indicator:hover {
+  fill: var(--primary-blue);
+}
+
+.ps-select .vs__spinner {
+  display: none;
+}
+
+.ps-select.vs--disabled .vs__dropdown-toggle {
+  background: #f8fafc;
+}
+
+.ps-select__loader {
+  position: absolute;
+  top: 50%;
+  right: 44px;
+  transform: translateY(-50%);
+  z-index: 2;
+  pointer-events: none;
+}
+
+.ps-select__message {
+  padding: 12px 10px;
+  color: var(--text-muted);
+  font-size: 0.85rem;
+  text-align: center;
+}
+
+.ps-datepicker {
+  width: 100%;
+}
+
+.ps-datepicker .dp__main,
+.ps-datepicker .dp__input_wrap,
+.ps-datepicker .dp__input_wrap input {
+  width: 100%;
+}
+
+.ps-datepicker .dp__input {
+  min-height: 48px;
+  padding: 0.82rem 1rem 0.82rem 2.8rem;
+  border: 1.5px solid #e2e8f0;
+  border-radius: var(--radius-input);
+  background: rgba(255, 255, 255, 0.98);
+  color: var(--text-dark);
+  font-size: 0.95rem;
+  font-weight: 500;
+  transition:
+    border-color var(--transition-soft),
+    box-shadow var(--transition-soft),
+    transform var(--transition-soft);
+}
+
+.ps-datepicker .dp__input:focus {
+  border-color: var(--primary-blue);
+  box-shadow: 0 0 0 0.25rem rgba(0, 94, 170, 0.12);
+  transform: translateY(-1px);
+}
+
+.ps-datepicker .dp__input::placeholder {
+  color: var(--text-muted);
+}
+
+.ps-datepicker .dp__menu {
+  border: 1px solid rgba(217, 231, 242, 0.95);
+  border-radius: 20px;
+  box-shadow: var(--shadow-card);
+}
+
+.ps-datepicker .dp__calendar_header_item,
+.ps-datepicker .dp__month_year_wrap {
+  color: var(--primary-blue);
+  font-weight: 700;
+}
+
+.ps-datepicker .dp__today {
+  border-color: rgba(0, 94, 170, 0.28);
+}
+
+.ps-datepicker .dp__active_date,
+.ps-datepicker .dp__range_start,
+.ps-datepicker .dp__range_end {
+  background: var(--primary-blue);
+  color: #ffffff;
+}
+
+.ps-datepicker .dp__action_button {
+  border-radius: 12px;
+  font-weight: 700;
+}
+
+.ps-datepicker .dp__action_button.dp__action_select {
+  background: var(--primary-blue);
+}
+
+.ps-datepicker .dp__action_button.dp__action_cancel {
+  color: var(--text-muted);
+}
+
+.ps-input-icon {
+  color: var(--primary-blue);
+}
+
+@media (max-width: 920px) {
+  .ps-datatable__toolbar,
+  .ps-datatable__footer {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .ps-datatable__toolbar-right,
+  .ps-datatable__search {
+    width: 100%;
+  }
+
+  .ps-datatable__search-submit {
+    justify-content: center;
+  }
+
+  .ps-datatable__pagination {
+    justify-content: flex-start;
+  }
+}
