@@ -16,22 +16,36 @@
       @search="onSearch"
     >
       <template #open-indicator="{ attributes }">
-        <i class="bi bi-chevron-down" v-bind="attributes" />
+        <i
+          class="bi bi-chevron-down"
+          v-bind="attributes"
+        />
       </template>
 
       <template #no-options="{ search, searching }">
         <div class="ps-select__message">
-          <template v-if="vm.loading"> Memuat data... </template>
+          <template v-if="vm.loading">
+            Memuat data...
+          </template>
           <template v-else-if="searching && search">
             Tidak ada hasil untuk "{{ search }}"
           </template>
-          <template v-else> Ketik kata kunci untuk mulai mencari. </template>
+          <template v-else>
+            Ketik kata kunci untuk mulai mencari.
+          </template>
         </div>
       </template>
     </VueSelect>
 
-    <div v-if="vm.loading" class="ps-select__loader">
-      <div class="spinner-border spinner-border-sm text-primary" role="status" aria-hidden="true" />
+    <div
+      v-if="vm.loading"
+      class="ps-select__loader"
+    >
+      <div
+        class="spinner-border spinner-border-sm text-primary"
+        role="status"
+        aria-hidden="true"
+      />
     </div>
   </div>
 </template>
@@ -108,7 +122,7 @@ onMounted(() => {
       (option) => resolvedReduce.value(option) == props.modelValue
     );
     if (!exists) {
-      props.vm.options.push({
+      props.vm.ensureOption({
         id: props.modelValue,
         [resolvedLabel.value]: props.nameVModel,
       });

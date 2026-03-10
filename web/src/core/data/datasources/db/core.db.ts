@@ -40,7 +40,9 @@ type PawnshopCollections = {
 type PawnshopDatabase = RxDatabase<PawnshopCollections>;
 
 declare global {
-    var __pawnshopRxDatabase__: Promise<PawnshopDatabase> | undefined;
+    interface GlobalThis {
+        __pawnshopRxDatabase__: Promise<PawnshopDatabase> | undefined;
+    }
 }
 
 const isIndexedDbAvailable = (): boolean =>

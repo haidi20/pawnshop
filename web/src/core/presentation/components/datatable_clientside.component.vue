@@ -4,28 +4,42 @@
       <div class="ps-datatable__toolbar-left">
         <div class="ps-datatable__entries">
           <span>Tampilkan</span>
-          <select v-model="vm.limit" class="form-select ps-field" @change="onLimitChange">
-            <option v-for="option in vmData.limitOptions" :key="option" :value="option">
+          <select
+            v-model="limitModel"
+            class="form-select ps-field"
+            @change="onLimitChange"
+          >
+            <option
+              v-for="option in vmData.limitOptions"
+              :key="option"
+              :value="option"
+            >
               {{ formatLimitOption(option) }}
             </option>
           </select>
           <span>baris</span>
         </div>
 
-        <slot name="extra-actions"></slot>
+        <slot name="extra-actions" />
       </div>
 
       <div class="ps-datatable__toolbar-right">
-        <form class="ps-datatable__search" @submit.prevent="vm.searchData()">
+        <form
+          class="ps-datatable__search"
+          @submit.prevent="vm.searchData()"
+        >
           <i class="bi bi-search ps-datatable__search-icon" />
           <input
-            v-model="vm.search"
+            v-model="searchModel"
             type="search"
             class="ps-datatable__search-input"
             :placeholder="searchPlaceholder"
             @input="vm.searchData()"
-          />
-          <button class="btn btn-primary ps-datatable__search-submit" type="submit">
+          >
+          <button
+            class="btn btn-primary ps-datatable__search-submit"
+            type="submit"
+          >
             <i class="bi bi-funnel" />
             <span>Filter</span>
           </button>
@@ -37,12 +51,22 @@
       <div class="ps-datatable__table-wrap">
         <table class="table table-hover align-middle ps-datatable__table">
           <thead v-if="hasCustomHead">
-            <slot name="head" :fields="normalizedFields"></slot>
+            <slot
+              name="head"
+              :fields="normalizedFields"
+            />
           </thead>
           <thead v-else>
             <tr>
-              <th v-for="field in normalizedFields" :key="field.key" :class="field.thClass">
-                <slot :name="`head(${field.key})`" :field="field">
+              <th
+                v-for="field in normalizedFields"
+                :key="field.key"
+                :class="field.thClass"
+              >
+                <slot
+                  :name="`head(${field.key})`"
+                  :field="field"
+                >
                   {{ field.label }}
                 </slot>
               </th>
@@ -50,12 +74,23 @@
           </thead>
 
           <tbody v-if="hasCustomBody && vmData.items.length > 0">
-            <template v-for="(item, index) in vmData.items" :key="getRowKey(item, index)">
-              <slot name="body" :item="item" :index="index" :fields="normalizedFields"></slot>
+            <template
+              v-for="(item, index) in vmData.items"
+              :key="getRowKey(item, index)"
+            >
+              <slot
+                name="body"
+                :item="item"
+                :index="index"
+                :fields="normalizedFields"
+              />
             </template>
           </tbody>
           <tbody v-else-if="vmData.items.length > 0">
-            <tr v-for="(item, index) in vmData.items" :key="getRowKey(item, index)">
+            <tr
+              v-for="(item, index) in vmData.items"
+              :key="getRowKey(item, index)"
+            >
               <td
                 v-for="field in normalizedFields"
                 :key="field.key"
@@ -76,13 +111,18 @@
           </tbody>
           <tbody v-else>
             <tr>
-              <td :colspan="Math.max(normalizedFields.length, 1)" class="ps-datatable__empty-cell">
+              <td
+                :colspan="Math.max(normalizedFields.length, 1)"
+                class="ps-datatable__empty-cell"
+              >
                 <slot name="empty">
                   <div class="ps-datatable__empty-state">
                     <span class="ps-datatable__empty-icon">
                       <i class="bi bi-folder2-open" />
                     </span>
-                    <div class="ps-datatable__empty-title">{{ emptyStateTitle }}</div>
+                    <div class="ps-datatable__empty-title">
+                      {{ emptyStateTitle }}
+                    </div>
                     <p class="ps-datatable__empty-note">
                       {{ emptyStateNote }}
                     </p>
@@ -94,11 +134,20 @@
         </table>
       </div>
 
-      <div v-if="vmData.loading" class="ps-datatable__overlay">
+      <div
+        v-if="vmData.loading"
+        class="ps-datatable__overlay"
+      >
         <div class="ps-datatable__overlay-card">
-          <div class="spinner-border text-primary" role="status" aria-hidden="true" />
+          <div
+            class="spinner-border text-primary"
+            role="status"
+            aria-hidden="true"
+          />
           <div class="ps-datatable__overlay-copy">
-            <div class="ps-datatable__overlay-title">Memproses tampilan tabel</div>
+            <div class="ps-datatable__overlay-title">
+              Memproses tampilan tabel
+            </div>
             <div>Filter lokal dan pagination sedang diperbarui.</div>
           </div>
         </div>
@@ -110,10 +159,15 @@
         <template v-if="vmData.totalItems > 0">
           Menampilkan {{ rangeStart }}-{{ rangeEnd }} dari {{ vmData.totalItems }} data
         </template>
-        <template v-else> Belum ada data yang bisa ditampilkan. </template>
+        <template v-else>
+          Belum ada data yang bisa ditampilkan.
+        </template>
       </div>
 
-      <div v-if="vmData.totalPages > 1" class="ps-datatable__pagination">
+      <div
+        v-if="vmData.totalPages > 1"
+        class="ps-datatable__pagination"
+      >
         <button
           type="button"
           class="ps-datatable__page-btn"
@@ -284,6 +338,18 @@ const emptyStateNote = computed(() =>
 const searchPlaceholder = computed(() =>
   normalizedFields.value.length > 0 ? 'Filter data secara instan...' : 'Cari data...'
 );
+const limitModel = computed({
+  get: () => vmData.value.limit,
+  set: (value: number | string) => {
+    props.vm.setLimit(Number(value));
+  },
+});
+const searchModel = computed({
+  get: () => vmData.value.search,
+  set: (value: string) => {
+    props.vm.setSearch(value);
+  },
+});
 
 const onLimitChange = () => {
   props.vm.searchData();

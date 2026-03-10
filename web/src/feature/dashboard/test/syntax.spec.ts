@@ -6,10 +6,7 @@ const dashboardKeys = Object.keys(dashboardModules).filter(k => !k.includes('/te
 
 test('dashboard feature compiles (no syntax errors)', () => {
     for (const k of dashboardKeys) {
-        // Access module to force evaluation
-        // eslint-disable-next-line @typescript-eslint/no-unused-expressions
-        // @ts-ignore
-        dashboardModules[k as keyof typeof dashboardModules];
+        void dashboardModules[k as keyof typeof dashboardModules];
     }
     expect(dashboardKeys.length).toBeGreaterThanOrEqual(0);
 });

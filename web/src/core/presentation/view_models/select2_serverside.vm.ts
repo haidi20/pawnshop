@@ -10,6 +10,7 @@ export interface Select2ServerSideVM {
     loading: boolean;
     search: (query?: string) => Promise<void>;
     onSearch: (searchQuery: string, loadingFn: (b: boolean) => void) => Promise<void>;
+    ensureOption: (option: any) => void;
 }
 
 export function createSelect2ServerSideVM(props: Select2ServerSideVMProps): Select2ServerSideVM {
@@ -38,11 +39,23 @@ export function createSelect2ServerSideVM(props: Select2ServerSideVMProps): Sele
         loadingFn(false);
     }
 
+    function ensureOption(option: any) {
+        if (!option || option.id === undefined || option.id === null) {
+            return;
+        }
+
+        const exists = state.options.some((item) => item?.id == option.id);
+        if (!exists) {
+            state.options = [...state.options, option];
+        }
+    }
+
     // Return a reactive object where computeds are automatically unwrapped
     return reactive({
         options: computed(() => state.options),
         loading: computed(() => state.loading),
         search,
-        onSearch
+        onSearch,
+        ensureOption
     }) as any as Select2ServerSideVM;
 }

@@ -6,7 +6,7 @@ const pawnTransactionRoutes: Array<RouteRecordRaw> = [
         name: 'PawnTransaction',
         component: () => import('@feature/pawn_transaction/presentation/views/pawn_transaction.view.vue'),
         meta: {
-            title: 'Pawn Transactions'
+            title: 'Transaksi Gadai'
         }
     }
 ];

@@ -17,6 +17,8 @@ export interface DataTableServerSideVM<T extends Record<string, any>> {
   totalPages: number;
   currentPage: number;
   pageNumbers: (number | string)[];
+  setLimit: (limit: number) => void;
+  setSearch: (search: string) => void;
   changePage: (page: number) => void;
   searchData: () => void;
 }
@@ -65,6 +67,15 @@ export function createDataTableServerSideVM<T extends Record<string, any>>(
     if (options.size === 0) options.add(10);
     return Array.from(options).sort((a, b) => a - b);
   });
+
+  const setLimit = (value: number) => {
+    const nextLimit = Number.isFinite(value) && value > 0 ? Math.trunc(value) : 10;
+    limit.value = nextLimit;
+  };
+
+  const setSearch = (value: string) => {
+    search.value = value;
+  };
 
   const totalPages = computed(() => Math.max(1, Math.ceil(totalItems.value / limit.value) || 1));
   const currentPage = computed(() => Math.floor(offset.value / limit.value) + 1);
@@ -119,6 +130,8 @@ export function createDataTableServerSideVM<T extends Record<string, any>>(
     totalPages: totalPages as any,
     currentPage: currentPage as any,
     pageNumbers: pageNumbers as any,
+    setLimit,
+    setSearch,
     changePage,
     searchData,
   } as DataTableServerSideVM<T>;

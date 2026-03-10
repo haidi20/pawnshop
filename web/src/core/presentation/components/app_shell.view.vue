@@ -1,9 +1,18 @@
 <template>
   <div class="admin-layout">
-    <AppSidebar :active-path="route.path" :is-open="isSidebarOpen" :items="navigationItems" @navigate="closeSidebar" />
+    <AppSidebar
+      :active-path="route.path"
+      :is-open="isSidebarOpen"
+      :items="navigationItems"
+      @navigate="closeSidebar"
+    />
 
     <div class="admin-main">
-      <button class="sidebar-toggle sidebar-toggle-floating" type="button" @click="toggleSidebar">
+      <button
+        class="sidebar-toggle sidebar-toggle-floating"
+        type="button"
+        @click="toggleSidebar"
+      >
         <i class="bi bi-list" />
       </button>
 

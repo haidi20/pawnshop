@@ -213,7 +213,7 @@ export const appModules: AppModuleSummary[] = [
     },
     {
         key: 'pawn-transaction',
-        title: 'Pawn Transactions',
+        title: 'Transaksi Gadai',
         shortTitle: 'Transactions',
         route: '/pawn-transactions',
         icon: 'bi-cash-stack',

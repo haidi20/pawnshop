@@ -1,28 +1,59 @@
 <template>
-  <section v-if="isLoading" class="card p-4">
+  <section
+    v-if="isLoading"
+    class="card p-4"
+  >
     <div class="d-flex align-items-center gap-3">
-      <div class="spinner-border text-primary" role="status" aria-hidden="true" />
+      <div
+        class="spinner-border text-primary"
+        role="status"
+        aria-hidden="true"
+      />
       <div>
-        <div class="fw-bold">Loading Master Investor</div>
-        <div class="text-secondary">Mengambil data lokal dari DAO feature.</div>
+        <div class="fw-bold">
+          Loading Master Investor
+        </div>
+        <div class="text-secondary">
+          Mengambil data lokal dari DAO feature.
+        </div>
       </div>
     </div>
   </section>
 
-  <section v-else-if="error" class="card p-4">
-    <div class="fw-bold text-danger mb-2">Feature load failed</div>
-    <p class="mb-3 text-secondary">{{ error }}</p>
-    <button class="btn btn-primary" type="button" @click="vm.getMasterInvestorData()">
+  <section
+    v-else-if="error"
+    class="card p-4"
+  >
+    <div class="fw-bold text-danger mb-2">
+      Feature load failed
+    </div>
+    <p class="mb-3 text-secondary">
+      {{ error }}
+    </p>
+    <button
+      class="btn btn-primary"
+      type="button"
+      @click="vm.getMasterInvestorData()"
+    >
       Muat ulang
     </button>
   </section>
 
-  <section v-else-if="data" class="feature-data-page">
+  <section
+    v-else-if="data"
+    class="feature-data-page"
+  >
     <div class="module-stats-grid row row-cols-1 row-cols-md-2 row-cols-xl-4 g-3">
       <article class="metric-card card col h-100">
-        <div class="metric-label">Total Rows</div>
-        <div class="metric-value">{{ data.totalRows }}</div>
-        <div class="metric-note">Seluruh row lokal yang dimuat oleh feature ini.</div>
+        <div class="metric-label">
+          Total Rows
+        </div>
+        <div class="metric-value">
+          {{ data.totalRows }}
+        </div>
+        <div class="metric-note">
+          Seluruh row lokal yang dimuat oleh feature ini.
+        </div>
       </article>
 
       <article
@@ -30,9 +61,15 @@
         :key="metric.key"
         class="metric-card card col h-100"
       >
-        <div class="metric-label">{{ metric.label }}</div>
-        <div class="metric-value">{{ metric.count }}</div>
-        <div class="metric-note">Data lokal untuk tabel {{ metric.key }}.</div>
+        <div class="metric-label">
+          {{ metric.label }}
+        </div>
+        <div class="metric-value">
+          {{ metric.count }}
+        </div>
+        <div class="metric-note">
+          Data lokal untuk tabel {{ metric.key }}.
+        </div>
       </article>
     </div>
 
@@ -44,9 +81,15 @@
       >
         <div class="feature-data-page__table-head d-flex flex-column flex-lg-row align-items-start justify-content-between gap-3">
           <div>
-            <div class="table-card-role">{{ table.entity.role }}</div>
-            <h2 class="table-card-title">{{ table.entity.label }}</h2>
-            <p class="table-card-description mb-0">{{ table.entity.description }}</p>
+            <div class="table-card-role">
+              {{ table.entity.role }}
+            </div>
+            <h2 class="table-card-title">
+              {{ table.entity.label }}
+            </h2>
+            <p class="table-card-description mb-0">
+              {{ table.entity.description }}
+            </p>
           </div>
 
           <div class="feature-data-page__table-meta d-flex flex-wrap gap-2 align-items-center">
