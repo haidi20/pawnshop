@@ -13,6 +13,7 @@ import {
 } from '@core/util/helpers';
 import { getTodayDateValue } from '@core/util/pawn-contract-form';
 import type {
+    PawnContractActionOptionModel,
     GetPawnContractAjtTableParamsModel,
     GetPawnContractIndexTabsParamsModel,
     GetPawnContractLocationTableParamsModel,
@@ -176,8 +177,13 @@ export class PawnContractIndexLocalDatasource {
                         paymentOptionDays: detail.contract.paymentOptionDays,
                         storageFeeAmount: detail.contract.storageFeeAmount
                     }),
-                    procedureTags: this.getProcedureTags({
-                        isOpenContract,
+                    processStatusLabel: this.getProcessStatusLabel({
+                        contractDate: detail.contract.contractDate,
+                        contractStatus: detail.contract.contractStatus,
+                        daysToMaturity
+                    }),
+                    availableActions: this.getAvailableActions({
+                        contractStatus: detail.contract.contractStatus,
                         daysToMaturity
                     })
                 };
@@ -508,21 +514,89 @@ export class PawnContractIndexLocalDatasource {
         }
     }
 
-    private getProcedureTags(params: {
-        isOpenContract: boolean;
+    private getProcessStatusLabel(params: {
+        contractDate: string;
+        contractStatus: PawnContractStatusModel;
         daysToMaturity: number;
-    }): string[] {
-        const tags = ['Bayar B. Titip', 'Pelunasan', 'Review'];
+    }): string {
+        if (isSameDateValue(params.contractDate, getTodayDateValue())) {
+            return 'Data Baru';
+        }
 
-        if (params.isOpenContract) {
-            tags.push('Akad Ulang', 'Perpanjangan');
+        switch (params.contractStatus) {
+            case 'extended':
+                return 'Perpanjangan';
+            case 'redeemed':
+            case 'closed':
+                return 'Pelunasan';
+            case 'auctioned':
+                return 'Lelang';
+            case 'cancelled':
+                return 'Refund';
+            default:
+                break;
         }
 
         if (params.daysToMaturity < 0) {
-            tags.push('Lelang');
+            return 'Lelang';
         }
 
-        return tags;
+        if (params.daysToMaturity <= 7) {
+            return 'Bayar B. Titip';
+        }
+
+        return 'Akad Aktif';
+    }
+
+    private getAvailableActions(params: {
+        contractStatus: PawnContractStatusModel;
+        daysToMaturity: number;
+    }): PawnContractActionOptionModel[] {
+        const actions: PawnContractActionOptionModel[] = [
+            {
+                key: 'edit',
+                label: 'Ubah Data',
+                description: 'Buka form akad untuk memperbarui data kontrak dan jaminan.'
+            },
+            {
+                key: 'history',
+                label: 'History',
+                description: 'Lihat ringkasan riwayat perubahan, jatuh tempo, dan aktivitas penting akad.'
+            }
+        ];
+
+        if (['active', 'extended'].includes(params.contractStatus)) {
+            actions.push({
+                key: 'storage_fee',
+                label: 'Bayar B. Titip',
+                description: 'Tandai tindak lanjut pembayaran biaya titip untuk akad yang masih berjalan.'
+            });
+            actions.push({
+                key: 'settlement',
+                label: 'Pelunasan',
+                description: 'Siapkan proses pelunasan jika nasabah ingin menutup akad.'
+            });
+        }
+
+        if (params.contractStatus === 'active') {
+            actions.push({
+                key: 'extension',
+                label: 'Perpanjangan',
+                description: 'Lanjutkan akad dengan proses perpanjangan atau akad ulang.'
+            });
+        }
+
+        if (params.daysToMaturity < 0 || params.contractStatus === 'auctioned') {
+            actions.push({
+                key: 'auction',
+                label: 'Lelang',
+                description: 'Tindak lanjuti akad yang sudah lewat jatuh tempo atau masuk proses lelang.'
+            });
+        }
+
+        return actions.filter(
+            (action, index, items) => items.findIndex((item) => item.key === action.key) === index
+        );
     }
 
     private getPrimaryLocationActionLabel(status: string | null): string {

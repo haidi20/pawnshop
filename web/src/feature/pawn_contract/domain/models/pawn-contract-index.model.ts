@@ -31,6 +31,19 @@ export type PawnContractAjtTypeModel =
 
 export type PawnContractSettlementTypeModel = 'lunas' | 'lelang' | 'refund';
 export type PawnContractLocationTabModel = 'kantor' | 'proses' | 'gudang';
+export type PawnContractActionKeyModel =
+    | 'edit'
+    | 'history'
+    | 'storage_fee'
+    | 'extension'
+    | 'settlement'
+    | 'auction';
+
+export interface PawnContractActionOptionModel {
+    key: PawnContractActionKeyModel;
+    label: string;
+    description: string;
+}
 
 export interface PawnContractSummaryModel extends PawnContractDetailModel {
     customerName: string;
@@ -45,7 +58,8 @@ export interface PawnContractSummaryModel extends PawnContractDetailModel {
     hasWarehouseItem: boolean;
     isOpenContract: boolean;
     arrears: PawnContractEstimatedArrearsModel;
-    procedureTags: string[];
+    processStatusLabel: string;
+    availableActions: PawnContractActionOptionModel[];
 }
 
 export interface GetPawnContractNasabahTableParamsModel {

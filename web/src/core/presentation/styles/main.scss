@@ -521,7 +521,7 @@ body {
 }
 
 .admin-content {
-  padding: 32px;
+  padding: 12px;
 }
 
 .card {
@@ -715,10 +715,13 @@ body {
     transform: translateX(0);
   }
 
-  .admin-header,
-  .admin-content {
+  .admin-header {
     padding-left: 20px;
     padding-right: 20px;
+  }
+
+  .admin-content {
+    padding: 12px;
   }
 
   .sidebar-collapse-toggle {
@@ -732,6 +735,6 @@ body {
   }
 
   .admin-content {
-    padding: 16px;
+    padding: 12px;
   }
 }

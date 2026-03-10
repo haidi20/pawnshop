@@ -109,17 +109,32 @@
       </div>
 
       <div class="col-12 col-md-4">
-        <label
-          class="form-label"
-          for="maturityDate"
-        >Jatuh tempo</label>
-        <input
-          id="maturityDate"
-          class="form-control"
-          type="date"
-          :value="maturityDate"
-          readonly
-        >
+        <div class="pawn-contract-create-page__readonly-label">
+          <label
+            class="form-label mb-0"
+            for="maturityDate"
+          >Jatuh tempo</label>
+          <span class="pawn-contract-create-page__readonly-badge">
+            Otomatis
+          </span>
+        </div>
+        <div class="pawn-contract-create-page__readonly-field">
+          <input
+            id="maturityDate"
+            class="form-control pawn-contract-create-page__readonly-input"
+            type="date"
+            :value="maturityDate"
+            readonly
+            aria-readonly="true"
+          >
+          <i
+            class="bi bi-lock"
+            aria-hidden="true"
+          />
+        </div>
+        <div class="form-text">
+          Tanggal jatuh tempo dihitung otomatis dari tanggal mulai dan durasi gadai.
+        </div>
       </div>
     </div>
   </section>

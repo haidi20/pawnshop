@@ -1,27 +1,29 @@
-import { computed, watch } from 'vue';
+import { computed, watch, type ComputedRef, type Ref } from 'vue';
 import { defineStore } from 'pinia';
 
+import { DataTableClientSideService } from '@core/presentation/services/datatable_clientside.service';
+import type { DataTableClientSideVM } from '@core/presentation/view_models/datatable_clientside.vm';
 import {
-    buildPawnItemDescriptor,
     formatCountForHumans,
     formatCurrencyValueForHumans,
-    formatDateTimeForHumans,
     formatDateValueForHumans,
-    formatMonthYearForHumans,
     getPawnContractDueStateBadgeClass,
-    getPawnContractPaymentOptionLabel,
     getPawnContractStatusBadgeClass,
     getPawnContractStatusLabel,
     getPawnContractTermLabel,
     getPawnItemLocationStatusBadgeClass,
-    getPawnItemLocationStatusLabel,
     pawnContractStatusOptions,
     type PawnContractDueStateModel,
     type PawnContractStatusModel
 } from '@core/util/helpers';
 import type {
     PawnContractDataFilterModel,
-    PawnContractItemDetailModel
+    PawnContractLocationRowModel,
+    PawnContractMaintenanceRowModel,
+    PawnContractNasabahSectionModel,
+    PawnContractRingkasanPendapatanRowModel,
+    PawnContractRingkasanSectionModel,
+    PawnContractSummaryModel
 } from '@feature/pawn_contract/domain/models';
 import {
     getPawnContractAjtTableUsecase,
@@ -35,13 +37,91 @@ import {
     getPawnContractSummariesUsecase
 } from '@feature/pawn_contract/presentation/di/pawn_contract.di';
 import {
+    ajtTableFields,
     createPawnContractState,
+    locationTableFields,
+    maintenanceTableFields,
+    nasabahTableFields,
+    ringkasanPendapatanTableFields,
+    ringkasanTableFields,
+    settlementTableFields,
     type PawnContractAjtTypeModel,
     type PawnContractIndexTabKeyModel,
     type PawnContractLocationTabModel,
     type PawnContractNasabahTabKeyModel,
-    type PawnContractSettlementTypeModel
+    type PawnContractSettlementTypeModel,
+    type PawnContractTableField
 } from '@feature/pawn_contract/presentation/view_models/pawn_contract.state';
+
+type PawnContractClientTableRow<TSource = unknown> = Record<string, unknown> & {
+    id: number | string;
+    source?: TSource;
+};
+
+type PawnContractRowsSource<TSource> = ComputedRef<TSource[]> | Ref<TSource[]>;
+
+type PawnContractSectionTableModel<TSection, TRow extends Record<string, unknown>> = TSection & {
+    vm: DataTableClientSideVM<TRow>;
+};
+
+const createClientTableVm = <TSource, TRow extends Record<string, unknown>>(
+    sourceRows: PawnContractRowsSource<TSource>,
+    fields: PawnContractTableField[],
+    mapRow: (row: TSource, index: number) => TRow
+): DataTableClientSideVM<TRow> => {
+    const service = new DataTableClientSideService<TRow>(fields, []);
+
+    watch(
+        sourceRows,
+        (rows) => {
+            service.setItems(rows.map(mapRow));
+        },
+        { immediate: true, deep: true }
+    );
+
+    return service.vm;
+};
+
+const createSectionTableRegistry = <
+    TSource,
+    TSection extends { key: string; rows: TSource[] },
+    TRow extends Record<string, unknown>
+>(
+    sections: PawnContractRowsSource<TSection>,
+    fields: PawnContractTableField[],
+    mapRow: (row: TSource, index: number) => TRow
+): ComputedRef<Array<PawnContractSectionTableModel<TSection, TRow>>> => {
+    const services = new Map<string, DataTableClientSideService<TRow>>();
+
+    const ensureService = (key: string): DataTableClientSideService<TRow> => {
+        const existingService = services.get(key);
+
+        if (existingService) {
+            return existingService;
+        }
+
+        const service = new DataTableClientSideService<TRow>(fields, []);
+        services.set(key, service);
+        return service;
+    };
+
+    watch(
+        sections,
+        (currentSections) => {
+            currentSections.forEach((section) => {
+                ensureService(section.key).setItems(section.rows.map(mapRow));
+            });
+        },
+        { immediate: true, deep: true }
+    );
+
+    return computed(() =>
+        sections.value.map((section) => ({
+            ...section,
+            vm: ensureService(section.key).vm
+        }))
+    );
+};
 
 export const pawnContractViewModel = defineStore('pawnContractStore', () => {
     const state = createPawnContractState();
@@ -128,9 +208,18 @@ export const pawnContractViewModel = defineStore('pawnContractStore', () => {
             maintenanceRowCount: maintenanceTable.value.rows.length
         })
     );
+    const activeIndexTabMeta = computed(() => {
+        const currentTab = indexTabs.value.find((tab) => tab.key === state.activeIndexTab.value);
+
+        return {
+            label: currentTab?.label ?? 'Index Akad',
+            description:
+                currentTab?.description ??
+                'Pantau data akad gadai secara terpusat dengan filter cabang dan status kontrak.'
+        };
+    });
 
     const nasabahTabs = computed(() => nasabahTable.value.tabs);
-    const nasabahAllSections = computed(() => nasabahTable.value.sections);
     const activeNasabahSection = computed(() => nasabahTable.value.activeSection);
     const displayedNasabahSections = computed(() => nasabahTable.value.displayedSections);
     const ringkasanSections = computed(() => ringkasanTable.value.sections);
@@ -143,6 +232,158 @@ export const pawnContractViewModel = defineStore('pawnContractStore', () => {
     const locationOptions = computed(() => locationTable.value.options);
     const locationRows = computed(() => locationTable.value.rows);
     const maintenanceRows = computed(() => maintenanceTable.value.rows);
+
+    const formatters = {
+        formatCurrency: (value: number): string => formatCurrencyValueForHumans(value),
+        formatDate: (value: string | null): string => formatDateValueForHumans(value),
+        formatCount: (value: number): string => formatCountForHumans(value),
+        getContractStatusLabel: (status: PawnContractStatusModel): string =>
+            getPawnContractStatusLabel(status),
+        getContractStatusClass: (status: PawnContractStatusModel): string =>
+            getPawnContractStatusBadgeClass(status),
+        getDueStateClass: (dueState: PawnContractDueStateModel): string =>
+            getPawnContractDueStateBadgeClass(dueState),
+        getLocationStatusClass: (status: string | null): string =>
+            getPawnItemLocationStatusBadgeClass(status),
+        getTermLabel: (value: number): string => getPawnContractTermLabel(value)
+    };
+
+    const mapNasabahTableRow = (
+        row: PawnContractSummaryModel
+    ): PawnContractClientTableRow<PawnContractSummaryModel> => ({
+        id: row.contract.id,
+        source: row,
+        contractNumber: row.contract.contractNumber,
+        customerName: row.customerName,
+        branchName: row.branchName,
+        customerPhone: row.customerPhone,
+        customerIdentity: row.customerIdentity,
+        itemNames: row.itemNames,
+        principalAmount: formatters.formatCurrency(row.contract.disbursedValue),
+        arrearsAmount: formatters.formatCurrency(row.arrears.overdueAmount),
+        dueTodayAmount: formatters.formatCurrency(row.arrears.dueTodayAmount),
+        contractDate: formatters.formatDate(row.contract.contractDate),
+        maturityDate: formatters.formatDate(row.contract.maturityDate),
+        dueLabel: row.dueLabel,
+        processStatusLabel: row.processStatusLabel
+    });
+
+    const mapRingkasanTableRow = (
+        row: PawnContractSummaryModel
+    ): PawnContractClientTableRow<PawnContractSummaryModel> => ({
+        id: row.contract.id,
+        source: row,
+        contractNumber: row.contract.contractNumber,
+        customerName: row.customerName,
+        branchName: row.branchName,
+        itemNames: row.itemNames,
+        principalAmount: formatters.formatCurrency(row.contract.disbursedValue),
+        statusLabel: formatters.getContractStatusLabel(row.contract.contractStatus),
+        processStatusLabel: row.processStatusLabel
+    });
+
+    const mapRingkasanPendapatanTableRow = (
+        row: PawnContractRingkasanPendapatanRowModel
+    ): PawnContractClientTableRow<PawnContractRingkasanPendapatanRowModel> => ({
+        id: row.contractId,
+        source: row,
+        contractNumber: row.contractNumber,
+        customerName: row.customerName,
+        branchName: row.branchName,
+        storageFeeAmount: formatters.formatCurrency(row.storageFeeAmount),
+        administrationFeeAmount: formatters.formatCurrency(row.administrationFeeAmount),
+        totalIncome: formatters.formatCurrency(row.totalIncome)
+    });
+
+    const mapAjtTableRow = (
+        row: PawnContractSummaryModel
+    ): PawnContractClientTableRow<PawnContractSummaryModel> => ({
+        id: row.contract.id,
+        source: row,
+        contractNumber: row.contract.contractNumber,
+        customerName: row.customerName,
+        itemNames: row.itemNames,
+        maturityDate: formatters.formatDate(row.contract.maturityDate),
+        dueLabel: row.dueLabel,
+        termLabel: formatters.getTermLabel(row.contract.termDays),
+        statusLabel: formatters.getContractStatusLabel(row.contract.contractStatus)
+    });
+
+    const mapSettlementTableRow = (
+        row: PawnContractSummaryModel
+    ): PawnContractClientTableRow<PawnContractSummaryModel> => ({
+        id: row.contract.id,
+        source: row,
+        contractNumber: row.contract.contractNumber,
+        customerName: row.customerName,
+        branchName: row.branchName,
+        itemNames: row.itemNames,
+        settlementDate: formatters.formatDate(
+            row.contract.updatedAt?.slice(0, 10) ?? row.contract.maturityDate
+        ),
+        principalAmount: formatters.formatCurrency(row.contract.disbursedValue),
+        statusLabel: formatters.getContractStatusLabel(row.contract.contractStatus)
+    });
+
+    const mapLocationTableRow = (
+        row: PawnContractLocationRowModel,
+        index: number
+    ): PawnContractClientTableRow<PawnContractLocationRowModel> => ({
+        id: row.itemId,
+        source: row,
+        sequence: index + 1,
+        contractNumber: row.contractNumber,
+        itemName: row.itemName,
+        customerName: row.customerName,
+        branchName: row.branchName,
+        currentLocationLabel: row.currentLocationLabel,
+        primaryActionLabel: row.primaryActionLabel,
+        secondaryActionLabel: row.secondaryActionLabel ?? ''
+    });
+
+    const mapMaintenanceTableRow = (
+        row: PawnContractMaintenanceRowModel
+    ): PawnContractClientTableRow<PawnContractMaintenanceRowModel> => ({
+        id: row.contractId,
+        source: row,
+        contractId: row.contractId,
+        customerName: row.customerName,
+        itemNames: row.itemNames,
+        contractDate: formatters.formatDate(row.contractDate),
+        checklistLabel: row.checklistLabel
+    });
+
+    const displayedNasabahSectionTables = createSectionTableRegistry<
+        PawnContractSummaryModel,
+        PawnContractNasabahSectionModel,
+        PawnContractClientTableRow<PawnContractSummaryModel>
+    >(displayedNasabahSections, nasabahTableFields, mapNasabahTableRow);
+    const ringkasanSectionTables = createSectionTableRegistry<
+        PawnContractSummaryModel,
+        PawnContractRingkasanSectionModel,
+        PawnContractClientTableRow<PawnContractSummaryModel>
+    >(ringkasanSections, ringkasanTableFields, mapRingkasanTableRow);
+    const ringkasanPendapatanTableVm = createClientTableVm(
+        ringkasanPendapatanRows,
+        ringkasanPendapatanTableFields,
+        mapRingkasanPendapatanTableRow
+    );
+    const ajtDataTableVm = createClientTableVm(ajtRows, ajtTableFields, mapAjtTableRow);
+    const settlementDataTableVm = createClientTableVm(
+        settlementRows,
+        settlementTableFields,
+        mapSettlementTableRow
+    );
+    const locationDataTableVm = createClientTableVm(
+        locationRows,
+        locationTableFields,
+        mapLocationTableRow
+    );
+    const maintenanceDataTableVm = createClientTableVm(
+        maintenanceRows,
+        maintenanceTableFields,
+        mapMaintenanceTableRow
+    );
 
     const hasActiveFilters = computed(
         () => state.branchFilter.value !== 'all' || state.statusFilter.value !== 'all'
@@ -205,63 +446,27 @@ export const pawnContractViewModel = defineStore('pawnContractStore', () => {
         }
     };
 
-    const formatters = {
-        formatCurrency: (value: number): string => formatCurrencyValueForHumans(value),
-        formatDate: (value: string | null): string => formatDateValueForHumans(value),
-        formatDateTime: (value: string | null): string => formatDateTimeForHumans(value),
-        formatCount: (value: number): string => formatCountForHumans(value),
-        formatMonthYear: (value: string): string => formatMonthYearForHumans(value),
-        getContractStatusLabel: (status: PawnContractStatusModel): string =>
-            getPawnContractStatusLabel(status),
-        getContractStatusClass: (status: PawnContractStatusModel): string =>
-            getPawnContractStatusBadgeClass(status),
-        getDueStateClass: (dueState: PawnContractDueStateModel): string =>
-            getPawnContractDueStateBadgeClass(dueState),
-        getLocationStatusLabel: (status: string | null): string =>
-            getPawnItemLocationStatusLabel(status),
-        getLocationStatusClass: (status: string | null): string =>
-            getPawnItemLocationStatusBadgeClass(status),
-        getPaymentOptionLabel: (value: number | null): string =>
-            getPawnContractPaymentOptionLabel(value),
-        getTermLabel: (value: number): string => getPawnContractTermLabel(value),
-        getItemDescriptor: (itemDetail: PawnContractItemDetailModel): string =>
-            buildPawnItemDescriptor({
-                brandName: itemDetail.item.brandName,
-                modelName: itemDetail.item.modelName,
-                serialNumber: itemDetail.item.serialNumber,
-                itemDescription: itemDetail.item.itemDescription
-            })
-    };
-
     return {
         ...state,
         ...setters,
         ...actions,
         ...formatters,
         sortedBranches,
-        contractSummaries,
-        openContractSummaries,
+        activeIndexTabMeta,
         indexTabs,
-        nasabahTable,
         nasabahTabs,
-        nasabahAllSections,
         activeNasabahSection,
-        displayedNasabahSections,
-        ringkasanTable,
-        ringkasanSections,
-        ringkasanPendapatanRows,
+        displayedNasabahSectionTables,
+        ringkasanSectionTables,
+        ringkasanPendapatanTableVm,
         ringkasanMetrics,
-        ajtTable,
         ajtOptions,
-        ajtRows,
-        settlementTable,
+        ajtDataTableVm,
         settlementOptions,
-        settlementRows,
-        locationTable,
+        settlementDataTableVm,
         locationOptions,
-        locationRows,
-        maintenanceTable,
-        maintenanceRows,
+        locationDataTableVm,
+        maintenanceDataTableVm,
         hasActiveFilters,
         contractStatusOptions: pawnContractStatusOptions,
         getPawnContractData: actions.loadData

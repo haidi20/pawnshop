@@ -43,12 +43,22 @@ describe('pawn_contract index usecases', () => {
             dueState: 'soon',
             dueLabel: '5 hari lagi',
             itemNames: 'Laptop Pro',
-            isOpenContract: true
+            isOpenContract: true,
+            processStatusLabel: 'Data Baru'
         });
-        expect(todaySummary?.procedureTags).toEqual(
-            expect.arrayContaining(['Bayar B. Titip', 'Pelunasan', 'Akad Ulang', 'Perpanjangan'])
+        expect(todaySummary?.availableActions).toEqual(
+            expect.arrayContaining([
+                expect.objectContaining({ key: 'edit' }),
+                expect.objectContaining({ key: 'history' }),
+                expect.objectContaining({ key: 'storage_fee' }),
+                expect.objectContaining({ key: 'extension' }),
+                expect.objectContaining({ key: 'settlement' })
+            ])
         );
-        expect(overdueExtendedSummary?.procedureTags).toContain('Lelang');
+        expect(overdueExtendedSummary?.processStatusLabel).toBe('Perpanjangan');
+        expect(overdueExtendedSummary?.availableActions).toEqual(
+            expect.arrayContaining([expect.objectContaining({ key: 'auction' })])
+        );
     });
 
     test('does not treat draft contracts as open contracts in index summaries', () => {
