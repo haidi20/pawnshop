@@ -59,33 +59,14 @@
               type="button"
               @click="setActiveIndexTab(tab.key)"
             >
-              <span>{{ tab.label }}</span>
-              <strong>{{ formatCount(tab.count) }}</strong>
+              <span class="pawn-contract-page__tab-label">{{ tab.label }}</span>
+              <strong class="pawn-contract-page__tab-count">{{ formatCount(tab.count) }}</strong>
             </button>
           </div>
-
-          <button
-            class="btn btn-outline-secondary pawn-contract-page__overview-toggle"
-            type="button"
-            :aria-expanded="isOverviewExpanded"
-            @click="toggleOverview()"
-          >
-            <i
-              class="bi"
-              :class="isOverviewExpanded ? 'bi-chevron-up' : 'bi-chevron-down'"
-              aria-hidden="true"
-            />
-            <span>{{ isOverviewExpanded ? 'Sembunyikan panel' : 'Tampilkan panel' }}</span>
-          </button>
         </div>
 
-        <div
-          v-show="isOverviewExpanded"
-          class="pawn-contract-page__overview-body mt-3"
-        >
-          <div
-            class="d-flex flex-column flex-xl-row justify-content-between align-items-xl-center gap-3"
-          >
+        <div class="pawn-contract-page__overview-body mt-3">
+          <div class="d-flex flex-column flex-xl-row justify-content-between align-items-xl-center gap-3">
             <div class="pawn-contract-page__toolbar-copy">
               <div class="pawn-contract-page__section-eyebrow">
                 Index Akad
@@ -107,69 +88,6 @@
               />
               <span>Buat akad baru</span>
             </RouterLink>
-          </div>
-
-          <div class="row g-3 mt-1">
-            <div class="col-12 col-md-5">
-              <label
-                class="form-label fw-semibold"
-                for="pawn-contract-branch-filter"
-              >Cabang</label>
-              <select
-                id="pawn-contract-branch-filter"
-                v-model="branchFilter"
-                class="form-select"
-              >
-                <option value="all">
-                  Semua cabang
-                </option>
-                <option
-                  v-for="branch in sortedBranches"
-                  :key="branch.id"
-                  :value="String(branch.id)"
-                >
-                  {{ branch.branchName }}
-                </option>
-              </select>
-            </div>
-
-            <div class="col-12 col-md-5">
-              <label
-                class="form-label fw-semibold"
-                for="pawn-contract-status-filter"
-              >Status kontrak</label>
-              <select
-                id="pawn-contract-status-filter"
-                v-model="statusFilter"
-                class="form-select"
-              >
-                <option value="all">
-                  Semua status
-                </option>
-                <option
-                  v-for="status in contractStatusOptions"
-                  :key="status.value"
-                  :value="status.value"
-                >
-                  {{ status.label }}
-                </option>
-              </select>
-            </div>
-
-            <div class="col-12 col-md-2 d-flex align-items-end">
-              <button
-                class="btn btn-outline-secondary w-100 pawn-contract-page__reset-button"
-                type="button"
-                :disabled="!hasActiveFilters"
-                @click="resetFilters()"
-              >
-                <i
-                  class="bi bi-arrow-counterclockwise"
-                  aria-hidden="true"
-                />
-                <span>Reset</span>
-              </button>
-            </div>
           </div>
         </div>
 
@@ -239,6 +157,20 @@
                   :vm="sectionTable.vm"
                   class="pawn-contract-page__datatable"
                 >
+                  <template #extra-actions>
+                    <button
+                      class="btn btn-outline-secondary pawn-contract-page__table-filter-button"
+                      :class="{ 'is-active': hasActiveFilters }"
+                      type="button"
+                      @click="openFilterModal()"
+                    >
+                      <i
+                        class="bi bi-sliders"
+                        aria-hidden="true"
+                      />
+                      <span>Filter akad</span>
+                    </button>
+                  </template>
                   <template #body="{ item }">
                     <tr>
                       <td
@@ -373,12 +305,14 @@
                 </article>
                 <article class="col">
                   <div class="pawn-contract-page__metric-card">
-                    <span>Pendapatan B. Titip</span><strong>{{ formatCurrency(ringkasanMetrics.pendapatanBtitip) }}</strong>
+                    <span>Pendapatan B. Titip</span><strong>{{ formatCurrency(ringkasanMetrics.pendapatanBtitip)
+                    }}</strong>
                   </div>
                 </article>
                 <article class="col">
                   <div class="pawn-contract-page__metric-card">
-                    <span>Pendapatan B. Admin</span><strong>{{ formatCurrency(ringkasanMetrics.pendapatanBadmin) }}</strong>
+                    <span>Pendapatan B. Admin</span><strong>{{ formatCurrency(ringkasanMetrics.pendapatanBadmin)
+                    }}</strong>
                   </div>
                 </article>
               </div>
@@ -401,6 +335,20 @@
                     :vm="sectionTable.vm"
                     class="pawn-contract-page__datatable"
                   >
+                    <template #extra-actions>
+                      <button
+                        class="btn btn-outline-secondary pawn-contract-page__table-filter-button"
+                        :class="{ 'is-active': hasActiveFilters }"
+                        type="button"
+                        @click="openFilterModal()"
+                      >
+                        <i
+                          class="bi bi-sliders"
+                          aria-hidden="true"
+                        />
+                        <span>Filter akad</span>
+                      </button>
+                    </template>
                     <template #body="{ item }">
                       <tr>
                         <td data-label="No. Akad">
@@ -446,6 +394,20 @@
                 :vm="ringkasanPendapatanTableVm"
                 class="mt-3 pawn-contract-page__datatable"
               >
+                <template #extra-actions>
+                  <button
+                    class="btn btn-outline-secondary pawn-contract-page__table-filter-button"
+                    :class="{ 'is-active': hasActiveFilters }"
+                    type="button"
+                    @click="openFilterModal()"
+                  >
+                    <i
+                      class="bi bi-sliders"
+                      aria-hidden="true"
+                    />
+                    <span>Filter akad</span>
+                  </button>
+                </template>
                 <template #empty>
                   <div class="pawn-contract-page__empty-state mt-3">
                     Belum ada pendapatan yang tercatat hari ini.
@@ -481,6 +443,20 @@
               :vm="ajtDataTableVm"
               class="mt-3 pawn-contract-page__datatable"
             >
+              <template #extra-actions>
+                <button
+                  class="btn btn-outline-secondary pawn-contract-page__table-filter-button"
+                  :class="{ 'is-active': hasActiveFilters }"
+                  type="button"
+                  @click="openFilterModal()"
+                >
+                  <i
+                    class="bi bi-sliders"
+                    aria-hidden="true"
+                  />
+                  <span>Filter akad</span>
+                </button>
+              </template>
               <template #body="{ item }">
                 <tr>
                   <td data-label="No. Akad">
@@ -570,6 +546,20 @@
               :vm="settlementDataTableVm"
               class="mt-3 pawn-contract-page__datatable"
             >
+              <template #extra-actions>
+                <button
+                  class="btn btn-outline-secondary pawn-contract-page__table-filter-button"
+                  :class="{ 'is-active': hasActiveFilters }"
+                  type="button"
+                  @click="openFilterModal()"
+                >
+                  <i
+                    class="bi bi-sliders"
+                    aria-hidden="true"
+                  />
+                  <span>Filter akad</span>
+                </button>
+              </template>
               <template #body="{ item }">
                 <tr>
                   <td data-label="No. Akad">
@@ -642,6 +632,20 @@
               :vm="locationDataTableVm"
               class="mt-3 pawn-contract-page__datatable"
             >
+              <template #extra-actions>
+                <button
+                  class="btn btn-outline-secondary pawn-contract-page__table-filter-button"
+                  :class="{ 'is-active': hasActiveFilters }"
+                  type="button"
+                  @click="openFilterModal()"
+                >
+                  <i
+                    class="bi bi-sliders"
+                    aria-hidden="true"
+                  />
+                  <span>Filter akad</span>
+                </button>
+              </template>
               <template #body="{ item, index }">
                 <tr>
                   <td data-label="No">
@@ -721,6 +725,20 @@
               :vm="maintenanceDataTableVm"
               class="mt-3 pawn-contract-page__datatable"
             >
+              <template #extra-actions>
+                <button
+                  class="btn btn-outline-secondary pawn-contract-page__table-filter-button"
+                  :class="{ 'is-active': hasActiveFilters }"
+                  type="button"
+                  @click="openFilterModal()"
+                >
+                  <i
+                    class="bi bi-sliders"
+                    aria-hidden="true"
+                  />
+                  <span>Filter akad</span>
+                </button>
+              </template>
               <template #body="{ item }">
                 <tr>
                   <td data-label="ID">
@@ -741,10 +759,9 @@
                   >
                     <span
                       class="status-badge pawn-contract-page__status-badge"
-                      :class="
-                        item.source.maintenanceRequired
-                          ? 'status-badge--warning'
-                          : 'status-badge--success'
+                      :class="item.source.maintenanceRequired
+                        ? 'status-badge--warning'
+                        : 'status-badge--success'
                       "
                     >
                       {{ item.source.checklistLabel }}
@@ -775,6 +792,122 @@
       :row="selectedActionRow"
       @close="closeActionModal()"
     />
+
+    <section
+      v-if="isFilterModalOpen"
+      class="modal fade show d-block pawn-contract-page__filter-modal"
+      tabindex="-1"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="pawn-contract-filter-modal-title"
+    >
+      <div class="modal-dialog modal-dialog-centered pawn-contract-page__filter-dialog">
+        <div class="modal-content border-0 pawn-contract-page__filter-content">
+          <div class="modal-header pawn-contract-page__filter-header">
+            <div>
+              <div class="pawn-contract-page__section-eyebrow mb-2">
+                Filter Tabel
+              </div>
+              <h2
+                id="pawn-contract-filter-modal-title"
+                class="h5 mb-1"
+              >
+                Filter index akad
+              </h2>
+              <p class="mb-0 text-secondary">
+                Pilih cabang dan status kontrak untuk mempersempit data pada tabel.
+              </p>
+            </div>
+            <button
+              type="button"
+              class="btn-close"
+              aria-label="Close"
+              @click="closeFilterModal()"
+            />
+          </div>
+
+          <div class="modal-body pawn-contract-page__filter-body">
+            <div class="row g-3">
+              <div class="col-12">
+                <label
+                  class="form-label fw-semibold"
+                  for="pawn-contract-table-branch-filter"
+                >Cabang</label>
+                <select
+                  id="pawn-contract-table-branch-filter"
+                  v-model="draftBranchFilter"
+                  class="form-select"
+                >
+                  <option value="all">
+                    Semua cabang
+                  </option>
+                  <option
+                    v-for="branch in sortedBranches"
+                    :key="branch.id"
+                    :value="String(branch.id)"
+                  >
+                    {{ branch.branchName }}
+                  </option>
+                </select>
+              </div>
+
+              <div class="col-12">
+                <label
+                  class="form-label fw-semibold"
+                  for="pawn-contract-table-status-filter"
+                >Status kontrak</label>
+                <select
+                  id="pawn-contract-table-status-filter"
+                  v-model="draftStatusFilter"
+                  class="form-select"
+                >
+                  <option value="all">
+                    Semua status
+                  </option>
+                  <option
+                    v-for="status in contractStatusOptions"
+                    :key="status.value"
+                    :value="status.value"
+                  >
+                    {{ status.label }}
+                  </option>
+                </select>
+              </div>
+            </div>
+          </div>
+
+          <div class="modal-footer pawn-contract-page__filter-footer">
+            <button
+              class="btn btn-outline-secondary"
+              type="button"
+              @click="closeFilterModal()"
+            >
+              Tutup
+            </button>
+            <button
+              class="btn btn-outline-secondary"
+              type="button"
+              :disabled="!hasActiveFilters && draftBranchFilter === 'all' && draftStatusFilter === 'all'"
+              @click="resetFilterModal()"
+            >
+              Reset
+            </button>
+            <button
+              class="btn btn-primary"
+              type="button"
+              @click="applyFilterModal()"
+            >
+              Terapkan
+            </button>
+          </div>
+        </div>
+      </div>
+    </section>
+    <div
+      v-if="isFilterModalOpen"
+      class="modal-backdrop fade show pawn-contract-page__filter-backdrop"
+      @click="closeFilterModal()"
+    />
   </section>
 </template>
 
@@ -784,6 +917,7 @@ import { storeToRefs } from 'pinia';
 import { RouterLink } from 'vue-router';
 
 import DataTableClientSideComponent from '@core/presentation/components/datatable_clientside.component.vue';
+import type { PawnContractStatusModel } from '@core/util/helpers';
 import '../styles/pawn_contract.css';
 import type { PawnContractSummaryModel } from '@feature/pawn_contract/domain/models';
 import PawnContractActionModalComponent from '@feature/pawn_contract/presentation/components/pawn_contract_action_modal.component.vue';
@@ -821,8 +955,10 @@ const {
 } = storeToRefs(vm);
 
 const contractStatusOptions = vm.contractStatusOptions;
-const isOverviewExpanded = ref(false);
+const isFilterModalOpen = ref(false);
 const selectedActionRow = ref<PawnContractSummaryModel | null>(null);
+const draftBranchFilter = ref('all');
+const draftStatusFilter = ref<'all' | PawnContractStatusModel>('all');
 
 const {
   formatCurrency,
@@ -865,8 +1001,27 @@ const closeActionModal = (): void => {
   selectedActionRow.value = null;
 };
 
-const toggleOverview = (): void => {
-  isOverviewExpanded.value = !isOverviewExpanded.value;
+const openFilterModal = (): void => {
+  draftBranchFilter.value = branchFilter.value;
+  draftStatusFilter.value = statusFilter.value;
+  isFilterModalOpen.value = true;
+};
+
+const closeFilterModal = (): void => {
+  isFilterModalOpen.value = false;
+};
+
+const applyFilterModal = (): void => {
+  branchFilter.value = draftBranchFilter.value;
+  statusFilter.value = draftStatusFilter.value;
+  closeFilterModal();
+};
+
+const resetFilterModal = (): void => {
+  draftBranchFilter.value = 'all';
+  draftStatusFilter.value = 'all';
+  resetFilters();
+  closeFilterModal();
 };
 
 onMounted(() => {

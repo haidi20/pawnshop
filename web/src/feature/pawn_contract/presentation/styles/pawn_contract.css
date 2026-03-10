@@ -53,15 +53,6 @@
   padding: 1rem;
 }
 
-.pawn-contract-page__overview-toggle {
-  align-items: center;
-  display: inline-flex;
-  flex: 0 0 auto;
-  gap: 0.4rem;
-  min-height: 40px;
-  white-space: nowrap;
-}
-
 .pawn-contract-page__toolbar-copy {
   max-width: 42rem;
 }
@@ -96,7 +87,9 @@
 }
 
 .pawn-contract-page__tabs--index {
+  display: grid;
   gap: 0.75rem;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
 }
 
 .pawn-contract-page__tab {
@@ -129,9 +122,32 @@
 }
 
 .pawn-contract-page__tab--index {
-  flex: 1 1 11.5rem;
+  min-width: 0;
   justify-content: space-between;
-  min-width: min(100%, 11.5rem);
+  padding: 0.7rem 0.85rem;
+  width: 100%;
+}
+
+.pawn-contract-page__tab-label {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.pawn-contract-page__tab-count {
+  align-items: center;
+  background: rgba(0, 94, 170, 0.08);
+  border-radius: 999px;
+  color: var(--primary);
+  display: inline-flex;
+  flex: 0 0 auto;
+  font-size: 0.78rem;
+  font-weight: 700;
+  justify-content: center;
+  line-height: 1;
+  min-width: 1.9rem;
+  padding: 0.22rem 0.48rem;
 }
 
 .pawn-contract-page__tab.is-active {
@@ -139,6 +155,11 @@
   border-color: rgba(0, 94, 170, 0.28);
   box-shadow: inset 0 0 0 1px rgba(0, 94, 170, 0.05);
   color: var(--primary);
+}
+
+.pawn-contract-page__tab--index.is-active .pawn-contract-page__tab-count {
+  background: var(--primary);
+  color: #ffffff;
 }
 
 .pawn-contract-page__primary-action,
@@ -149,6 +170,22 @@
   justify-content: center;
   min-height: 42px;
   padding-inline: 0.9rem;
+}
+
+.pawn-contract-page__table-filter-button {
+  align-items: center;
+  display: inline-flex;
+  gap: 0.45rem;
+  justify-content: center;
+  min-height: 36px;
+  padding-inline: 0.85rem;
+  white-space: nowrap;
+}
+
+.pawn-contract-page__table-filter-button.is-active {
+  background: rgba(0, 94, 170, 0.08);
+  border-color: rgba(0, 94, 170, 0.24);
+  color: var(--primary);
 }
 
 .pawn-contract-page__section-title {
@@ -389,6 +426,33 @@
   white-space: nowrap;
 }
 
+.pawn-contract-page__filter-modal {
+  background: rgba(15, 23, 42, 0.45);
+}
+
+.pawn-contract-page__filter-dialog {
+  max-width: min(480px, calc(100vw - 2rem));
+}
+
+.pawn-contract-page__filter-content {
+  border-radius: 1rem;
+  box-shadow: 0 22px 48px rgba(15, 23, 42, 0.18);
+}
+
+.pawn-contract-page__filter-header,
+.pawn-contract-page__filter-footer {
+  border-color: rgba(217, 231, 242, 0.92);
+  padding: 1rem 1.25rem;
+}
+
+.pawn-contract-page__filter-body {
+  padding: 1.25rem;
+}
+
+.pawn-contract-page__filter-footer {
+  gap: 0.75rem;
+}
+
 .pawn-contract-page__action-modal {
   background: rgba(15, 23, 42, 0.45);
 }
@@ -560,15 +624,15 @@
   .pawn-contract-page__totals {
     grid-template-columns: 1fr;
   }
+
+  .pawn-contract-page__tabs--index {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
 }
 
 @media (max-width: 767.98px) {
   .pawn-contract-page__overview-head {
     flex-direction: column;
-  }
-
-  .pawn-contract-page__overview-toggle {
-    width: 100%;
   }
 
   .pawn-contract-page__panel {
@@ -594,7 +658,10 @@
 
   .pawn-contract-page__action-body,
   .pawn-contract-page__action-header,
-  .pawn-contract-page__action-footer {
+  .pawn-contract-page__action-footer,
+  .pawn-contract-page__filter-body,
+  .pawn-contract-page__filter-header,
+  .pawn-contract-page__filter-footer {
     padding: 1rem;
   }
 
@@ -603,7 +670,16 @@
   }
 
   .pawn-contract-page__tab--index {
-    flex-basis: 100%;
+    padding: 0.65rem 0.75rem;
+  }
+
+  .pawn-contract-page__tabs--index {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .pawn-contract-page__tab-label {
+    font-size: 0.84rem;
+    white-space: normal;
   }
 
   .pawn-contract-page__table thead th,
@@ -625,7 +701,8 @@
   }
 
   .pawn-contract-page__primary-action,
-  .pawn-contract-page__reset-button {
+  .pawn-contract-page__reset-button,
+  .pawn-contract-page__table-filter-button {
     width: 100%;
   }
 }

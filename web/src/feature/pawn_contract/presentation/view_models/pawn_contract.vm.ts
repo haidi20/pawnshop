@@ -55,7 +55,7 @@ import {
 
 type PawnContractClientTableRow<TSource = unknown> = Record<string, unknown> & {
     id: number | string;
-    source?: TSource;
+    source: TSource;
 };
 
 type PawnContractRowsSource<TSource> = ComputedRef<TSource[]> | Ref<TSource[]>;
