@@ -3,6 +3,7 @@ export interface PawnContractConfirmationRowModel {
     label: string;
     value: string;
     helper?: string;
+    valueClassName?: string;
 }
 
 export interface PawnContractConfirmationSectionModel {

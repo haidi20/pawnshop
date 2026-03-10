@@ -24,11 +24,18 @@
           id="appraisedValue"
           v-model="appraisedValueInputModel"
           class="form-control"
+          :class="{ 'is-invalid': !!fieldErrors.appraisedValue }"
           type="text"
           inputmode="numeric"
           autocomplete="off"
           placeholder="Contoh: 5.000.000"
         >
+        <div
+          v-if="fieldErrors.appraisedValue"
+          class="invalid-feedback d-block"
+        >
+          {{ fieldErrors.appraisedValue }}
+        </div>
         <div class="form-text">
           {{ formatCurrency(form.appraisedValue) }}
         </div>
@@ -43,11 +50,18 @@
           id="disbursedValue"
           v-model="disbursedValueInputModel"
           class="form-control"
+          :class="{ 'is-invalid': !!fieldErrors.disbursedValue }"
           type="text"
           inputmode="numeric"
           autocomplete="off"
           placeholder="Contoh: 3.500.000"
         >
+        <div
+          v-if="fieldErrors.disbursedValue"
+          class="invalid-feedback d-block"
+        >
+          {{ fieldErrors.disbursedValue }}
+        </div>
         <div
           v-if="showAmountInWords"
           class="form-text"
@@ -70,8 +84,10 @@
               :class="{ 'is-active': form.paymentOptionDays === option.value }"
               @click="updateFormField('paymentOptionDays', option.value)"
             >
-              <strong>{{ option.label }}</strong>
-              <small>{{ option.helper }}</small>
+              <span class="pawn-contract-create-page__option-copy">
+                <strong>{{ option.label }}</strong>
+                <small>{{ option.helper }}</small>
+              </span>
             </button>
           </div>
         </div>
@@ -124,35 +140,13 @@
           </div>
           <div>
             <span>Uang yang diberikan kepada nasabah</span>
-            <strong>{{ formatCurrency(customerReceivedAmount) }}</strong>
+            <strong class="text-success">{{ formatCurrency(customerReceivedAmount) }}</strong>
           </div>
           <div>
             <span>Sisa saldo cabang setelah pencairan</span>
             <strong :class="hasEnoughBalance ? 'text-primary' : 'text-danger'">
               {{ formatCurrency(projectedRemainingBalance) }}
             </strong>
-          </div>
-        </div>
-      </div>
-
-      <div
-        v-if="showValidationAlerts"
-        class="col-12"
-      >
-        <div class="d-grid gap-2">
-          <div
-            v-if="hasDisbursedValueExceedingAppraisedValue"
-            class="alert alert-danger mb-0"
-            role="alert"
-          >
-            Dana pencairan tidak boleh lebih dari nilai taksir.
-          </div>
-          <div
-            v-if="showInsufficientBalanceAlert"
-            class="alert alert-danger mb-0"
-            role="alert"
-          >
-            Dana pencairan melebihi saldo cabang aktif. Kurangi nominal pencairan atau pilih cabang lain.
           </div>
         </div>
       </div>
@@ -167,10 +161,14 @@ import type {
   PawnContractFormValueModel,
   PawnContractOptionModel
 } from '@feature/pawn_contract/domain/models';
-import type { PawnContractFormFieldUpdater } from '@feature/pawn_contract/presentation/models/pawn_contract_form_ui.model';
+import type {
+  PawnContractFormFieldErrorMap,
+  PawnContractFormFieldUpdater
+} from '@feature/pawn_contract/presentation/models/pawn_contract_form_ui.model';
 
 interface PawnContractFormFinanceSectionProps {
   form: PawnContractFormValueModel;
+  fieldErrors: PawnContractFormFieldErrorMap;
   availablePaymentOptions: Array<PawnContractOptionModel<PawnContractPaymentOptionDaysEnum>>;
   storageFeeAmount: number;
   prepaidStorageOptions: number[];
@@ -180,7 +178,6 @@ interface PawnContractFormFinanceSectionProps {
   amountInWords: string;
   projectedRemainingBalance: number;
   hasEnoughBalance: boolean;
-  hasDisbursedValueExceedingAppraisedValue: boolean;
   currentPresetLabel: string | null;
   formatCurrency: (value: number) => string;
   updateFormField: PawnContractFormFieldUpdater;
@@ -189,6 +186,7 @@ interface PawnContractFormFinanceSectionProps {
 const props = defineProps<PawnContractFormFinanceSectionProps>();
 
 const form = computed<PawnContractFormValueModel>(() => props.form);
+const fieldErrors = computed<PawnContractFormFieldErrorMap>(() => props.fieldErrors);
 const availablePaymentOptions = computed<Array<PawnContractOptionModel<PawnContractPaymentOptionDaysEnum>>>(
   () => props.availablePaymentOptions
 );
@@ -200,17 +198,8 @@ const administrationFeeAmount = computed<number>(() => props.administrationFeeAm
 const amountInWords = computed<string>(() => props.amountInWords);
 const projectedRemainingBalance = computed<number>(() => props.projectedRemainingBalance);
 const hasEnoughBalance = computed<boolean>(() => props.hasEnoughBalance);
-const hasDisbursedValueExceedingAppraisedValue = computed<boolean>(
-  () => props.hasDisbursedValueExceedingAppraisedValue
-);
 const currentPresetLabel = computed<string | null>(() => props.currentPresetLabel);
 const showAmountInWords = computed<boolean>(() => form.value.disbursedValue > 0);
-const showValidationAlerts = computed<boolean>(
-  () => hasDisbursedValueExceedingAppraisedValue.value || showInsufficientBalanceAlert.value
-);
-const showInsufficientBalanceAlert = computed<boolean>(() =>
-  form.value.branchId > 0 && form.value.disbursedValue > 0 && !hasEnoughBalance.value
-);
 const customerReceivedAmount = computed<number>(() =>
   Math.max(0, form.value.disbursedValue - prepaidStorageAmount.value - administrationFeeAmount.value)
 );

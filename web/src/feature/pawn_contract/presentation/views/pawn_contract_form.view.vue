@@ -17,6 +17,32 @@
   >
     <div class="row g-4 align-items-start">
       <div class="col-12">
+        <div class="card border-0 bg-light-subtle">
+          <div class="card-body py-3 px-4">
+            <div class="form-check form-switch mb-0">
+              <input
+                id="stepOneAutoInsert"
+                class="form-check-input"
+                type="checkbox"
+                :checked="isStepOneAutoInsertEnabled"
+                @change="handleStepOneAutoInsertChange"
+              >
+              <label
+                class="form-check-label fw-semibold"
+                for="stepOneAutoInsert"
+              >
+                Auto insert data tab 1
+              </label>
+              <div class="form-text mt-1">
+                Isi otomatis contoh data untuk tab detail gadai. Matikan kembali untuk mengembalikan data tab 1
+                sebelumnya.
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-12">
         <section class="card pawn-contract-create-page__hero p-4 p-lg-5">
           <div class="row">
             <div class="col-md-6">
@@ -72,7 +98,7 @@
                 role="tab"
                 :aria-selected="activeStep === 2"
                 aria-controls="pawn-contract-form-customer-panel"
-                @click="activeStep = 2"
+                @click="handleCustomerTabClick"
               >
                 <span class="pawn-contract-create-page__tab-number">2</span>
                 <span class="pawn-contract-create-page__tab-copy">
@@ -104,6 +130,7 @@
             <div class="d-grid gap-4">
               <PawnContractFormContractSection
                 :form="form"
+                :field-errors="fieldErrors"
                 :reference-data="referenceData"
                 :maturity-date="maturityDate"
                 :format-currency="formatCurrency"
@@ -112,6 +139,7 @@
 
               <PawnContractFormItemSection
                 :form="form"
+                :field-errors="fieldErrors"
                 :item-preset-list="itemPresetList"
                 :current-preset="currentPreset"
                 :selected-detail-option="selectedDetailOption"
@@ -121,6 +149,7 @@
 
               <PawnContractFormFinanceSection
                 :form="form"
+                :field-errors="fieldErrors"
                 :available-payment-options="availablePaymentOptions"
                 :storage-fee-amount="storageFeeAmount"
                 :prepaid-storage-options="prepaidStorageOptions"
@@ -130,7 +159,6 @@
                 :amount-in-words="amountInWords"
                 :projected-remaining-balance="projectedRemainingBalance"
                 :has-enough-balance="hasEnoughBalance"
-                :has-disbursed-value-exceeding-appraised-value="hasDisbursedValueExceedingAppraisedValue"
                 :current-preset-label="currentPreset?.label ?? null"
                 :format-currency="formatCurrency"
                 :update-form-field="updateFormField"
@@ -141,14 +169,17 @@
           <PawnContractFormCustomerSection
             :active-step="activeStep"
             :form="form"
+            :field-errors="fieldErrors"
             :reference-data="referenceData"
             :customer-name-suggestions="customerNameSuggestions"
             :customer-phone-suggestions="customerPhoneSuggestions"
             :customer-identity-number-suggestions="customerIdentityNumberSuggestions"
             :customer-lookup-message="customerLookupMessage"
+            :is-step-two-auto-insert-enabled="isStepTwoAutoInsertEnabled"
             :apply-customer-lookup-from-name="applyCustomerLookupFromName"
             :apply-customer-lookup-from-phone="applyCustomerLookupFromPhone"
             :apply-customer-lookup-from-identity-number="applyCustomerLookupFromIdentityNumber"
+            :set-step-two-auto-insert-enabled="setStepTwoAutoInsertEnabled"
             :update-form-field="updateFormField"
           />
         </div>
@@ -165,13 +196,13 @@
           <span v-else />
 
           <div class="d-flex flex-column flex-sm-row gap-2">
-            <button
+            <!-- <button
               class="btn btn-outline-primary"
               type="button"
               @click="goToList"
             >
               Lihat data gadai
-            </button>
+            </button> -->
 
             <button
               v-if="activeStep === 1"
@@ -199,6 +230,32 @@
             </button>
           </div>
         </div>
+
+        <PawnContractFormStepConfirmation
+          :is-open="isStepConfirmationModalOpen"
+          :sections="stepConfirmationData.sections"
+          @close="closeStepConfirmationModal"
+          @confirm="confirmCustomerStep"
+        />
+
+        <PawnContractFormValidation
+          :is-open="isValidationModalOpen"
+          :title="validationModalTitle"
+          :messages="validationErrorMessages"
+          @close="closeValidationModal"
+        />
+
+        <PawnContractFormSubmitConfirmation
+          :is-open="isSubmitConfirmationModalOpen"
+          :is-edit-mode="isEditMode"
+          :is-submitting="isSubmitting"
+          :sections="submitConfirmationData.sections"
+          :status-label="submitConfirmationData.statusLabel"
+          :balance-message="submitConfirmationData.balanceMessage"
+          :has-enough-balance="submitConfirmationData.hasEnoughBalance"
+          @close="closeSubmitConfirmationModal"
+          @confirm="confirmSubmitContract"
+        />
       </div>
     </div>
   </section>
@@ -213,6 +270,9 @@ import PawnContractFormError from '@feature/pawn_contract/presentation/component
 import PawnContractFormFinanceSection from '@feature/pawn_contract/presentation/components/pawn_contract_form_finance_section.component.vue';
 import PawnContractFormItemSection from '@feature/pawn_contract/presentation/components/pawn_contract_form_item_section.component.vue';
 import PawnContractFormLoading from '@feature/pawn_contract/presentation/components/pawn_contract_form_loading.component.vue';
+import PawnContractFormStepConfirmation from '@feature/pawn_contract/presentation/components/pawn_contract_form_step_confirmation.component.vue';
+import PawnContractFormSubmitConfirmation from '@feature/pawn_contract/presentation/components/pawn_contract_form_submit_confirmation.component.vue';
+import PawnContractFormValidation from '@feature/pawn_contract/presentation/components/pawn_contract_form_validation.component.vue';
 import '@feature/pawn_contract/presentation/styles/pawn_contract_form.css';
 import { pawnContractFormViewModel } from '@feature/pawn_contract/presentation/view_models/pawn_contract_form.vm';
 
@@ -226,7 +286,16 @@ const {
   error,
   submitError,
   activeStep,
+  isEditMode,
+  isStepOneAutoInsertEnabled,
+  isStepTwoAutoInsertEnabled,
+  isValidationModalOpen,
+  validationModalTitle,
+  validationErrorMessages,
+  isStepConfirmationModalOpen,
+  isSubmitConfirmationModalOpen,
   form,
+  fieldErrors,
   loadingTitle,
   submitButtonLabel,
   itemPresetList,
@@ -246,9 +315,10 @@ const {
   prepaidStorageAmount,
   prepaidStoragePeriodLabel,
   amountInWords,
+  stepConfirmationData,
+  submitConfirmationData,
   projectedRemainingBalance,
   hasEnoughBalance,
-  hasDisbursedValueExceedingAppraisedValue,
   isProcessingBlocked
 } = storeToRefs(vm);
 
@@ -258,10 +328,33 @@ const {
   applyCustomerLookupFromName,
   applyCustomerLookupFromPhone,
   applyCustomerLookupFromIdentityNumber,
+  setStepOneAutoInsertEnabled,
+  setStepTwoAutoInsertEnabled,
+  closeValidationModal,
+  closeStepConfirmationModal,
+  confirmCustomerStep,
+  closeSubmitConfirmationModal,
+  confirmSubmitContract,
   goToList,
   goToCustomerStep,
   submitContract
 } = vm;
+
+const handleStepOneAutoInsertChange = (event: Event): void => {
+  const { target } = event;
+
+  if (target instanceof HTMLInputElement) {
+    setStepOneAutoInsertEnabled(target.checked);
+  }
+};
+
+const handleCustomerTabClick = (): void => {
+  if (activeStep.value === 2) {
+    return;
+  }
+
+  void goToCustomerStep();
+};
 
 onMounted(() => {
   void vm.initialize();

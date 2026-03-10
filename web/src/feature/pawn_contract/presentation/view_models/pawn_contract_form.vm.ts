@@ -1,6 +1,5 @@
-import { computed, h, render, watch } from 'vue';
+import { computed, watch } from 'vue';
 import { defineStore } from 'pinia';
-import Swal from 'sweetalert2';
 
 import {
     PawnContractCustomerGenderEnum,
@@ -25,12 +24,19 @@ import type {
     PawnContractFormReferenceModel,
     PawnContractFormValueModel
 } from '@feature/pawn_contract/domain/models';
-import type { PawnContractFormFieldUpdater } from '@feature/pawn_contract/presentation/models/pawn_contract_form_ui.model';
-import PawnContractFormStepConfirmation from '@feature/pawn_contract/presentation/components/pawn_contract_form_step_confirmation.component.vue';
-import PawnContractFormSubmitConfirmation from '@feature/pawn_contract/presentation/components/pawn_contract_form_submit_confirmation.component.vue';
+import type {
+    PawnContractFormFieldName,
+    PawnContractFormFieldUpdater
+} from '@feature/pawn_contract/presentation/models/pawn_contract_form_ui.model';
+import {
+    validatePawnContractForm,
+    validatePawnContractSavePayload
+} from '@feature/pawn_contract/presentation/validations/pawn_contract_form.validation';
 import { pawnContractRepository } from '@feature/pawn_contract/presentation/di/pawn_contract.di';
 import {
     createPawnContractCustomerLookupKey,
+    createInitialPawnContractFormFieldErrors,
+    createInitialPawnContractTouchedFields,
     createPawnContractFormState
 } from '@feature/pawn_contract/presentation/view_models/pawn_contract_form.state';
 import {
@@ -46,19 +52,21 @@ import {
     createDefaultPawnContractFormValue,
     createErrorMessage,
     createPawnContractItemDetailPlaceholders,
+    createStepOneAutoInsertPatch,
+    createStepOneAutoInsertSnapshot,
+    createStepTwoAutoInsertPatch,
+    createStepTwoAutoInsertSnapshot,
     createPawnContractRouteContext,
-    escapeHtml,
     findMatchedPawnContractCustomer,
     PawnContractCustomerLookupFieldEnum,
+    pawnContractStepOneAutoInsertFieldNames,
+    pawnContractStepOneFieldNames,
+    pawnContractStepTwoAutoInsertFieldNames,
+    pawnContractStepTwoFieldNames,
     resolveValidItemDetailType,
     resolveValidPaymentOptionDays,
     resolveValidPrepaidStoragePeriods
 } from '@feature/pawn_contract/presentation/view_models/pawn_contract_form.vm.utils';
-
-interface MountedPawnContractConfirmationContentModel {
-    element: HTMLDivElement;
-    unmount: () => void;
-}
 
 export const pawnContractFormViewModel = defineStore('pawnContractFormStore', () => {
     const state = createPawnContractFormState();
@@ -195,12 +203,66 @@ export const pawnContractFormViewModel = defineStore('pawnContractFormStore', ()
     const prepaidStoragePeriodLabel = computed(() =>
         buildPawnContractPrepaidStorageLabel(state.form.prepaidStoragePeriods)
     );
+    const customerReceivedAmount = computed(() =>
+        Math.max(0, state.form.disbursedValue - prepaidStorageAmount.value - administrationFeeAmount.value)
+    );
     const amountInWords = computed(() => convertNumberToIndonesianCurrencyWords(state.form.disbursedValue));
     const customerGenderLabel = computed(() =>
         state.form.customerGender === PawnContractCustomerGenderEnum.Female ? 'Perempuan' : 'Laki-laki'
     );
     const projectedRemainingBalance = computed(
         () => (selectedBranch.value?.availableBalance ?? 0) - state.form.disbursedValue
+    );
+    const stepConfirmationData = computed(() =>
+        buildPawnContractSummaryConfirmation({
+            form: state.form,
+            selectedBranchName: selectedBranch.value?.branchName ?? null,
+            selectedBranchAvailableBalance: selectedBranch.value?.availableBalance ?? null,
+            maturityDate: maturityDate.value,
+            currentPresetLabel: currentPreset.value?.label ?? null,
+            currentPresetDetailLabels: currentPreset.value?.detailLabels ?? null,
+            selectedDetailOptionLabel: selectedDetailOption.value?.label ?? null,
+            selectedDetailMarginRate: selectedDetailOption.value?.marginRate ?? null,
+            selectedDetailDeductionRate: selectedDetailOption.value?.deductionRate ?? null,
+            selectedPaymentOptionLabel: selectedPaymentOption.value?.label ?? null,
+            selectedPaymentOptionHelper: selectedPaymentOption.value?.helper ?? null,
+            storageFeeAmount: storageFeeAmount.value,
+            prepaidStorageAmount: prepaidStorageAmount.value,
+            prepaidStoragePeriodLabel: prepaidStoragePeriodLabel.value,
+            administrationFeeAmount: administrationFeeAmount.value,
+            customerReceivedAmount: customerReceivedAmount.value,
+            amountInWords: amountInWords.value,
+            projectedRemainingBalance: projectedRemainingBalance.value,
+            formatCurrency,
+            formatDate
+        })
+    );
+    const submitConfirmationData = computed(() =>
+        buildPawnContractFinalConfirmation({
+            form: state.form,
+            selectedBranchName: selectedBranch.value?.branchName ?? null,
+            selectedBranchAvailableBalance: selectedBranch.value?.availableBalance ?? null,
+            maturityDate: maturityDate.value,
+            currentPresetLabel: currentPreset.value?.label ?? null,
+            currentPresetDetailLabels: currentPreset.value?.detailLabels ?? null,
+            selectedDetailOptionLabel: selectedDetailOption.value?.label ?? null,
+            selectedDetailMarginRate: selectedDetailOption.value?.marginRate ?? null,
+            selectedDetailDeductionRate: selectedDetailOption.value?.deductionRate ?? null,
+            selectedPaymentOptionLabel: selectedPaymentOption.value?.label ?? null,
+            selectedPaymentOptionHelper: selectedPaymentOption.value?.helper ?? null,
+            storageFeeAmount: storageFeeAmount.value,
+            prepaidStorageAmount: prepaidStorageAmount.value,
+            prepaidStoragePeriodLabel: prepaidStoragePeriodLabel.value,
+            administrationFeeAmount: administrationFeeAmount.value,
+            customerReceivedAmount: customerReceivedAmount.value,
+            amountInWords: amountInWords.value,
+            projectedRemainingBalance: projectedRemainingBalance.value,
+            formatCurrency,
+            formatDate,
+            customerLookupMessage: customerLookupMessage.value,
+            customerGenderLabel: customerGenderLabel.value,
+            hasEnoughBalance: hasEnoughBalance.value
+        })
     );
     const hasEnoughBalance = computed(() => projectedRemainingBalance.value >= 0);
     const hasDisbursedValueExceedingAppraisedValue = computed(
@@ -221,6 +283,47 @@ export const pawnContractFormViewModel = defineStore('pawnContractFormStore', ()
         state.submitError.value = message;
     };
 
+    const getAllFieldNames = (): PawnContractFormFieldName[] =>
+        Object.keys(state.fieldErrors) as PawnContractFormFieldName[];
+
+    const resetValidationState = (): void => {
+        Object.assign(state.fieldErrors, createInitialPawnContractFormFieldErrors());
+        Object.assign(state.touchedFields, createInitialPawnContractTouchedFields());
+    };
+
+    const resetStepOneAutoInsertState = (): void => {
+        state.isStepOneAutoInsertEnabled.value = false;
+        state.stepOneAutoInsertSnapshot.value = null;
+    };
+
+    const resetStepTwoAutoInsertState = (): void => {
+        state.isStepTwoAutoInsertEnabled.value = false;
+        state.stepTwoAutoInsertSnapshot.value = null;
+    };
+
+    const getCurrentFormValidationResult = () =>
+        validatePawnContractForm({
+            form: state.form,
+            currentPreset: currentPreset.value,
+            selectedBranchAvailableBalance: selectedBranch.value?.availableBalance ?? null
+        });
+
+    const refreshDisplayedValidation = (): void => {
+        const validationResult = getCurrentFormValidationResult();
+
+        for (const field of getAllFieldNames()) {
+            state.fieldErrors[field] = state.touchedFields[field] ? validationResult.fieldErrors[field] ?? null : null;
+        }
+    };
+
+    const markFieldsAsTouched = (fields: PawnContractFormFieldName[]): void => {
+        for (const field of fields) {
+            state.touchedFields[field] = true;
+        }
+
+        refreshDisplayedValidation();
+    };
+
     const applyRouteContext = (): void => {
         const routeContext = createPawnContractRouteContext(router.currentRoute.value.params.contractId);
         state.mode.value = routeContext.mode;
@@ -230,6 +333,10 @@ export const pawnContractFormViewModel = defineStore('pawnContractFormStore', ()
     const resetProgressState = (): void => {
         state.activeStep.value = 1;
         state.lastAutofilledCustomerId.value = null;
+        state.isValidationModalOpen.value = false;
+        state.validationErrorMessages.value = [];
+        state.isStepConfirmationModalOpen.value = false;
+        state.isSubmitConfirmationModalOpen.value = false;
     };
 
     const applyReferenceDefaults = (referenceData: PawnContractFormReferenceModel): void => {
@@ -241,93 +348,126 @@ export const pawnContractFormViewModel = defineStore('pawnContractFormStore', ()
             })
         );
         resetProgressState();
+        resetValidationState();
+        resetStepOneAutoInsertState();
+        resetStepTwoAutoInsertState();
     };
 
     const applyLoadedFormValue = (formValue: PawnContractFormValueModel): void => {
         Object.assign(state.form, formValue);
         resetProgressState();
+        resetValidationState();
+        resetStepOneAutoInsertState();
+        resetStepTwoAutoInsertState();
     };
 
     const applyCustomerLookup = (customer: PawnContractCustomerLookupModel): void => {
         Object.assign(state.form, createCustomerLookupFormPatch(customer));
+        refreshDisplayedValidation();
     };
 
     const updateFormField: PawnContractFormFieldUpdater = (field, value): void => {
         state.form[field] = value;
+        state.touchedFields[field] = true;
+        refreshDisplayedValidation();
     };
 
-    const createMountedStepConfirmationContent = (): MountedPawnContractConfirmationContentModel => {
-        const element = document.createElement('div');
-        const confirmationProps = buildPawnContractSummaryConfirmation({
-            form: state.form,
-            selectedBranchName: selectedBranch.value?.branchName ?? null,
-            selectedBranchAvailableBalance: selectedBranch.value?.availableBalance ?? null,
-            maturityDate: maturityDate.value,
-            currentPresetLabel: currentPreset.value?.label ?? null,
-            currentPresetDetailLabels: currentPreset.value?.detailLabels ?? null,
-            selectedDetailOptionLabel: selectedDetailOption.value?.label ?? null,
-            selectedDetailMarginRate: selectedDetailOption.value?.marginRate ?? null,
-            selectedDetailDeductionRate: selectedDetailOption.value?.deductionRate ?? null,
-            selectedPaymentOptionLabel: selectedPaymentOption.value?.label ?? null,
-            selectedPaymentOptionHelper: selectedPaymentOption.value?.helper ?? null,
-            storageFeeAmount: storageFeeAmount.value,
-            prepaidStorageAmount: prepaidStorageAmount.value,
-            prepaidStoragePeriodLabel: prepaidStoragePeriodLabel.value,
-            administrationFeeAmount: administrationFeeAmount.value,
-            amountInWords: amountInWords.value,
-            projectedRemainingBalance: projectedRemainingBalance.value,
-            formatCurrency,
-            formatDate
-        });
-        render(h(PawnContractFormStepConfirmation, confirmationProps), element);
+    const setStepOneAutoInsertEnabled = (enabled: boolean): void => {
+        if (!state.referenceData.value || enabled === state.isStepOneAutoInsertEnabled.value) {
+            return;
+        }
 
-        return {
-            element,
-            unmount: () => render(null, element)
-        };
+        if (enabled) {
+            state.stepOneAutoInsertSnapshot.value = createStepOneAutoInsertSnapshot({
+                form: state.form,
+                touchedFields: state.touchedFields
+            });
+
+            Object.assign(
+                state.form,
+                createStepOneAutoInsertPatch({
+                    form: state.form,
+                    referenceData: state.referenceData.value,
+                    currentPreset: currentPreset.value,
+                    itemDetailPlaceholders: itemDetailPlaceholders.value,
+                    availablePaymentOptions: availablePaymentOptions.value,
+                    prepaidStorageOptions: prepaidStorageOptions.value
+                })
+            );
+
+            markFieldsAsTouched(pawnContractStepOneAutoInsertFieldNames);
+            state.isStepOneAutoInsertEnabled.value = true;
+            return;
+        }
+
+        if (state.stepOneAutoInsertSnapshot.value) {
+            Object.assign(state.form, state.stepOneAutoInsertSnapshot.value.values);
+            Object.assign(state.touchedFields, state.stepOneAutoInsertSnapshot.value.touchedFields);
+        }
+
+        state.isStepOneAutoInsertEnabled.value = false;
+        state.stepOneAutoInsertSnapshot.value = null;
+        refreshDisplayedValidation();
     };
 
-    const createMountedSubmitConfirmationContent = (): MountedPawnContractConfirmationContentModel => {
-        const element = document.createElement('div');
-        const confirmationProps = buildPawnContractFinalConfirmation({
-            form: state.form,
-            selectedBranchName: selectedBranch.value?.branchName ?? null,
-            selectedBranchAvailableBalance: selectedBranch.value?.availableBalance ?? null,
-            maturityDate: maturityDate.value,
-            currentPresetLabel: currentPreset.value?.label ?? null,
-            currentPresetDetailLabels: currentPreset.value?.detailLabels ?? null,
-            selectedDetailOptionLabel: selectedDetailOption.value?.label ?? null,
-            selectedDetailMarginRate: selectedDetailOption.value?.marginRate ?? null,
-            selectedDetailDeductionRate: selectedDetailOption.value?.deductionRate ?? null,
-            selectedPaymentOptionLabel: selectedPaymentOption.value?.label ?? null,
-            selectedPaymentOptionHelper: selectedPaymentOption.value?.helper ?? null,
-            storageFeeAmount: storageFeeAmount.value,
-            prepaidStorageAmount: prepaidStorageAmount.value,
-            prepaidStoragePeriodLabel: prepaidStoragePeriodLabel.value,
-            administrationFeeAmount: administrationFeeAmount.value,
-            amountInWords: amountInWords.value,
-            projectedRemainingBalance: projectedRemainingBalance.value,
-            formatCurrency,
-            formatDate,
-            customerLookupMessage: customerLookupMessage.value,
-            customerGenderLabel: customerGenderLabel.value,
-            hasEnoughBalance: hasEnoughBalance.value
-        });
-        render(h(PawnContractFormSubmitConfirmation, confirmationProps), element);
+    const setStepTwoAutoInsertEnabled = (enabled: boolean): void => {
+        if (!state.referenceData.value || enabled === state.isStepTwoAutoInsertEnabled.value) {
+            return;
+        }
 
-        return {
-            element,
-            unmount: () => render(null, element)
-        };
+        if (enabled) {
+            state.stepTwoAutoInsertSnapshot.value = createStepTwoAutoInsertSnapshot({
+                form: state.form,
+                touchedFields: state.touchedFields
+            });
+
+            Object.assign(
+                state.form,
+                createStepTwoAutoInsertPatch({
+                    referenceData: state.referenceData.value
+                })
+            );
+
+            markFieldsAsTouched(pawnContractStepTwoAutoInsertFieldNames);
+            state.isStepTwoAutoInsertEnabled.value = true;
+            return;
+        }
+
+        if (state.stepTwoAutoInsertSnapshot.value) {
+            Object.assign(state.form, state.stepTwoAutoInsertSnapshot.value.values);
+            Object.assign(state.touchedFields, state.stepTwoAutoInsertSnapshot.value.touchedFields);
+        }
+
+        state.isStepTwoAutoInsertEnabled.value = false;
+        state.stepTwoAutoInsertSnapshot.value = null;
+        refreshDisplayedValidation();
     };
 
-    const showValidationErrors = async (errors: string[]): Promise<void> => {
-        await Swal.fire({
-            icon: 'warning',
-            title: 'Masih ada data yang perlu dilengkapi',
-            html: `<ul class="text-start mb-0">${errors.map((item) => `<li>${escapeHtml(item)}</li>`).join('')}</ul>`,
-            confirmButtonText: 'Saya cek lagi'
-        });
+    const showValidationErrors = (errors: string[], title = 'Masih ada data yang perlu dilengkapi'): void => {
+        state.validationModalTitle.value = title;
+        state.validationErrorMessages.value = Array.from(new Set(errors));
+        state.isValidationModalOpen.value = true;
+    };
+
+    const closeValidationModal = (): void => {
+        state.isValidationModalOpen.value = false;
+    };
+
+    const closeStepConfirmationModal = (): void => {
+        state.isStepConfirmationModalOpen.value = false;
+    };
+
+    const confirmCustomerStep = (): void => {
+        closeStepConfirmationModal();
+        state.activeStep.value = 2;
+    };
+
+    const closeSubmitConfirmationModal = (): void => {
+        if (state.isSubmitting.value) {
+            return;
+        }
+
+        state.isSubmitConfirmationModalOpen.value = false;
     };
 
     const getStepOneValidationErrors = (): string[] =>
@@ -337,7 +477,12 @@ export const pawnContractFormViewModel = defineStore('pawnContractFormStore', ()
             selectedBranchAvailableBalance: selectedBranch.value?.availableBalance ?? null
         });
 
-    const getStepTwoValidationErrors = (): string[] => buildStepTwoValidationErrors(state.form);
+    const getStepTwoValidationErrors = (): string[] =>
+        buildStepTwoValidationErrors({
+            form: state.form,
+            currentPreset: currentPreset.value,
+            selectedBranchAvailableBalance: selectedBranch.value?.availableBalance ?? null
+        });
 
     const createSavePayload = () =>
         buildSavePawnContractPayload({
@@ -400,77 +545,27 @@ export const pawnContractFormViewModel = defineStore('pawnContractFormStore', ()
     };
 
     const goToCustomerStep = async (): Promise<void> => {
+        markFieldsAsTouched(pawnContractStepOneFieldNames);
         const errors = getStepOneValidationErrors();
         if (errors.length > 0) {
-            await showValidationErrors(errors);
+            showValidationErrors(errors);
             return;
         }
 
-        const confirmationContent = createMountedStepConfirmationContent();
-        const result = await Swal.fire({
-            icon: 'info',
-            title: 'Periksa ringkasan gadai',
-            html: confirmationContent.element,
-            width: '1140px',
-            showCancelButton: true,
-            confirmButtonText: 'Lanjut ke data nasabah',
-            cancelButtonText: 'Periksa lagi',
-            customClass: {
-                popup: 'pawn-contract-create-page__confirm-modal'
-            }
-        }).finally(() => {
-            confirmationContent.unmount();
-        });
-
-        if (result.isConfirmed) {
-            state.activeStep.value = 2;
-        }
+        state.isStepConfirmationModalOpen.value = true;
     };
 
     const goToList = async (): Promise<void> => {
         await router.push('/pawn-contracts/list');
     };
 
-    const submitContract = async (): Promise<void> => {
-        const errors = [...getStepOneValidationErrors(), ...getStepTwoValidationErrors()];
-        if (errors.length > 0) {
-            await showValidationErrors(errors);
-            return;
-        }
-
-        if (hasInsufficientBranchBalance.value) {
-            await showErrorMessage(
-                'Saldo cabang tidak cukup',
-                'Kurangi dana pencairan atau pilih cabang dengan saldo yang mencukupi.'
-            );
-            return;
-        }
-
-        const confirmationContent = createMountedSubmitConfirmationContent();
-        const confirmation = await Swal.fire({
-            icon: 'question',
-            title: isEditMode.value ? 'Simpan perubahan data gadai ini?' : 'Simpan data gadai sekarang?',
-            html: confirmationContent.element,
-            width: '1140px',
-            showCancelButton: true,
-            confirmButtonText: 'Ya, proses gadai',
-            cancelButtonText: 'Periksa lagi',
-            customClass: {
-                popup: 'pawn-contract-create-page__confirm-modal'
-            }
-        }).finally(() => {
-            confirmationContent.unmount();
-        });
-
-        if (!confirmation.isConfirmed) {
-            return;
-        }
-
+    const persistContract = async (): Promise<void> => {
         state.isSubmitting.value = true;
         setSubmitError(null);
 
         try {
-            const result = await pawnContractRepository.saveContract(createSavePayload());
+            const savePayload = createSavePayload();
+            const result = await pawnContractRepository.saveContract(savePayload);
             state.lastSavedResult.value = result;
 
             const successMessage = buildSaveSuccessMessage({
@@ -493,6 +588,45 @@ export const pawnContractFormViewModel = defineStore('pawnContractFormStore', ()
         }
     };
 
+    const submitContract = async (): Promise<void> => {
+        markFieldsAsTouched([...pawnContractStepOneFieldNames, ...pawnContractStepTwoFieldNames]);
+        const errors = [...getStepOneValidationErrors(), ...getStepTwoValidationErrors()];
+        if (errors.length > 0) {
+            showValidationErrors(errors);
+            return;
+        }
+
+        if (hasInsufficientBranchBalance.value) {
+            await showErrorMessage(
+                'Saldo cabang tidak cukup',
+                'Kurangi dana pencairan atau pilih cabang dengan saldo yang mencukupi.'
+            );
+            return;
+        }
+
+        const savePayload = createSavePayload();
+        const savePayloadErrors = validatePawnContractSavePayload({
+            payload: savePayload,
+            selectedBranchAvailableBalance: selectedBranch.value?.availableBalance ?? null
+        });
+
+        if (savePayloadErrors.length > 0) {
+            showValidationErrors(savePayloadErrors, 'Data simpan masih perlu diperiksa');
+            return;
+        }
+
+        state.isSubmitConfirmationModalOpen.value = true;
+    };
+
+    const confirmSubmitContract = async (): Promise<void> => {
+        if (state.isSubmitting.value) {
+            return;
+        }
+
+        closeSubmitConfirmationModal();
+        await persistContract();
+    };
+
     watch(
         () => state.form.termDays,
         () => {
@@ -500,6 +634,7 @@ export const pawnContractFormViewModel = defineStore('pawnContractFormStore', ()
                 availableOptions: availablePaymentOptions.value,
                 currentValue: state.form.paymentOptionDays
             });
+            refreshDisplayedValidation();
         }
     );
 
@@ -510,6 +645,7 @@ export const pawnContractFormViewModel = defineStore('pawnContractFormStore', ()
                 availableOptions: prepaidStorageOptions.value,
                 currentValue: state.form.prepaidStoragePeriods
             });
+            refreshDisplayedValidation();
         }
     );
 
@@ -520,6 +656,7 @@ export const pawnContractFormViewModel = defineStore('pawnContractFormStore', ()
                 currentPreset: currentPreset.value,
                 currentValue: state.form.itemDetailType
             });
+            refreshDisplayedValidation();
         }
     );
 
@@ -564,6 +701,8 @@ export const pawnContractFormViewModel = defineStore('pawnContractFormStore', ()
         prepaidStorageAmount,
         prepaidStoragePeriodLabel,
         amountInWords,
+        stepConfirmationData,
+        submitConfirmationData,
         projectedRemainingBalance,
         hasEnoughBalance,
         hasDisbursedValueExceedingAppraisedValue,
@@ -577,6 +716,14 @@ export const pawnContractFormViewModel = defineStore('pawnContractFormStore', ()
         applyLoadedFormValue,
         applyCustomerLookup,
         updateFormField,
+        setStepOneAutoInsertEnabled,
+        setStepTwoAutoInsertEnabled,
+        closeStepConfirmationModal,
+        confirmCustomerStep,
+        closeValidationModal,
+        closeSubmitConfirmationModal,
+        confirmSubmitContract,
+        resetValidationState,
         initialize,
         loadReferenceData,
         applyCustomerLookupFromName,

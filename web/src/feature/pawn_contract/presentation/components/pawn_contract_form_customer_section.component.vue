@@ -20,6 +20,30 @@
       </div>
     </div>
 
+    <div class="card border-0 bg-light-subtle mt-3">
+      <div class="card-body py-3 px-4">
+        <div class="form-check form-switch mb-0">
+          <input
+            id="stepTwoAutoInsert"
+            class="form-check-input"
+            type="checkbox"
+            :checked="isStepTwoAutoInsertEnabled"
+            @change="handleStepTwoAutoInsertChange"
+          >
+          <label
+            class="form-check-label fw-semibold"
+            for="stepTwoAutoInsert"
+          >
+            Auto insert data tab 2
+          </label>
+          <div class="form-text mt-1">
+            Isi otomatis contoh data nasabah dari penyimpanan lokal. Matikan kembali untuk mengembalikan data tab 2
+            sebelumnya.
+          </div>
+        </div>
+      </div>
+    </div>
+
     <div class="row g-3 mt-1">
       <div class="col-12">
         <label
@@ -30,6 +54,7 @@
           id="customerFullName"
           :value="form.customerFullName"
           class="form-control"
+          :class="{ 'is-invalid': !!fieldErrors.customerFullName }"
           type="text"
           list="pawn-contract-customer-suggestions"
           placeholder="Contoh: Andi Saputra"
@@ -48,6 +73,12 @@
         </datalist>
         <div class="form-text">
           {{ customerLookupMessage }}
+        </div>
+        <div
+          v-if="fieldErrors.customerFullName"
+          class="invalid-feedback d-block"
+        >
+          {{ fieldErrors.customerFullName }}
         </div>
       </div>
 
@@ -95,9 +126,16 @@
           id="customerAddress"
           v-model="customerAddressModel"
           class="form-control"
+          :class="{ 'is-invalid': !!fieldErrors.customerAddress }"
           rows="3"
           placeholder="Contoh: Jl. Andi Pangeran Pettarani No. 88, Panakkukang"
         />
+        <div
+          v-if="fieldErrors.customerAddress"
+          class="invalid-feedback d-block"
+        >
+          {{ fieldErrors.customerAddress }}
+        </div>
       </div>
 
       <div class="col-12 col-md-4">
@@ -109,9 +147,16 @@
           id="customerCity"
           v-model="customerCityModel"
           class="form-control"
+          :class="{ 'is-invalid': !!fieldErrors.customerCity }"
           type="text"
           placeholder="Contoh: Makassar"
         >
+        <div
+          v-if="fieldErrors.customerCity"
+          class="invalid-feedback d-block"
+        >
+          {{ fieldErrors.customerCity }}
+        </div>
       </div>
 
       <div class="col-12 col-md-4">
@@ -123,6 +168,7 @@
           id="customerPhone"
           :value="form.customerPhone"
           class="form-control"
+          :class="{ 'is-invalid': !!fieldErrors.customerPhone }"
           type="text"
           list="pawn-contract-customer-phone-suggestions"
           placeholder="Contoh: 081234567890"
@@ -141,6 +187,12 @@
         </datalist>
         <div class="form-text">
           Ketik nomor telepon untuk menampilkan maksimal 5 nasabah dari data lokal.
+        </div>
+        <div
+          v-if="fieldErrors.customerPhone"
+          class="invalid-feedback d-block"
+        >
+          {{ fieldErrors.customerPhone }}
         </div>
       </div>
 
@@ -173,6 +225,7 @@
           id="customerIdentityNumber"
           :value="form.customerIdentityNumber"
           class="form-control"
+          :class="{ 'is-invalid': !!fieldErrors.customerIdentityNumber }"
           type="text"
           list="pawn-contract-customer-identity-suggestions"
           placeholder="Contoh: 7371xxxxxxxxxxxx"
@@ -192,6 +245,12 @@
         <div class="form-text">
           Ketik nomor identitas untuk menampilkan maksimal 5 nasabah dari data lokal.
         </div>
+        <div
+          v-if="fieldErrors.customerIdentityNumber"
+          class="invalid-feedback d-block"
+        >
+          {{ fieldErrors.customerIdentityNumber }}
+        </div>
       </div>
     </div>
   </section>
@@ -206,20 +265,24 @@ import type {
 } from '@feature/pawn_contract/domain/models';
 import type {
   PawnContractCustomerSuggestionOptionModel,
+  PawnContractFormFieldErrorMap,
   PawnContractFormFieldUpdater
 } from '@feature/pawn_contract/presentation/models/pawn_contract_form_ui.model';
 
 interface PawnContractFormCustomerSectionProps {
   activeStep: 1 | 2;
   form: PawnContractFormValueModel;
+  fieldErrors: PawnContractFormFieldErrorMap;
   referenceData: PawnContractFormReferenceModel;
   customerNameSuggestions: PawnContractCustomerSuggestionOptionModel[];
   customerPhoneSuggestions: PawnContractCustomerSuggestionOptionModel[];
   customerIdentityNumberSuggestions: PawnContractCustomerSuggestionOptionModel[];
   customerLookupMessage: string;
+  isStepTwoAutoInsertEnabled: boolean;
   applyCustomerLookupFromName: () => void;
   applyCustomerLookupFromPhone: () => void;
   applyCustomerLookupFromIdentityNumber: () => void;
+  setStepTwoAutoInsertEnabled: (enabled: boolean) => void;
   updateFormField: PawnContractFormFieldUpdater;
 }
 
@@ -227,6 +290,7 @@ const props = defineProps<PawnContractFormCustomerSectionProps>();
 
 const activeStep = computed<1 | 2>(() => props.activeStep);
 const form = computed<PawnContractFormValueModel>(() => props.form);
+const fieldErrors = computed<PawnContractFormFieldErrorMap>(() => props.fieldErrors);
 const referenceData = computed<PawnContractFormReferenceModel>(() => props.referenceData);
 const customerNameSuggestions = computed<PawnContractCustomerSuggestionOptionModel[]>(() => props.customerNameSuggestions);
 const customerPhoneSuggestions = computed<PawnContractCustomerSuggestionOptionModel[]>(() => props.customerPhoneSuggestions);
@@ -234,9 +298,11 @@ const customerIdentityNumberSuggestions = computed<PawnContractCustomerSuggestio
   () => props.customerIdentityNumberSuggestions
 );
 const customerLookupMessage = computed<string>(() => props.customerLookupMessage);
+const isStepTwoAutoInsertEnabled = computed<boolean>(() => props.isStepTwoAutoInsertEnabled);
 const applyCustomerLookupFromName: () => void = props.applyCustomerLookupFromName;
 const applyCustomerLookupFromPhone: () => void = props.applyCustomerLookupFromPhone;
 const applyCustomerLookupFromIdentityNumber: () => void = props.applyCustomerLookupFromIdentityNumber;
+const setStepTwoAutoInsertEnabled: (enabled: boolean) => void = props.setStepTwoAutoInsertEnabled;
 const updateFormField: PawnContractFormFieldUpdater = props.updateFormField;
 
 const customerBirthDateModel = computed({
@@ -278,5 +344,13 @@ const handleCustomerPhoneInput = (event: Event): void => {
 const handleCustomerIdentityNumberInput = (event: Event): void => {
   updateFormField('customerIdentityNumber', readInputValue(event));
   applyCustomerLookupFromIdentityNumber();
+};
+
+const handleStepTwoAutoInsertChange = (event: Event): void => {
+  const { target } = event;
+
+  if (target instanceof HTMLInputElement) {
+    setStepTwoAutoInsertEnabled(target.checked);
+  }
 };
 </script>

@@ -24,9 +24,16 @@
           id="itemName"
           v-model="itemNameModel"
           class="form-control"
+          :class="{ 'is-invalid': !!fieldErrors.itemName }"
           type="text"
           placeholder="Contoh: iPhone 13 Pro 128GB"
         >
+        <div
+          v-if="fieldErrors.itemName"
+          class="invalid-feedback d-block"
+        >
+          {{ fieldErrors.itemName }}
+        </div>
       </div>
 
       <div class="col-12">
@@ -43,8 +50,10 @@
               :class="{ 'is-active': form.itemKind === preset.kind }"
               @click="updateFormField('itemKind', preset.kind)"
             >
-              <strong>{{ preset.label }}</strong>
-              <small>{{ preset.description }}</small>
+              <span class="pawn-contract-create-page__option-copy">
+                <strong>{{ preset.label }}</strong>
+                <small>{{ preset.description }}</small>
+              </span>
             </button>
           </div>
         </div>
@@ -61,6 +70,7 @@
               id="itemDetailType"
               v-model="itemDetailTypeModel"
               class="form-select"
+              :class="{ 'is-invalid': !!fieldErrors.itemDetailType }"
             >
               <option
                 v-for="option in currentPreset?.detailOptions ?? []"
@@ -70,6 +80,12 @@
                 {{ option.label }}
               </option>
             </select>
+            <div
+              v-if="fieldErrors.itemDetailType"
+              class="invalid-feedback d-block"
+            >
+              {{ fieldErrors.itemDetailType }}
+            </div>
           </div>
 
           <div class="col-12 col-md-6 pawn-contract-create-page__metric-field">
@@ -97,9 +113,16 @@
               id="itemDetailFirst"
               v-model="itemDetailFirstModel"
               class="form-control"
+              :class="{ 'is-invalid': !!fieldErrors.itemDetailFirst }"
               type="text"
               :placeholder="itemDetailPlaceholders.first"
             >
+            <div
+              v-if="fieldErrors.itemDetailFirst"
+              class="invalid-feedback d-block"
+            >
+              {{ fieldErrors.itemDetailFirst }}
+            </div>
           </div>
 
           <div class="col-12 col-md-4">
@@ -111,9 +134,16 @@
               id="itemDetailSecond"
               v-model="itemDetailSecondModel"
               class="form-control"
+              :class="{ 'is-invalid': !!fieldErrors.itemDetailSecond }"
               type="text"
               :placeholder="itemDetailPlaceholders.second"
             >
+            <div
+              v-if="fieldErrors.itemDetailSecond"
+              class="invalid-feedback d-block"
+            >
+              {{ fieldErrors.itemDetailSecond }}
+            </div>
           </div>
 
           <div class="col-12 col-md-4">
@@ -125,9 +155,16 @@
               id="itemDetailThird"
               v-model="itemDetailThirdModel"
               class="form-control"
+              :class="{ 'is-invalid': !!fieldErrors.itemDetailThird }"
               type="text"
               :placeholder="itemDetailPlaceholders.third"
             >
+            <div
+              v-if="fieldErrors.itemDetailThird"
+              class="invalid-feedback d-block"
+            >
+              {{ fieldErrors.itemDetailThird }}
+            </div>
           </div>
         </div>
       </div>
@@ -141,9 +178,16 @@
           id="accessorySummary"
           v-model="accessorySummaryModel"
           class="form-control"
+          :class="{ 'is-invalid': !!fieldErrors.accessorySummary }"
           rows="3"
           placeholder="Contoh: dus, charger 20W, kabel data, headset"
         />
+        <div
+          v-if="fieldErrors.accessorySummary"
+          class="invalid-feedback d-block"
+        >
+          {{ fieldErrors.accessorySummary }}
+        </div>
       </div>
 
       <div class="col-12 col-lg-6">
@@ -155,9 +199,16 @@
           id="issueSummary"
           v-model="issueSummaryModel"
           class="form-control"
+          :class="{ 'is-invalid': !!fieldErrors.issueSummary }"
           rows="3"
           placeholder="Contoh: backdoor lecet tipis, battery health 82%, tanpa kartu garansi"
         />
+        <div
+          v-if="fieldErrors.issueSummary"
+          class="invalid-feedback d-block"
+        >
+          {{ fieldErrors.issueSummary }}
+        </div>
       </div>
     </div>
   </section>
@@ -171,12 +222,14 @@ import type {
   PawnContractItemTypeOptionModel
 } from '@feature/pawn_contract/domain/models';
 import type {
+  PawnContractFormFieldErrorMap,
   PawnContractFormFieldUpdater,
   PawnContractItemDetailPlaceholderModel
 } from '@feature/pawn_contract/presentation/models/pawn_contract_form_ui.model';
 
 interface PawnContractFormItemSectionProps {
   form: PawnContractFormValueModel;
+  fieldErrors: PawnContractFormFieldErrorMap;
   itemPresetList: PawnContractItemPresetModel[];
   currentPreset: PawnContractItemPresetModel | null;
   selectedDetailOption: PawnContractItemTypeOptionModel | null;
@@ -187,6 +240,7 @@ interface PawnContractFormItemSectionProps {
 const props = defineProps<PawnContractFormItemSectionProps>();
 
 const form = computed<PawnContractFormValueModel>(() => props.form);
+const fieldErrors = computed<PawnContractFormFieldErrorMap>(() => props.fieldErrors);
 const itemPresetList = computed<PawnContractItemPresetModel[]>(() => props.itemPresetList);
 const currentPreset = computed<PawnContractItemPresetModel | null>(() => props.currentPreset);
 const selectedDetailOption = computed<PawnContractItemTypeOptionModel | null>(() => props.selectedDetailOption);

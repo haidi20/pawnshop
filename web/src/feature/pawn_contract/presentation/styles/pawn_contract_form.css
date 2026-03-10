@@ -129,6 +129,12 @@
   min-width: 0;
 }
 
+.pawn-contract-create-page__option-copy {
+  display: grid;
+  gap: 4px;
+  min-width: 0;
+}
+
 .pawn-contract-create-page__tab-link strong,
 .pawn-contract-create-page__item-kind strong,
 .pawn-contract-create-page__payment-option strong {
@@ -218,9 +224,40 @@
   font-size: 1rem;
 }
 
-.swal2-popup.pawn-contract-create-page__confirm-modal {
-  width: min(96vw, 1140px) !important;
-  max-width: 1140px !important;
+.pawn-contract-create-page__confirm-modal {
+  z-index: 1060;
+}
+
+.pawn-contract-create-page__confirm-backdrop {
+  z-index: 1055;
+  background: rgba(15, 23, 42, 0.38);
+}
+
+.pawn-contract-create-page__confirm-dialog {
+  max-width: min(96vw, 1140px);
+}
+
+.pawn-contract-create-page__warning-dialog {
+  max-width: min(92vw, 720px);
+}
+
+.pawn-contract-create-page__confirm-content {
+  border-radius: 24px;
+  background: #f8fafc;
+  overflow: hidden;
+}
+
+.pawn-contract-create-page__confirm-header {
+  align-items: flex-start;
+  padding: 20px 24px;
+  border-bottom: 1px solid rgba(148, 163, 184, 0.16);
+}
+
+.pawn-contract-create-page__confirm-footer {
+  justify-content: flex-end;
+  gap: 12px;
+  padding: 18px 24px 24px;
+  border-top: 1px solid rgba(148, 163, 184, 0.16);
 }
 
 .pawn-contract-create-page__summary-list {
@@ -264,6 +301,11 @@
 .pawn-contract-create-page__confirm-panel-icon.is-status {
   background: rgba(25, 135, 84, 0.12);
   color: #198754;
+}
+
+.pawn-contract-create-page__confirm-panel-icon.is-warning {
+  background: rgba(255, 193, 7, 0.16);
+  color: #b58105;
 }
 
 .pawn-contract-create-page__confirm-panel-copy {
@@ -354,6 +396,25 @@
   border-color: #f1aeb5;
 }
 
+.pawn-contract-create-page__warning-list {
+  display: grid;
+  gap: 10px;
+  padding-left: 0;
+  list-style: none;
+}
+
+.pawn-contract-create-page__warning-list li {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+}
+
+.pawn-contract-create-page__warning-list i {
+  line-height: 1;
+  font-size: 1.25rem;
+  color: #b58105;
+}
+
 @media (max-width: 991.98px) {
   .pawn-contract-create-page__tabs {
     gap: 0.5rem;
@@ -389,5 +450,18 @@
 
   .pawn-contract-create-page__summary-item strong {
     text-align: left;
+  }
+
+  .pawn-contract-create-page__confirm-header,
+  .pawn-contract-create-page__confirm-footer {
+    padding: 16px;
+  }
+
+  .pawn-contract-create-page__confirm-footer {
+    flex-direction: column-reverse;
+  }
+
+  .pawn-contract-create-page__confirm-footer .btn {
+    width: 100%;
   }
 }

@@ -49,7 +49,7 @@
         <section
           v-else
           class="sidebar-group"
-          :class="{ 'is-active': isGroupExpanded(item) }"
+          :class="{ 'is-active': isGroupActive(item), 'is-expanded': isGroupExpanded(item) }"
           :data-testid="`sidebar-group-${item.key}`"
         >
           <button
@@ -136,7 +136,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, ref } from 'vue';
+import { computed, ref, watch } from 'vue';
 import { RouterLink } from 'vue-router';
 
 import type { AppNavigationItem } from '@core/domain/interfaces/app_module.interface';
@@ -167,6 +167,9 @@ const isGroupActive = (item: AppNavigationItem): boolean =>
 
 const isGroupExpanded = (item: AppNavigationItem): boolean => isGroupActive(item) || expandedGroupKey.value === item.key;
 
+const findActiveGroupKey = (): string | null =>
+  props.items.find((item) => item.children?.some((child) => isItemActive(child.route)))?.key ?? null;
+
 const toggleGroup = (item: AppNavigationItem): void => {
   if (isCollapsed.value || !item.children?.length) {
     return;
@@ -174,6 +177,14 @@ const toggleGroup = (item: AppNavigationItem): void => {
 
   expandedGroupKey.value = expandedGroupKey.value === item.key ? null : item.key;
 };
+
+watch(
+  activePath,
+  () => {
+    expandedGroupKey.value = findActiveGroupKey();
+  },
+  { immediate: true }
+);
 
 const resetLocalData = (): void => {
   if (typeof window === 'undefined') {

@@ -24,8 +24,17 @@ import type {
 } from '@feature/pawn_contract/presentation/models/pawn_contract_confirmation.model';
 import type {
     PawnContractCustomerSuggestionOptionModel,
+    PawnContractFormFieldName,
+    PawnContractFormTouchedFieldMap,
     PawnContractItemDetailPlaceholderModel
 } from '@feature/pawn_contract/presentation/models/pawn_contract_form_ui.model';
+import type {
+    PawnContractStepOneAutoInsertFieldName,
+    PawnContractStepOneAutoInsertSnapshotModel,
+    PawnContractStepTwoAutoInsertFieldName,
+    PawnContractStepTwoAutoInsertSnapshotModel
+} from '@feature/pawn_contract/presentation/models/pawn_contract_form_ui.model';
+import { validatePawnContractForm } from '@feature/pawn_contract/presentation/validations/pawn_contract_form.validation';
 
 export const DEFAULT_PAWN_CONTRACT_CUSTOMER_BIRTH_DATE = '2000-01-01';
 
@@ -50,6 +59,7 @@ export interface PawnContractSummaryPresentationParams {
     prepaidStorageAmount: number;
     prepaidStoragePeriodLabel: string;
     administrationFeeAmount: number;
+    customerReceivedAmount: number;
     amountInWords: string;
     projectedRemainingBalance: number;
     formatCurrency: (value: number) => string;
@@ -292,12 +302,14 @@ const createConfirmationRow = (
     key: string,
     label: string,
     value: string,
-    helper?: string
+    helper?: string,
+    valueClassName?: string
 ): PawnContractConfirmationRowModel => ({
     key,
     label,
     value: value.trim() || '-',
-    helper
+    helper,
+    valueClassName
 });
 
 const createConfirmationSection = (
@@ -364,98 +376,282 @@ const pawnContractItemDetailPlaceholderMap: Record<
     }
 };
 
-export const buildStepOneValidationErrors = (params: {
+export const pawnContractStepOneFieldNames: PawnContractFormFieldName[] = [
+    'branchId',
+    'contractDate',
+    'itemName',
+    'itemDetailType',
+    'itemDetailFirst',
+    'itemDetailSecond',
+    'itemDetailThird',
+    'accessorySummary',
+    'issueSummary',
+    'appraisedValue',
+    'disbursedValue'
+];
+
+export const pawnContractStepOneAutoInsertFieldNames: PawnContractStepOneAutoInsertFieldName[] = [
+    'branchId',
+    'contractDate',
+    'termDays',
+    'itemName',
+    'itemKind',
+    'itemDetailType',
+    'itemDetailFirst',
+    'itemDetailSecond',
+    'itemDetailThird',
+    'accessorySummary',
+    'issueSummary',
+    'appraisedValue',
+    'disbursedValue',
+    'paymentOptionDays',
+    'prepaidStoragePeriods'
+];
+
+export const pawnContractStepTwoFieldNames: PawnContractFormFieldName[] = [
+    'customerFullName',
+    'customerAddress',
+    'customerCity',
+    'customerPhone',
+    'customerIdentityNumber'
+];
+
+export const pawnContractStepTwoAutoInsertFieldNames: PawnContractStepTwoAutoInsertFieldName[] = [
+    'customerFullName',
+    'customerGender',
+    'customerAddress',
+    'customerCity',
+    'customerPhone',
+    'customerIdentityType',
+    'customerIdentityNumber',
+    'customerBirthDate'
+];
+
+const removeExamplePrefix = (value: string): string => value.replace(/^Contoh:\s*/i, '').trim();
+
+const createAutoInsertValueSnapshot = <TFieldName extends PawnContractFormFieldName>(
+    fields: readonly TFieldName[],
+    form: PawnContractFormValueModel
+): Pick<PawnContractFormValueModel, TFieldName> => {
+    const snapshot = {} as Pick<PawnContractFormValueModel, TFieldName>;
+
+    const assignFieldValue = <TField extends TFieldName>(field: TField): void => {
+        snapshot[field] = form[field];
+    };
+
+    for (const field of fields) {
+        assignFieldValue(field);
+    }
+
+    return snapshot;
+};
+
+const createAutoInsertTouchedSnapshot = <TFieldName extends PawnContractFormFieldName>(
+    fields: readonly TFieldName[],
+    touchedFields: PawnContractFormTouchedFieldMap
+): Pick<PawnContractFormTouchedFieldMap, TFieldName> => {
+    const snapshot = {} as Pick<PawnContractFormTouchedFieldMap, TFieldName>;
+
+    const assignTouchedField = <TField extends TFieldName>(field: TField): void => {
+        snapshot[field] = touchedFields[field];
+    };
+
+    for (const field of fields) {
+        assignTouchedField(field);
+    }
+
+    return snapshot;
+};
+
+const createStepOneAutoInsertContent = (params: {
+    itemKind: PawnContractItemKindEnum;
+    itemDetailType: string;
+    itemDetailPlaceholders: PawnContractItemDetailPlaceholderModel;
+}): Pick<
+    PawnContractFormValueModel,
+    | 'itemName'
+    | 'itemDetailFirst'
+    | 'itemDetailSecond'
+    | 'itemDetailThird'
+    | 'accessorySummary'
+    | 'issueSummary'
+> => {
+    if (params.itemKind === PawnContractItemKindEnum.Vehicle) {
+        return {
+            itemName: params.itemDetailType === 'mobil' ? 'Mobil keluarga 7 penumpang' : 'Motor matic harian 150cc',
+            itemDetailFirst: removeExamplePrefix(params.itemDetailPlaceholders.first),
+            itemDetailSecond: removeExamplePrefix(params.itemDetailPlaceholders.second),
+            itemDetailThird: removeExamplePrefix(params.itemDetailPlaceholders.third),
+            accessorySummary:
+                params.itemDetailType === 'mobil'
+                    ? 'STNK asli, kunci utama, kunci cadangan, buku servis'
+                    : 'STNK asli, kunci utama, helm, kunci cadangan',
+            issueSummary:
+                params.itemDetailType === 'mobil'
+                    ? 'Baret tipis pada bumper belakang, interior masih rapi'
+                    : 'Baret halus pada bodi samping, ban belakang mulai menipis'
+        };
+    }
+
+    return {
+        itemName:
+            params.itemDetailType === 'laptop'
+                ? 'Laptop kerja tipis 14 inci'
+                : params.itemDetailType === 'kamera'
+                  ? 'Kamera mirrorless lensa kit'
+                  : params.itemDetailType === 'tv'
+                    ? 'Televisi smart 50 inci'
+                    : 'Smartphone flagship 128GB',
+        itemDetailFirst: removeExamplePrefix(params.itemDetailPlaceholders.first),
+        itemDetailSecond: removeExamplePrefix(params.itemDetailPlaceholders.second),
+        itemDetailThird: removeExamplePrefix(params.itemDetailPlaceholders.third),
+        accessorySummary: 'Dus asli, charger, kabel data, nota pembelian',
+        issueSummary: 'Lecet tipis pada sisi belakang, fungsi utama masih normal'
+    };
+};
+
+export const createStepOneAutoInsertSnapshot = (params: {
+    form: PawnContractFormValueModel;
+    touchedFields: PawnContractFormTouchedFieldMap;
+}): PawnContractStepOneAutoInsertSnapshotModel => ({
+    values: createAutoInsertValueSnapshot(pawnContractStepOneAutoInsertFieldNames, params.form),
+    touchedFields: createAutoInsertTouchedSnapshot(pawnContractStepOneAutoInsertFieldNames, params.touchedFields)
+});
+
+export const createStepTwoAutoInsertSnapshot = (params: {
+    form: PawnContractFormValueModel;
+    touchedFields: PawnContractFormTouchedFieldMap;
+}): PawnContractStepTwoAutoInsertSnapshotModel => ({
+    values: createAutoInsertValueSnapshot(pawnContractStepTwoAutoInsertFieldNames, params.form),
+    touchedFields: createAutoInsertTouchedSnapshot(pawnContractStepTwoAutoInsertFieldNames, params.touchedFields)
+});
+
+export const createStepOneAutoInsertPatch = (params: {
+    form: PawnContractFormValueModel;
+    referenceData: PawnContractFormReferenceModel;
+    currentPreset: PawnContractItemPresetModel | null;
+    itemDetailPlaceholders: PawnContractItemDetailPlaceholderModel;
+    availablePaymentOptions: Array<EnumOptionModel<PawnContractPaymentOptionDaysEnum>>;
+    prepaidStorageOptions: number[];
+}): Pick<PawnContractFormValueModel, PawnContractStepOneAutoInsertFieldName> => {
+    const branchId = params.form.branchId > 0 ? params.form.branchId : params.referenceData.defaultBranchId ?? params.referenceData.branches[0]?.id ?? 0;
+    const contractDate = params.form.contractDate || params.referenceData.defaultContractDate;
+    const termDays = params.form.termDays;
+    const itemKind = params.form.itemKind;
+    const itemDetailType = params.form.itemDetailType || (params.currentPreset?.defaultDetailValue ?? '');
+    const paymentOptionDays =
+        params.availablePaymentOptions.find((option) => option.value === params.form.paymentOptionDays)?.value ??
+        params.availablePaymentOptions[0]?.value ??
+        PawnContractPaymentOptionDaysEnum.Daily;
+    const prepaidStoragePeriods = params.prepaidStorageOptions.includes(params.form.prepaidStoragePeriods)
+        ? params.form.prepaidStoragePeriods
+        : 0;
+    const branchBalance =
+        params.referenceData.branches.find((branch) => branch.id === branchId)?.availableBalance ??
+        params.referenceData.branches[0]?.availableBalance ??
+        0;
+    const appraisedValue = 5_000_000;
+    const disbursedValue = Math.min(3_500_000, appraisedValue, Math.max(0, branchBalance));
+    const detailContent = createStepOneAutoInsertContent({
+        itemKind,
+        itemDetailType,
+        itemDetailPlaceholders: params.itemDetailPlaceholders
+    });
+
+    return {
+        branchId,
+        contractDate,
+        termDays,
+        itemName: detailContent.itemName,
+        itemKind,
+        itemDetailType,
+        itemDetailFirst: detailContent.itemDetailFirst,
+        itemDetailSecond: detailContent.itemDetailSecond,
+        itemDetailThird: detailContent.itemDetailThird,
+        accessorySummary: detailContent.accessorySummary,
+        issueSummary: detailContent.issueSummary,
+        appraisedValue,
+        disbursedValue,
+        paymentOptionDays,
+        prepaidStoragePeriods
+    };
+};
+
+export const createStepTwoAutoInsertPatch = (params: {
+    referenceData: PawnContractFormReferenceModel;
+}): Pick<PawnContractFormValueModel, PawnContractStepTwoAutoInsertFieldName> => {
+    const existingCustomer = params.referenceData.customers[0];
+
+    if (existingCustomer) {
+        return {
+            customerFullName: existingCustomer.fullName,
+            customerGender: existingCustomer.gender,
+            customerAddress: existingCustomer.address,
+            customerCity: existingCustomer.city,
+            customerPhone: existingCustomer.phoneNumber,
+            customerIdentityType: existingCustomer.identityType ?? PawnContractIdentityTypeEnum.Ktp,
+            customerIdentityNumber: existingCustomer.identityNumber ?? '7371123412340001',
+            customerBirthDate: existingCustomer.birthDate ?? DEFAULT_PAWN_CONTRACT_CUSTOMER_BIRTH_DATE
+        };
+    }
+
+    return {
+        customerFullName: 'Andi Saputra',
+        customerGender: PawnContractCustomerGenderEnum.Male,
+        customerAddress: 'Jl. Andi Pangeran Pettarani No. 88, Panakkukang',
+        customerCity: 'Makassar',
+        customerPhone: '081234567890',
+        customerIdentityType: PawnContractIdentityTypeEnum.Ktp,
+        customerIdentityNumber: '7371123412340001',
+        customerBirthDate: '1995-08-17'
+    };
+};
+
+const buildValidationErrorsFromFields = (params: {
+    fields: PawnContractFormFieldName[];
     form: PawnContractFormValueModel;
     currentPreset: PawnContractItemPresetModel | null;
     selectedBranchAvailableBalance: number | null;
 }): string[] => {
-    const { form, currentPreset, selectedBranchAvailableBalance } = params;
-    const errors: string[] = [];
+    const validationResult = validatePawnContractForm({
+        form: params.form,
+        currentPreset: params.currentPreset,
+        selectedBranchAvailableBalance: params.selectedBranchAvailableBalance
+    });
 
-    if (form.branchId <= 0) {
-        errors.push('Cabang aktif perlu dipilih.');
-    }
+    return params.fields.reduce<string[]>((errors, field) => {
+        const message = validationResult.fieldErrors[field];
+        if (message && !errors.includes(message)) {
+            errors.push(message);
+        }
 
-    if (!form.contractDate) {
-        errors.push('Tanggal mulai gadai wajib diisi.');
-    }
-
-    if (!form.itemName.trim()) {
-        errors.push('Nama barang jaminan belum diisi.');
-    }
-
-    if (!form.itemDetailType) {
-        errors.push('Jenis detail barang belum dipilih.');
-    }
-
-    if (!form.itemDetailFirst.trim()) {
-        errors.push(`${currentPreset?.detailLabels.first ?? 'Detail pertama'} wajib diisi.`);
-    }
-
-    if (!form.itemDetailSecond.trim()) {
-        errors.push(`${currentPreset?.detailLabels.second ?? 'Detail kedua'} wajib diisi.`);
-    }
-
-    if (!form.itemDetailThird.trim()) {
-        errors.push(`${currentPreset?.detailLabels.third ?? 'Detail ketiga'} wajib diisi.`);
-    }
-
-    if (!form.accessorySummary.trim()) {
-        errors.push('Kelengkapan barang wajib dijelaskan.');
-    }
-
-    if (!form.issueSummary.trim()) {
-        errors.push('Catatan kekurangan atau kerusakan wajib diisi.');
-    }
-
-    if (form.appraisedValue <= 0) {
-        errors.push('Nilai taksiran harus lebih besar dari nol.');
-    }
-
-    if (form.disbursedValue <= 0) {
-        errors.push('Dana pencairan harus lebih besar dari nol.');
-    }
-
-    if (form.disbursedValue > form.appraisedValue) {
-        errors.push('Dana pencairan tidak boleh lebih dari nilai taksir.');
-    }
-
-    if (selectedBranchAvailableBalance !== null && form.disbursedValue > selectedBranchAvailableBalance) {
-        errors.push('Dana pencairan melebihi saldo cabang aktif.');
-    }
-
-    return errors;
+        return errors;
+    }, []);
 };
 
-export const buildStepTwoValidationErrors = (form: PawnContractFormValueModel): string[] => {
-    const errors: string[] = [];
+export const buildStepOneValidationErrors = (params: {
+    form: PawnContractFormValueModel;
+    currentPreset: PawnContractItemPresetModel | null;
+    selectedBranchAvailableBalance: number | null;
+}): string[] =>
+    buildValidationErrorsFromFields({
+        fields: pawnContractStepOneFieldNames,
+        form: params.form,
+        currentPreset: params.currentPreset,
+        selectedBranchAvailableBalance: params.selectedBranchAvailableBalance
+    });
 
-    if (!form.customerFullName.trim()) {
-        errors.push('Nama lengkap nasabah wajib diisi.');
-    }
-
-    if (!form.customerAddress.trim()) {
-        errors.push('Alamat lengkap nasabah wajib diisi.');
-    }
-
-    if (!form.customerCity.trim()) {
-        errors.push('Kota atau kabupaten wajib diisi.');
-    }
-
-    if (!form.customerPhone.trim()) {
-        errors.push('Nomor telepon nasabah wajib diisi.');
-    }
-
-    if (!form.customerIdentityType) {
-        errors.push('Jenis identitas belum dipilih.');
-    }
-
-    if (!form.customerIdentityNumber.trim()) {
-        errors.push('Nomor identitas wajib diisi.');
-    }
-
-    return errors;
-};
+export const buildStepTwoValidationErrors = (params: {
+    form: PawnContractFormValueModel;
+    currentPreset: PawnContractItemPresetModel | null;
+    selectedBranchAvailableBalance: number | null;
+}): string[] =>
+    buildValidationErrorsFromFields({
+        fields: pawnContractStepTwoFieldNames,
+        form: params.form,
+        currentPreset: params.currentPreset,
+        selectedBranchAvailableBalance: params.selectedBranchAvailableBalance
+    });
 
 export const buildSavePawnContractPayload = (params: {
     contractId: number | null;
@@ -587,6 +783,13 @@ export const buildPawnContractSummaryConfirmation = (
                         'prepaid-storage-amount',
                         'Total biaya titip di muka',
                         params.formatCurrency(params.prepaidStorageAmount)
+                    ),
+                    createConfirmationRow(
+                        'customer-received-amount',
+                        'Uang yang diberikan kepada nasabah',
+                        params.formatCurrency(params.customerReceivedAmount),
+                        'Dana pencairan setelah dikurangi biaya titip di muka dan biaya admin.',
+                        'text-success'
                     ),
                     createConfirmationRow(
                         'administration-fee',

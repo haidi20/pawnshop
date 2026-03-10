@@ -24,6 +24,7 @@
           id="branchId"
           v-model.number="branchIdModel"
           class="form-select"
+          :class="{ 'is-invalid': !!fieldErrors.branchId }"
         >
           <option
             :value="0"
@@ -41,6 +42,12 @@
         </select>
         <div class="form-text">
           Hanya cabang dengan akun kas aktif yang ditampilkan.
+        </div>
+        <div
+          v-if="fieldErrors.branchId"
+          class="invalid-feedback d-block"
+        >
+          {{ fieldErrors.branchId }}
         </div>
       </div>
 
@@ -90,8 +97,15 @@
           id="contractDate"
           v-model="contractDateModel"
           class="form-control"
+          :class="{ 'is-invalid': !!fieldErrors.contractDate }"
           type="date"
         >
+        <div
+          v-if="fieldErrors.contractDate"
+          class="invalid-feedback d-block"
+        >
+          {{ fieldErrors.contractDate }}
+        </div>
       </div>
 
       <div class="col-12 col-md-4">
@@ -117,10 +131,14 @@ import type {
   PawnContractFormReferenceModel,
   PawnContractFormValueModel
 } from '@feature/pawn_contract/domain/models';
-import type { PawnContractFormFieldUpdater } from '@feature/pawn_contract/presentation/models/pawn_contract_form_ui.model';
+import type {
+  PawnContractFormFieldErrorMap,
+  PawnContractFormFieldUpdater
+} from '@feature/pawn_contract/presentation/models/pawn_contract_form_ui.model';
 
 interface PawnContractFormContractSectionProps {
   form: PawnContractFormValueModel;
+  fieldErrors: PawnContractFormFieldErrorMap;
   referenceData: PawnContractFormReferenceModel;
   maturityDate: string;
   formatCurrency: (value: number) => string;
@@ -130,6 +148,7 @@ interface PawnContractFormContractSectionProps {
 const props = defineProps<PawnContractFormContractSectionProps>();
 
 const form = computed<PawnContractFormValueModel>(() => props.form);
+const fieldErrors = computed<PawnContractFormFieldErrorMap>(() => props.fieldErrors);
 const referenceData = computed<PawnContractFormReferenceModel>(() => props.referenceData);
 const maturityDate = computed<string>(() => props.maturityDate);
 const formatCurrency: (value: number) => string = props.formatCurrency;
