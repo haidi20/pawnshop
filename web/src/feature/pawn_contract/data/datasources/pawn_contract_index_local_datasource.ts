@@ -1,0 +1,546 @@
+import {
+    buildPawnContractIdentityLabel,
+    buildPawnContractLocationLabel,
+    getMonthOffsetFromToday,
+    getPawnContractDaysToDate,
+    getPawnContractDueLabel,
+    getPawnContractDueState,
+    getPawnContractEstimatedArrears,
+    getPawnItemLocationStatusLabel,
+    isSameDateValue,
+    sortDateOnlyDesc,
+    type PawnContractStatusModel
+} from '@core/util/helpers';
+import { getTodayDateValue } from '@core/util/pawn-contract-form';
+import type {
+    GetPawnContractAjtTableParamsModel,
+    GetPawnContractIndexTabsParamsModel,
+    GetPawnContractLocationTableParamsModel,
+    GetPawnContractMaintenanceTableParamsModel,
+    GetPawnContractNasabahTableParamsModel,
+    GetPawnContractRingkasanTableParamsModel,
+    GetPawnContractSettlementTableParamsModel,
+    PawnContractAjtTableModel,
+    PawnContractAjtTypeModel,
+    PawnContractDataModel,
+    PawnContractIndexTabModel,
+    PawnContractLocationRowModel,
+    PawnContractLocationTableModel,
+    PawnContractLocationTabModel,
+    PawnContractMaintenanceRowModel,
+    PawnContractMaintenanceTableModel,
+    PawnContractNasabahSectionModel,
+    PawnContractNasabahTabKeyModel,
+    PawnContractNasabahTableModel,
+    PawnContractRingkasanTableModel,
+    PawnContractSettlementTableModel,
+    PawnContractSettlementTypeModel,
+    PawnContractSummaryModel,
+    PawnContractTableOptionModel
+} from '@feature/pawn_contract/domain/models';
+
+const RUNNING_CONTRACT_STATUSES = new Set<PawnContractStatusModel>(['active', 'extended']);
+
+const PAWN_CONTRACT_INDEX_TABS: Array<Omit<PawnContractIndexTabModel, 'count'>> = [
+    {
+        key: 'nasabah_akad',
+        label: 'Nasabah Akad',
+        description: 'Pantau daftar nasabah aktif, jatuh tempo, dan tindak lanjut utama berdasarkan filter cabang dan status.'
+    },
+    {
+        key: 'ringkasan_harian',
+        label: 'Ringkasan Harian',
+        description: 'Ringkas pergerakan akad dan pendapatan harian untuk membantu monitoring operasional yang lebih cepat.'
+    },
+    {
+        key: 'akad_jatuh_tempo',
+        label: 'Akad Jatuh Tempo',
+        description: 'Kelompokkan akad yang mendekati atau melewati jatuh tempo agar tindak lanjut tidak tertinggal.'
+    },
+    {
+        key: 'pelunasan_lelang',
+        label: 'Pelunasan & Lelang',
+        description: 'Tinjau kontrak yang sudah lunas, masuk proses lelang, atau memerlukan refund dalam satu alur kerja.'
+    },
+    {
+        key: 'lokasi_distribusi',
+        label: 'Lokasi / Distribusi',
+        description: 'Lihat perpindahan dan lokasi barang jaminan per cabang tanpa pindah halaman.'
+    },
+    {
+        key: 'maintenance',
+        label: 'Maintenance',
+        description: 'Awasi kontrak yang masuk window maintenance dan ceklis operasional yang perlu ditangani.'
+    }
+];
+
+const PAWN_CONTRACT_NASABAH_TABS: Array<
+    Omit<PawnContractTableOptionModel<PawnContractNasabahTabKeyModel>, 'count'>
+> = [
+    {
+        key: 'seluruh_data',
+        label: 'Seluruh Data',
+        description: 'Ringkasan kontrak aktif berdasarkan rentang bulan.'
+    },
+    {
+        key: 'harian',
+        label: 'Harian',
+        description: 'Kontrak aktif dengan opsi pembayaran harian.'
+    },
+    {
+        key: 'tujuh_hari',
+        label: '7 Hari',
+        description: 'Kontrak aktif dengan opsi pembayaran per 7 hari.'
+    },
+    {
+        key: 'lima_belas_hari',
+        label: '15 Hari',
+        description: 'Kontrak aktif dengan opsi pembayaran per 15 hari.'
+    }
+];
+
+const PAWN_CONTRACT_AJT_OPTIONS: Array<
+    Omit<PawnContractTableOptionModel<PawnContractAjtTypeModel>, 'count'>
+> = [
+    { key: '7', label: '7 Hari', description: 'Akad tenor 7 hari yang masih aktif dan mendekati jatuh tempo.' },
+    { key: '15', label: '15 Hari', description: 'Akad tenor 15 hari yang perlu dipantau menjelang jatuh tempo.' },
+    { key: '30', label: '30 Hari', description: 'Akad tenor 30 hari yang jatuh tempo dalam waktu dekat.' },
+    { key: '60', label: '60 Hari', description: 'Akad tenor 60 hari yang mendekati tenggat kontrak.' },
+    { key: 'tertunggak', label: 'Tertunggak', description: 'Akad aktif yang sudah melewati jatuh tempo.' },
+    {
+        key: 'mendekati_tempo_lelang',
+        label: 'Mendekati Lelang',
+        description: 'Akad overdue awal yang masih punya ruang tindak lanjut sebelum lelang.'
+    },
+    {
+        key: 'tempo_lelang',
+        label: 'Tempo Lelang',
+        description: 'Akad overdue lebih lanjut yang mulai masuk window lelang.'
+    },
+    {
+        key: 'tunda_lelang',
+        label: 'Tunda Lelang',
+        description: 'Akad perpanjangan yang tetap overdue dan perlu keputusan lanjutan.'
+    }
+];
+
+const PAWN_CONTRACT_SETTLEMENT_OPTIONS: Array<
+    Omit<PawnContractTableOptionModel<PawnContractSettlementTypeModel>, 'count'>
+> = [
+    { key: 'lunas', label: 'Lunas', description: 'Kontrak yang sudah selesai melalui pelunasan atau penutupan.' },
+    { key: 'lelang', label: 'Lelang', description: 'Kontrak yang berakhir melalui proses lelang.' },
+    { key: 'refund', label: 'Refund', description: 'Kontrak batal yang memerlukan tindak lanjut pengembalian.' }
+];
+
+const PAWN_CONTRACT_LOCATION_OPTIONS: Array<
+    Omit<PawnContractTableOptionModel<PawnContractLocationTabModel>, 'count'>
+> = [
+    { key: 'kantor', label: 'Kantor', description: 'Barang jaminan yang saat ini berada di kantor cabang.' },
+    { key: 'proses', label: 'Proses', description: 'Barang jaminan yang sedang bergerak atau diproses.' },
+    { key: 'gudang', label: 'Gudang', description: 'Barang jaminan yang saat ini berada di gudang.' }
+];
+
+export class PawnContractIndexLocalDatasource {
+    getContractSummaries(data: PawnContractDataModel | null): PawnContractSummaryModel[] {
+        if (!data) {
+            return [];
+        }
+
+        return [...data.contractDetails]
+            .map((detail) => {
+                const customer = data.customers.find((item) => item.id === detail.contract.customerId) ?? null;
+                const branch = data.branches.find((item) => item.id === detail.contract.branchId) ?? null;
+                const itemNames = detail.items.map(({ item }) => item.itemName).join(', ') || 'Belum ada barang';
+                const locationStatuses = Array.from(new Set(detail.items.map(({ item }) => item.currentLocationStatus)));
+                const daysToMaturity = getPawnContractDaysToDate(detail.contract.maturityDate);
+                const isOpenContract = RUNNING_CONTRACT_STATUSES.has(detail.contract.contractStatus);
+
+                return {
+                    ...detail,
+                    customerName: customer?.fullName ?? `Nasabah #${detail.contract.customerId}`,
+                    customerPhone: customer?.phoneNumber || '-',
+                    customerIdentity: buildPawnContractIdentityLabel(
+                        customer?.identityType ?? null,
+                        customer?.identityNumber ?? null
+                    ),
+                    branchName: branch?.branchName ?? `Cabang #${detail.contract.branchId}`,
+                    itemNames,
+                    locationLabel: buildPawnContractLocationLabel(locationStatuses),
+                    daysToMaturity,
+                    dueState: getPawnContractDueState(daysToMaturity),
+                    dueLabel: getPawnContractDueLabel(daysToMaturity),
+                    hasWarehouseItem: detail.items.some(({ item }) => item.currentLocationStatus === 'in_warehouse'),
+                    isOpenContract,
+                    arrears: getPawnContractEstimatedArrears({
+                        maturityDate: detail.contract.maturityDate,
+                        paymentOptionDays: detail.contract.paymentOptionDays,
+                        storageFeeAmount: detail.contract.storageFeeAmount
+                    }),
+                    procedureTags: this.getProcedureTags({
+                        isOpenContract,
+                        daysToMaturity
+                    })
+                };
+            })
+            .sort((left, right) => sortDateOnlyDesc(left.contract.contractDate, right.contract.contractDate));
+    }
+
+    getNasabahTable(params: GetPawnContractNasabahTableParamsModel): PawnContractNasabahTableModel {
+        const tabs = PAWN_CONTRACT_NASABAH_TABS.map((tab) => ({
+            ...tab,
+            count: this.getNasabahTabRows(params.summaries, tab.key).length
+        }));
+        const sections = this.createNasabahMonthlySections(params.summaries);
+        const activeTabMeta = tabs.find((tab) => tab.key === params.activeTab) ?? tabs[0];
+        const activeSection = this.createNasabahSection(
+            params.activeTab,
+            activeTabMeta.label,
+            activeTabMeta.description,
+            this.getNasabahTabRows(params.summaries, params.activeTab)
+        );
+
+        return {
+            title: 'Daftar akad aktif',
+            description: 'Kelompokkan akad aktif per rentang pembayaran dan umur kontrak agar tindak lanjut lebih cepat.',
+            tabs,
+            sections,
+            activeSection,
+            displayedSections: params.activeTab === 'seluruh_data' ? sections : [activeSection]
+        };
+    }
+
+    getRingkasanTable(params: GetPawnContractRingkasanTableParamsModel): PawnContractRingkasanTableModel {
+        const todayRows = params.summaries.filter((item) =>
+            isSameDateValue(item.contract.contractDate, getTodayDateValue())
+        );
+        const akadBaruRows = todayRows.filter((item) => item.contract.contractStatus !== 'extended');
+        const akadUlangRows = params.summaries.filter(
+            (item) =>
+                item.contract.contractStatus === 'extended' &&
+                isSameDateValue(item.contract.updatedAt, getTodayDateValue())
+        );
+        const pendapatanRows = todayRows.map((item) => ({
+            contractId: item.contract.id,
+            contractNumber: item.contract.contractNumber,
+            customerName: item.customerName,
+            branchName: item.branchName,
+            storageFeeAmount: item.contract.storageFeeAmount,
+            administrationFeeAmount: item.contract.administrationFeeAmount,
+            totalIncome: item.contract.storageFeeAmount + item.contract.administrationFeeAmount
+        }));
+        const akadBaru = akadBaruRows.reduce((total, item) => total + item.contract.disbursedValue, 0);
+        const akadUlang = akadUlangRows.reduce((total, item) => total + item.contract.disbursedValue, 0);
+        const pendapatanBtitip = pendapatanRows.reduce((total, item) => total + item.storageFeeAmount, 0);
+        const pendapatanBadmin = pendapatanRows.reduce((total, item) => total + item.administrationFeeAmount, 0);
+
+        return {
+            title: 'Aktivitas hari ini',
+            description: 'Lihat realisasi akad baru, akad ulang, dan pendapatan harian dari data lokal.',
+            sections: [
+                {
+                    key: 'akad_baru',
+                    label: 'Data Akad Baru',
+                    description: 'Kontrak yang tercatat pada hari ini dari data lokal.',
+                    rows: akadBaruRows
+                },
+                {
+                    key: 'akad_ulang',
+                    label: 'Data Akad Ulang',
+                    description: 'Kontrak berstatus perpanjangan yang diperbarui hari ini.',
+                    rows: akadUlangRows
+                }
+            ],
+            pendapatanRows,
+            metrics: {
+                akadBaru,
+                akadUlang,
+                totalRealisasi: akadBaru + akadUlang,
+                pendapatanBtitip,
+                pendapatanBadmin
+            }
+        };
+    }
+
+    getAjtTable(params: GetPawnContractAjtTableParamsModel): PawnContractAjtTableModel {
+        return {
+            title: 'Pilihan jenis jatuh tempo',
+            description: 'Fokuskan pemantauan akad aktif berdasarkan tenor dan tingkat keterlambatan.',
+            options: PAWN_CONTRACT_AJT_OPTIONS.map((item) => ({
+                ...item,
+                count: this.getAjtRows(params.summaries, item.key).length
+            })),
+            rows: this.getAjtRows(params.summaries, params.activeType)
+        };
+    }
+
+    getSettlementTable(params: GetPawnContractSettlementTableParamsModel): PawnContractSettlementTableModel {
+        return {
+            title: 'Data lunas, lelang, dan refund',
+            description: 'Satukan status penyelesaian kontrak agar proses back office lebih mudah dipantau.',
+            options: PAWN_CONTRACT_SETTLEMENT_OPTIONS.map((item) => ({
+                ...item,
+                count: this.getSettlementRows(params.summaries, item.key).length
+            })),
+            rows: this.getSettlementRows(params.summaries, params.activeType)
+        };
+    }
+
+    getLocationTable(params: GetPawnContractLocationTableParamsModel): PawnContractLocationTableModel {
+        return {
+            title: 'Mutasi lokasi barang jaminan',
+            description: 'Lacak barang jaminan per lokasi agar distribusi dan perpindahan tidak terlewat.',
+            options: PAWN_CONTRACT_LOCATION_OPTIONS.map((item) => ({
+                ...item,
+                count: this.getLocationRows(params.summaries, item.key).length
+            })),
+            rows: this.getLocationRows(params.summaries, params.activeTab)
+        };
+    }
+
+    getMaintenanceTable(params: GetPawnContractMaintenanceTableParamsModel): PawnContractMaintenanceTableModel {
+        return {
+            title: 'Window maintenance operasional',
+            description: 'Tampilkan akad yang perlu inspeksi atau checklist maintenance dalam window kontrol.',
+            rows: this.getMaintenanceRows(params.summaries)
+        };
+    }
+
+    getIndexTabs(params: GetPawnContractIndexTabsParamsModel): PawnContractIndexTabModel[] {
+        return PAWN_CONTRACT_INDEX_TABS.map((item) => ({
+            ...item,
+            count: this.getIndexTabCount(item.key, params)
+        }));
+    }
+
+    private createNasabahSection(
+        key: string,
+        label: string,
+        description: string,
+        rows: PawnContractSummaryModel[]
+    ): PawnContractNasabahSectionModel {
+        return {
+            key,
+            label,
+            description,
+            rows,
+            totals: {
+                principalAmount: rows.reduce((total, item) => total + item.contract.disbursedValue, 0),
+                arrearsAmount: rows.reduce((total, item) => total + item.arrears.overdueAmount, 0),
+                dueTodayAmount: rows.reduce((total, item) => total + item.arrears.dueTodayAmount, 0)
+            }
+        };
+    }
+
+    private createNasabahMonthlySections(
+        rows: PawnContractSummaryModel[]
+    ): PawnContractNasabahSectionModel[] {
+        const currentMonthRows = rows.filter((item) => getMonthOffsetFromToday(item.contract.contractDate) === 0);
+        const oneMonthAgoRows = rows.filter((item) => getMonthOffsetFromToday(item.contract.contractDate) === 1);
+        const twoMonthAgoRows = rows.filter((item) => getMonthOffsetFromToday(item.contract.contractDate) === 2);
+        const threeMonthAgoRows = rows.filter((item) => getMonthOffsetFromToday(item.contract.contractDate) >= 3);
+
+        return [
+            this.createNasabahSection(
+                'bulan_berjalan',
+                'Bulan Berjalan',
+                'Kontrak aktif dengan tanggal akad pada bulan berjalan.',
+                currentMonthRows
+            ),
+            this.createNasabahSection(
+                'satu_bulan_lalu',
+                '1 Bulan Kemarin',
+                'Kontrak aktif yang tercatat pada bulan sebelumnya.',
+                oneMonthAgoRows
+            ),
+            this.createNasabahSection(
+                'dua_bulan_lalu',
+                '2 Bulan Kemarin',
+                'Kontrak aktif yang berasal dari dua bulan sebelumnya.',
+                twoMonthAgoRows
+            ),
+            this.createNasabahSection(
+                'tiga_bulan_atau_lebih',
+                '3 Bulan Kemarin dan Seterusnya',
+                'Kontrak aktif yang lebih lama dan masih perlu dipantau.',
+                threeMonthAgoRows
+            )
+        ];
+    }
+
+    private getNasabahTabRows(
+        rows: PawnContractSummaryModel[],
+        tab: PawnContractNasabahTabKeyModel
+    ): PawnContractSummaryModel[] {
+        switch (tab) {
+            case 'harian':
+                return rows.filter((item) => item.contract.paymentOptionDays === 1);
+            case 'tujuh_hari':
+                return rows.filter((item) => item.contract.paymentOptionDays === 7);
+            case 'lima_belas_hari':
+                return rows.filter((item) => item.contract.paymentOptionDays === 15);
+            default:
+                return rows;
+        }
+    }
+
+    private getAjtRows(
+        rows: PawnContractSummaryModel[],
+        type: PawnContractAjtTypeModel
+    ): PawnContractSummaryModel[] {
+        switch (type) {
+            case '7':
+            case '15':
+            case '30':
+            case '60':
+                return rows.filter(
+                    (item) =>
+                        item.contract.termDays === Number(type) &&
+                        item.daysToMaturity >= 0 &&
+                        item.daysToMaturity <= 7
+                );
+            case 'tertunggak':
+                return rows.filter((item) => item.daysToMaturity < 0);
+            case 'mendekati_tempo_lelang':
+                return rows.filter((item) => item.daysToMaturity < 0 && item.daysToMaturity >= -7);
+            case 'tempo_lelang':
+                return rows.filter((item) => item.daysToMaturity < -7 && item.daysToMaturity >= -21);
+            case 'tunda_lelang':
+                return rows.filter(
+                    (item) => item.contract.contractStatus === 'extended' && item.daysToMaturity < 0
+                );
+            default:
+                return rows;
+        }
+    }
+
+    private getSettlementRows(
+        rows: PawnContractSummaryModel[],
+        type: PawnContractSettlementTypeModel
+    ): PawnContractSummaryModel[] {
+        switch (type) {
+            case 'lunas':
+                return rows.filter((item) => ['redeemed', 'closed'].includes(item.contract.contractStatus));
+            case 'lelang':
+                return rows.filter((item) => item.contract.contractStatus === 'auctioned');
+            case 'refund':
+                return rows.filter((item) => item.contract.contractStatus === 'cancelled');
+            default:
+                return rows;
+        }
+    }
+
+    private getLocationRows(
+        rows: PawnContractSummaryModel[],
+        type: PawnContractLocationTabModel
+    ): PawnContractLocationRowModel[] {
+        return rows
+            .flatMap((summary) =>
+                summary.items.map((itemDetail) => ({
+                    itemId: itemDetail.item.id,
+                    contractId: summary.contract.id,
+                    contractNumber: summary.contract.contractNumber,
+                    itemName: itemDetail.item.itemName,
+                    customerName: summary.customerName,
+                    branchName: summary.branchName,
+                    currentLocationStatus: itemDetail.item.currentLocationStatus,
+                    currentLocationLabel: getPawnItemLocationStatusLabel(itemDetail.item.currentLocationStatus),
+                    primaryActionLabel: this.getPrimaryLocationActionLabel(itemDetail.item.currentLocationStatus),
+                    secondaryActionLabel:
+                        type === 'proses'
+                            ? this.getSecondaryLocationActionLabel(itemDetail.item.currentLocationStatus)
+                            : null
+                }))
+            )
+            .filter((row) => {
+                switch (type) {
+                    case 'kantor':
+                        return row.currentLocationStatus === 'in_office';
+                    case 'gudang':
+                        return row.currentLocationStatus === 'in_warehouse';
+                    case 'proses':
+                        return !['in_office', 'in_warehouse'].includes(row.currentLocationStatus ?? '');
+                    default:
+                        return true;
+                }
+            });
+    }
+
+    private getMaintenanceRows(rows: PawnContractSummaryModel[]): PawnContractMaintenanceRowModel[] {
+        return rows
+            .filter((item) => {
+                const daysSinceContract = Math.max(0, -getPawnContractDaysToDate(item.contract.contractDate));
+                return (
+                    daysSinceContract >= 15 &&
+                    daysSinceContract <= 30 &&
+                    ![1, 7].includes(item.contract.termDays)
+                );
+            })
+            .map((item) => ({
+                contractId: item.contract.id,
+                customerName: item.customerName,
+                itemNames: item.itemNames,
+                contractDate: item.contract.contractDate,
+                checklistLabel: item.contract.maintenanceRequired ? 'Belum Diperiksa' : 'Sudah Diperiksa',
+                maintenanceRequired: item.contract.maintenanceRequired
+            }))
+            .sort((left, right) => sortDateOnlyDesc(left.contractDate, right.contractDate));
+    }
+
+    private getIndexTabCount(
+        key: PawnContractIndexTabModel['key'],
+        params: GetPawnContractIndexTabsParamsModel
+    ): number {
+        switch (key) {
+            case 'nasabah_akad':
+                return params.openContractCount;
+            case 'ringkasan_harian':
+                return params.ringkasanRowCount;
+            case 'akad_jatuh_tempo':
+                return params.ajtRowCount;
+            case 'pelunasan_lelang':
+                return params.settlementRowCount;
+            case 'lokasi_distribusi':
+                return params.locationRowCount;
+            case 'maintenance':
+                return params.maintenanceRowCount;
+            default:
+                return 0;
+        }
+    }
+
+    private getProcedureTags(params: {
+        isOpenContract: boolean;
+        daysToMaturity: number;
+    }): string[] {
+        const tags = ['Bayar B. Titip', 'Pelunasan', 'Review'];
+
+        if (params.isOpenContract) {
+            tags.push('Akad Ulang', 'Perpanjangan');
+        }
+
+        if (params.daysToMaturity < 0) {
+            tags.push('Lelang');
+        }
+
+        return tags;
+    }
+
+    private getPrimaryLocationActionLabel(status: string | null): string {
+        switch (status) {
+            case 'in_office':
+                return 'Kirim ke Gudang';
+            case 'in_warehouse':
+                return 'Kirim ke Kantor';
+            default:
+                return 'Tinjau Lokasi';
+        }
+    }
+
+    private getSecondaryLocationActionLabel(status: string | null): string | null {
+        if (!status || ['in_office', 'in_warehouse'].includes(status)) {
+            return null;
+        }
+
+        return 'Kembalikan ke Kantor';
+    }
+}

@@ -101,8 +101,6 @@
         <DataTableClientSideComponent :vm="table.vm" />
       </article>
     </section>
-
-    <ModulePage :module="data.module" />
   </section>
 </template>
 
@@ -111,7 +109,6 @@ import { onMounted } from 'vue';
 import { storeToRefs } from 'pinia';
 
 import DataTableClientSideComponent from '@core/presentation/components/datatable_clientside.component.vue';
-import ModulePage from '@core/presentation/components/module_page.view.vue';
 import { useFeatureTableSections } from '@core/presentation/composables/use_feature_table_sections';
 import '@core/presentation/styles/feature_data_tables.css';
 import { masterBranchViewModel } from '@feature/master_branch/presentation/view_models/master_branch.vm';

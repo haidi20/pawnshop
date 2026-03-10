@@ -2,21 +2,101 @@
   {
     "id": 1,
     "pawn_item_id": 1,
-    "accessory_name": "Aksesori barang 1",
-    "accessory_condition": "Baik",
-    "notes": "Catatan contoh untuk Pawn Item Accessories 1.",
+    "accessory_name": "Dus unit",
+    "accessory_condition": "Cukup",
+    "notes": "Dus asli dengan label IMEI masih terbaca.",
     "sort_order": 1,
-    "created_at": "2026-02-22 09:00:00",
-    "updated_at": "2026-02-22 09:00:00"
+    "created_at": "2026-02-08 09:15:00",
+    "updated_at": "2026-02-08 09:15:00"
   },
   {
     "id": 2,
     "pawn_item_id": 2,
-    "accessory_name": "Aksesori barang 2",
+    "accessory_name": "Charger laptop",
+    "accessory_condition": "Baik",
+    "notes": "Adaptor bawaan pabrik.",
+    "sort_order": 1,
+    "created_at": "2026-02-10 09:10:00",
+    "updated_at": "2026-02-10 09:10:00"
+  },
+  {
+    "id": 3,
+    "pawn_item_id": 2,
+    "accessory_name": "Tas laptop",
     "accessory_condition": "Cukup",
-    "notes": null,
+    "notes": "Tas kain hitam.",
     "sort_order": 2,
-    "created_at": "2026-02-21 09:00:00",
-    "updated_at": "2026-02-21 09:00:00"
+    "created_at": "2026-02-10 09:10:00",
+    "updated_at": "2026-02-10 09:10:00"
+  },
+  {
+    "id": 4,
+    "pawn_item_id": 3,
+    "accessory_name": "Kabel data",
+    "accessory_condition": "Baik",
+    "notes": "Kabel lightning 1 meter.",
+    "sort_order": 1,
+    "created_at": "2026-02-10 09:20:00",
+    "updated_at": "2026-02-10 09:20:00"
+  },
+  {
+    "id": 5,
+    "pawn_item_id": 4,
+    "accessory_name": "STNK asli",
+    "accessory_condition": "Baik",
+    "notes": "STNK aktif hingga 2027.",
+    "sort_order": 1,
+    "created_at": "2026-02-01 11:00:00",
+    "updated_at": "2026-02-01 11:00:00"
+  },
+  {
+    "id": 6,
+    "pawn_item_id": 5,
+    "accessory_name": "Baterai cadangan",
+    "accessory_condition": "Cukup",
+    "notes": "Satu baterai tambahan non-original.",
+    "sort_order": 1,
+    "created_at": "2026-01-09 10:00:00",
+    "updated_at": "2026-01-09 10:00:00"
+  },
+  {
+    "id": 7,
+    "pawn_item_id": 7,
+    "accessory_name": "Lensa kit 16-50 mm",
+    "accessory_condition": "Baik",
+    "notes": "Lensa terpasang dan autofocus normal.",
+    "sort_order": 1,
+    "created_at": "2026-02-03 09:30:00",
+    "updated_at": "2026-02-03 09:30:00"
+  },
+  {
+    "id": 8,
+    "pawn_item_id": 8,
+    "accessory_name": "Charger original",
+    "accessory_condition": "Baik",
+    "notes": "Adaptor 65W.",
+    "sort_order": 1,
+    "created_at": "2026-01-18 08:50:00",
+    "updated_at": "2026-01-18 08:50:00"
+  },
+  {
+    "id": 9,
+    "pawn_item_id": 9,
+    "accessory_name": "Remote TV",
+    "accessory_condition": "Baik",
+    "notes": "Remote original LG.",
+    "sort_order": 1,
+    "created_at": "2026-01-05 09:00:00",
+    "updated_at": "2026-01-05 09:00:00"
+  },
+  {
+    "id": 10,
+    "pawn_item_id": 10,
+    "accessory_name": "Dock dan adaptor",
+    "accessory_condition": "Baik",
+    "notes": "Aksesori lengkap satu set.",
+    "sort_order": 1,
+    "created_at": "2026-03-09 13:20:00",
+    "updated_at": "2026-03-09 13:20:00"
   }
 ]

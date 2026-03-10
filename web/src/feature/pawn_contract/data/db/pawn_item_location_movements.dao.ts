@@ -5,6 +5,16 @@ export class PawnItemLocationMovementsDao extends FeatureTableDao<PawnItemLocati
     constructor() {
         super(pawnItemLocationMovementsTable);
     }
+
+    async findByPawnItemIds(pawnItemIds: number[]): Promise<PawnItemLocationMovementsRow[]> {
+        if (pawnItemIds.length === 0) {
+            return [];
+        }
+
+        const pawnItemIdSet = new Set(pawnItemIds);
+        const rows = await this.getAll();
+        return rows.filter((row) => pawnItemIdSet.has(row.pawn_item_id));
+    }
 }
 
 export const pawnItemLocationMovementsDao = new PawnItemLocationMovementsDao();

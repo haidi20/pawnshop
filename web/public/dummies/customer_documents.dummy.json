@@ -3,7 +3,7 @@
     "id": 1,
     "customer_id": 1,
     "document_type": "KTP",
-    "document_number": "CUSDOC-0001",
+    "document_number": "7371101204900001",
     "is_primary": 1,
     "issued_date": "2021-01-10",
     "expired_date": "2031-01-10",
@@ -13,12 +13,78 @@
   {
     "id": 2,
     "customer_id": 2,
-    "document_type": "NPWP",
-    "document_number": "CUSDOC-0002",
-    "is_primary": 0,
+    "document_type": "KTP",
+    "document_number": "7306111305910002",
+    "is_primary": 1,
     "issued_date": "2021-02-10",
     "expired_date": "2031-02-10",
     "created_at": "2026-02-28 09:00:00",
     "updated_at": "2026-02-28 09:00:00"
+  },
+  {
+    "id": 3,
+    "customer_id": 3,
+    "document_type": "SIM",
+    "document_number": "SIM-730312003",
+    "is_primary": 1,
+    "issued_date": "2022-03-15",
+    "expired_date": "2027-03-15",
+    "created_at": "2026-02-27 09:00:00",
+    "updated_at": "2026-02-27 09:00:00"
+  },
+  {
+    "id": 4,
+    "customer_id": 4,
+    "document_type": "KTP",
+    "document_number": "7371100511940004",
+    "is_primary": 1,
+    "issued_date": "2020-09-08",
+    "expired_date": "2030-09-08",
+    "created_at": "2026-02-26 09:00:00",
+    "updated_at": "2026-02-26 09:00:00"
+  },
+  {
+    "id": 5,
+    "customer_id": 5,
+    "document_type": "KK",
+    "document_number": "KK-730611005",
+    "is_primary": 1,
+    "issued_date": "2019-06-11",
+    "expired_date": null,
+    "created_at": "2026-02-25 09:00:00",
+    "updated_at": "2026-02-25 09:00:00"
+  },
+  {
+    "id": 6,
+    "customer_id": 6,
+    "document_type": "KTP",
+    "document_number": "7305090902930006",
+    "is_primary": 1,
+    "issued_date": "2020-12-19",
+    "expired_date": "2030-12-19",
+    "created_at": "2026-02-24 09:00:00",
+    "updated_at": "2026-02-24 09:00:00"
+  },
+  {
+    "id": 7,
+    "customer_id": 7,
+    "document_type": "SIM",
+    "document_number": "SIM-730312007",
+    "is_primary": 1,
+    "issued_date": "2021-04-22",
+    "expired_date": "2026-04-22",
+    "created_at": "2026-02-23 09:00:00",
+    "updated_at": "2026-02-23 09:00:00"
+  },
+  {
+    "id": 8,
+    "customer_id": 8,
+    "document_type": "KTP",
+    "document_number": "7311123006960008",
+    "is_primary": 1,
+    "issued_date": "2023-08-01",
+    "expired_date": "2033-08-01",
+    "created_at": "2026-03-09 09:00:00",
+    "updated_at": "2026-03-09 09:00:00"
   }
 ]

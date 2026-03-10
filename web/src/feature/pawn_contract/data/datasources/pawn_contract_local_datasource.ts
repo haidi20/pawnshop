@@ -47,6 +47,7 @@ import {
 } from '@feature/pawn_contract/data/db';
 import { createPawnContractDataFromRows } from '@feature/pawn_contract/data/mappers/pawn_contract.mapper';
 import type {
+    PawnContractDataFilterModel,
     PawnContractDataModel,
     PawnContractBranchReferenceModel,
     PawnContractCustomerLookupModel,
@@ -233,15 +234,43 @@ const supportedIdentityTypes = new Set<PawnContractIdentityTypeModel>([
 ]);
 
 export class PawnContractLocalDatasource {
-    async getData(): Promise<PawnContractDataModel> {
-        const [contractRows, itemRows, accessoryRows, issueRows, locationMovementRows] =
-            await Promise.all([
-                pawnContractsDao.getAll(),
-                pawnItemsDao.getAll(),
-                pawnItemAccessoriesDao.getAll(),
-                pawnItemIssuesDao.getAll(),
-                pawnItemLocationMovementsDao.getAll()
-            ]);
+    async getData(filters?: PawnContractDataFilterModel): Promise<PawnContractDataModel> {
+        const contractRows = await this.getFilteredContractRows(filters);
+        const itemRows = await pawnItemsDao.findByContractIds(contractRows.map((row) => row.id));
+
+        const [
+            branchRows,
+            cashAccountRows,
+            customerRows,
+            contactRows,
+            documentRows,
+            accessoryRows,
+            issueRows,
+            locationMovementRows
+        ] = await Promise.all([
+            branchesDao.getAll(),
+            branchCashAccountsDao.getAll(),
+            customersDao.getAll(),
+            customerContactsDao.getAll(),
+            customerDocumentsDao.getAll(),
+            pawnItemAccessoriesDao.findByPawnItemIds(itemRows.map((row) => row.id)),
+            pawnItemIssuesDao.findByPawnItemIds(itemRows.map((row) => row.id)),
+            pawnItemLocationMovementsDao.findByPawnItemIds(itemRows.map((row) => row.id))
+        ]);
+
+        const branches = branchRows.map((branchRow) => {
+            const primaryCashAccount =
+                cashAccountRows.find((row) => row.branch_id === branchRow.id && row.is_active === 1) ?? null;
+
+            return {
+                id: branchRow.id,
+                branchCode: branchRow.branch_code,
+                branchName: branchRow.branch_name,
+                branchPhoneNumber: branchRow.phone_number,
+                availableBalance: primaryCashAccount?.current_balance ?? 0,
+                primaryCashAccountId: primaryCashAccount?.id ?? null
+            };
+        });
 
         return createPawnContractDataFromRows({
             module: getAppModuleByKey('pawn-contract'),
@@ -249,8 +278,35 @@ export class PawnContractLocalDatasource {
             itemRows,
             accessoryRows,
             issueRows,
-            locationMovementRows
+            locationMovementRows,
+            branches,
+            customers: this.buildCustomerReferences(customerRows, contactRows, documentRows)
         });
+    }
+
+    private async getFilteredContractRows(
+        filters?: PawnContractDataFilterModel
+    ): Promise<PawnContractsRow[]> {
+        const contractIds = await this.resolveFilteredContractIds(filters);
+
+        return pawnContractsDao.findByFilters({
+            branchId: filters?.branchId ?? null,
+            contractStatus: filters?.contractStatus ?? null,
+            onlyOpenContracts: filters?.onlyOpenContracts ?? false,
+            dueWithinDays: filters?.dueWithinDays ?? null,
+            maintenanceRequired: filters?.maintenanceRequired ?? false,
+            contractIds
+        });
+    }
+
+    private async resolveFilteredContractIds(
+        filters?: PawnContractDataFilterModel
+    ): Promise<number[] | null> {
+        if (!filters?.warehouseOnly) {
+            return null;
+        }
+
+        return pawnItemsDao.findContractIdsByLocationStatus('in_warehouse');
     }
 
     async getFormReferenceData(): Promise<PawnContractFormReferenceModel> {

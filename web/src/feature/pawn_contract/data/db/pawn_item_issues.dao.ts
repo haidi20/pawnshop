@@ -5,6 +5,16 @@ export class PawnItemIssuesDao extends FeatureTableDao<PawnItemIssuesRow> {
     constructor() {
         super(pawnItemIssuesTable);
     }
+
+    async findByPawnItemIds(pawnItemIds: number[]): Promise<PawnItemIssuesRow[]> {
+        if (pawnItemIds.length === 0) {
+            return [];
+        }
+
+        const pawnItemIdSet = new Set(pawnItemIds);
+        const rows = await this.getAll();
+        return rows.filter((row) => pawnItemIdSet.has(row.pawn_item_id));
+    }
 }
 
 export const pawnItemIssuesDao = new PawnItemIssuesDao();

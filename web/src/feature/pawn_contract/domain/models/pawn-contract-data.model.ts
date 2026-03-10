@@ -4,6 +4,10 @@ import {
     createPawnContractDetailModels,
     type PawnContractDetailModel
 } from '@feature/pawn_contract/domain/models/pawn-contract-detail.model';
+import type {
+    PawnContractBranchReferenceModel,
+    PawnContractCustomerLookupModel
+} from '@feature/pawn_contract/domain/models/pawn-contract-form.model';
 import type { PawnContractModel } from '@feature/pawn_contract/domain/models/pawn-contract.model';
 import type { PawnItemAccessoryModel } from '@feature/pawn_contract/domain/models/pawn-item-accessory.model';
 import type { PawnItemIssueModel } from '@feature/pawn_contract/domain/models/pawn-item-issue.model';
@@ -16,6 +20,8 @@ export interface PawnContractDataModel extends FeatureModuleDataModel {
     accessories: PawnItemAccessoryModel[];
     issues: PawnItemIssueModel[];
     locationMovements: PawnItemLocationMovementModel[];
+    branches: PawnContractBranchReferenceModel[];
+    customers: PawnContractCustomerLookupModel[];
     contractDetails: PawnContractDetailModel[];
     totalContracts: number;
     totalItems: number;
@@ -31,6 +37,8 @@ export const createPawnContractDataModel = (params: {
     accessories: PawnItemAccessoryModel[];
     issues: PawnItemIssueModel[];
     locationMovements: PawnItemLocationMovementModel[];
+    branches: PawnContractBranchReferenceModel[];
+    customers: PawnContractCustomerLookupModel[];
 }): PawnContractDataModel => {
     const contractDetails = createPawnContractDetailModels(
         params.contracts,

@@ -8,8 +8,10 @@ import type {
 } from '@feature/pawn_contract/data/db';
 import {
     createPawnContractDataModel,
+    type PawnContractBranchReferenceModel,
     type PawnContractDataModel,
     type PawnContractModel,
+    type PawnContractCustomerLookupModel,
     type PawnItemAccessoryModel,
     type PawnItemIssueModel,
     type PawnItemLocationMovementModel,
@@ -108,6 +110,8 @@ export const createPawnContractDataFromRows = (params: {
     accessoryRows: PawnItemAccessoriesRow[];
     issueRows: PawnItemIssuesRow[];
     locationMovementRows: PawnItemLocationMovementsRow[];
+    branches: PawnContractBranchReferenceModel[];
+    customers: PawnContractCustomerLookupModel[];
 }): PawnContractDataModel =>
     createPawnContractDataModel({
         module: params.module,
@@ -115,5 +119,7 @@ export const createPawnContractDataFromRows = (params: {
         items: params.itemRows.map(mapPawnItemRowToModel),
         accessories: params.accessoryRows.map(mapPawnItemAccessoryRowToModel),
         issues: params.issueRows.map(mapPawnItemIssueRowToModel),
-        locationMovements: params.locationMovementRows.map(mapPawnItemLocationMovementRowToModel)
+        locationMovements: params.locationMovementRows.map(mapPawnItemLocationMovementRowToModel),
+        branches: params.branches,
+        customers: params.customers
     });

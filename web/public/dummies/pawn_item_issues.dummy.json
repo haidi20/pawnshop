@@ -2,19 +2,55 @@
   {
     "id": 1,
     "pawn_item_id": 1,
-    "issue_name": "Isu barang 1",
-    "issue_details": "Detail isu barang 1.",
+    "issue_name": "Kepala charger tidak ada",
+    "issue_details": "Unit hanya diserahkan dengan kabel data.",
     "severity_level": "low",
-    "created_at": "2026-02-21 09:00:00",
-    "updated_at": "2026-02-21 09:00:00"
+    "created_at": "2026-02-08 09:15:00",
+    "updated_at": "2026-02-08 09:15:00"
   },
   {
     "id": 2,
     "pawn_item_id": 2,
-    "issue_name": "Isu barang 2",
-    "issue_details": "Detail isu barang 2.",
+    "issue_name": "Touchpad aus",
+    "issue_details": "Klik kiri terasa lebih dalam dari biasanya.",
     "severity_level": "medium",
-    "created_at": "2026-02-20 09:00:00",
-    "updated_at": "2026-02-20 09:00:00"
+    "created_at": "2026-02-10 09:10:00",
+    "updated_at": "2026-02-10 09:10:00"
+  },
+  {
+    "id": 3,
+    "pawn_item_id": 3,
+    "issue_name": "Face ID nonaktif",
+    "issue_details": "Nasabah menyampaikan fitur biometrik tidak berfungsi.",
+    "severity_level": "medium",
+    "created_at": "2026-02-10 09:20:00",
+    "updated_at": "2026-02-10 09:20:00"
+  },
+  {
+    "id": 4,
+    "pawn_item_id": 4,
+    "issue_name": "Bodi samping lecet",
+    "issue_details": "Ada lecet tipis di sisi kanan cover belakang.",
+    "severity_level": "low",
+    "created_at": "2026-02-01 11:00:00",
+    "updated_at": "2026-02-01 11:00:00"
+  },
+  {
+    "id": 5,
+    "pawn_item_id": 7,
+    "issue_name": "Shutter count tinggi",
+    "issue_details": "Shutter count di atas 80 ribu jepretan.",
+    "severity_level": "medium",
+    "created_at": "2026-02-03 09:30:00",
+    "updated_at": "2026-02-03 09:30:00"
+  },
+  {
+    "id": 6,
+    "pawn_item_id": 9,
+    "issue_name": "Shadow tipis panel",
+    "issue_details": "Bayangan tipis muncul di sisi kiri layar saat background terang.",
+    "severity_level": "high",
+    "created_at": "2026-01-05 09:00:00",
+    "updated_at": "2026-01-05 09:00:00"
   }
 ]

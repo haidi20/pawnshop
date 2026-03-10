@@ -1,13 +1,13 @@
 import type {
-    PawnContractDataFilterModel,
-    PawnContractDataModel
+    GetPawnContractAjtTableParamsModel,
+    PawnContractAjtTableModel
 } from '@feature/pawn_contract/domain/models';
 import type { PawnContractRepository } from '@feature/pawn_contract/domain/repositories/pawn_contract.repository';
 
-export class GetPawnContractDataUsecase {
+export class GetPawnContractAjtTableUsecase {
     constructor(private readonly repository: PawnContractRepository) {}
 
-    async execute(filters?: PawnContractDataFilterModel): Promise<PawnContractDataModel> {
-        return this.repository.getData(filters);
+    execute(params: GetPawnContractAjtTableParamsModel): PawnContractAjtTableModel {
+        return this.repository.getAjtTable(params);
     }
 }

@@ -1,11 +1,19 @@
 // vitest.global.ts
-import { db } from './src/core/data/datasources/db/core.db';
 
 export async function teardown() {
     console.log('[global.teardown] Tearing down...');
     try {
-        await db.close();
-        console.log('[global.teardown] Database connection closed successfully.');
+        const dbPromise = globalThis.__pawnshopRxDatabase__;
+        if (!dbPromise) {
+            console.log('[global.teardown] No database instance to close.');
+            return;
+        }
+
+        const db = await dbPromise.catch(() => null);
+        if (db) {
+            await db.close();
+            console.log('[global.teardown] Database connection closed successfully.');
+        }
     } catch (e) {
         console.error('[global.teardown] Error closing database:', e);
     }
