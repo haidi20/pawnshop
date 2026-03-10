@@ -1,0 +1,162 @@
+{
+  "database": "pawnshop",
+  "generatedFrom": "/src/core/sql/pawnshop.sql",
+  "tableCount": 31,
+  "tables": [
+    {
+      "table": "branches",
+      "file": "/dummies/branches.dummy.json",
+      "rowCount": 2
+    },
+    {
+      "table": "investors",
+      "file": "/dummies/investors.dummy.json",
+      "rowCount": 2
+    },
+    {
+      "table": "branch_investors",
+      "file": "/dummies/branch_investors.dummy.json",
+      "rowCount": 2
+    },
+    {
+      "table": "roles",
+      "file": "/dummies/roles.dummy.json",
+      "rowCount": 2
+    },
+    {
+      "table": "users",
+      "file": "/dummies/users.dummy.json",
+      "rowCount": 2
+    },
+    {
+      "table": "user_roles",
+      "file": "/dummies/user_roles.dummy.json",
+      "rowCount": 2
+    },
+    {
+      "table": "user_branch_assignments",
+      "file": "/dummies/user_branch_assignments.dummy.json",
+      "rowCount": 2
+    },
+    {
+      "table": "login_sessions",
+      "file": "/dummies/login_sessions.dummy.json",
+      "rowCount": 2
+    },
+    {
+      "table": "customers",
+      "file": "/dummies/customers.dummy.json",
+      "rowCount": 2
+    },
+    {
+      "table": "customer_documents",
+      "file": "/dummies/customer_documents.dummy.json",
+      "rowCount": 2
+    },
+    {
+      "table": "customer_contacts",
+      "file": "/dummies/customer_contacts.dummy.json",
+      "rowCount": 2
+    },
+    {
+      "table": "item_categories",
+      "file": "/dummies/item_categories.dummy.json",
+      "rowCount": 2
+    },
+    {
+      "table": "item_types",
+      "file": "/dummies/item_types.dummy.json",
+      "rowCount": 2
+    },
+    {
+      "table": "storage_locations",
+      "file": "/dummies/storage_locations.dummy.json",
+      "rowCount": 2
+    },
+    {
+      "table": "pawn_contracts",
+      "file": "/dummies/pawn_contracts.dummy.json",
+      "rowCount": 2
+    },
+    {
+      "table": "pawn_items",
+      "file": "/dummies/pawn_items.dummy.json",
+      "rowCount": 2
+    },
+    {
+      "table": "pawn_item_accessories",
+      "file": "/dummies/pawn_item_accessories.dummy.json",
+      "rowCount": 2
+    },
+    {
+      "table": "pawn_item_issues",
+      "file": "/dummies/pawn_item_issues.dummy.json",
+      "rowCount": 2
+    },
+    {
+      "table": "pawn_item_location_movements",
+      "file": "/dummies/pawn_item_location_movements.dummy.json",
+      "rowCount": 2
+    },
+    {
+      "table": "contract_payments",
+      "file": "/dummies/contract_payments.dummy.json",
+      "rowCount": 2
+    },
+    {
+      "table": "contract_extensions",
+      "file": "/dummies/contract_extensions.dummy.json",
+      "rowCount": 2
+    },
+    {
+      "table": "auction_transactions",
+      "file": "/dummies/auction_transactions.dummy.json",
+      "rowCount": 2
+    },
+    {
+      "table": "branch_cash_accounts",
+      "file": "/dummies/branch_cash_accounts.dummy.json",
+      "rowCount": 2
+    },
+    {
+      "table": "branch_cash_transactions",
+      "file": "/dummies/branch_cash_transactions.dummy.json",
+      "rowCount": 2
+    },
+    {
+      "table": "branch_debts",
+      "file": "/dummies/branch_debts.dummy.json",
+      "rowCount": 2
+    },
+    {
+      "table": "branch_debt_payments",
+      "file": "/dummies/branch_debt_payments.dummy.json",
+      "rowCount": 2
+    },
+    {
+      "table": "inter_branch_transfers",
+      "file": "/dummies/inter_branch_transfers.dummy.json",
+      "rowCount": 2
+    },
+    {
+      "table": "investor_capital_transactions",
+      "file": "/dummies/investor_capital_transactions.dummy.json",
+      "rowCount": 2
+    },
+    {
+      "table": "branch_item_settings",
+      "file": "/dummies/branch_item_settings.dummy.json",
+      "rowCount": 2
+    },
+    {
+      "table": "notifications",
+      "file": "/dummies/notifications.dummy.json",
+      "rowCount": 2
+    },
+    {
+      "table": "audit_logs",
+      "file": "/dummies/audit_logs.dummy.json",
+      "rowCount": 2
+    }
+  ]
+}

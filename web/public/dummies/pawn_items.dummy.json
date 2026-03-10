@@ -1,0 +1,54 @@
+[
+  {
+    "id": 1,
+    "contract_id": 1,
+    "item_sequence": 1,
+    "item_name": "Cincin Emas 24K 5 gram",
+    "category_id": 1,
+    "item_type_id": 1,
+    "brand_name": "No Brand",
+    "model_name": "Model 1",
+    "serial_number": "PAWITE-0001",
+    "item_description": "Deskripsi item contoh 1.",
+    "quantity": 1,
+    "appraised_value": 1000000,
+    "disbursed_value": 1000000,
+    "condition_notes": "Kondisi item contoh 1.",
+    "missing_notes": "Catatan kekurangan item contoh 1.",
+    "specification_json": {
+      "table": "pawn_items",
+      "column": "specification_json",
+      "sampleIndex": 1
+    },
+    "current_location_id": 1,
+    "current_location_status": "in_office",
+    "created_at": "2026-02-23 09:00:00",
+    "updated_at": "2026-02-23 09:00:00"
+  },
+  {
+    "id": 2,
+    "contract_id": 2,
+    "item_sequence": 2,
+    "item_name": "Laptop ASUS Vivobook",
+    "category_id": 2,
+    "item_type_id": 2,
+    "brand_name": "ASUS",
+    "model_name": "Model 2",
+    "serial_number": "PAWITE-0002",
+    "item_description": "Deskripsi item contoh 2.",
+    "quantity": 2,
+    "appraised_value": 2000000,
+    "disbursed_value": 2000000,
+    "condition_notes": "Kondisi item contoh 2.",
+    "missing_notes": null,
+    "specification_json": {
+      "table": "pawn_items",
+      "column": "specification_json",
+      "sampleIndex": 2
+    },
+    "current_location_id": 2,
+    "current_location_status": "in_warehouse",
+    "created_at": "2026-02-22 09:00:00",
+    "updated_at": "2026-02-22 09:00:00"
+  }
+]

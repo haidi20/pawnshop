@@ -1,0 +1,808 @@
+{
+  "branches": [
+    {
+      "id": 1,
+      "branch_code": "BR-MKS-001",
+      "branch_number": "001",
+      "branch_name": "Pawnshop Makassar Utama",
+      "phone_number": "0411-800001",
+      "address": "Jl. Jenderal Sudirman No. 10, Makassar",
+      "is_active": 1,
+      "created_at": "2026-03-10 09:00:00",
+      "updated_at": "2026-03-10 09:00:00"
+    },
+    {
+      "id": 2,
+      "branch_code": "BR-GOW-002",
+      "branch_number": "002",
+      "branch_name": "Pawnshop Gowa Selatan",
+      "phone_number": "0411-800002",
+      "address": "Jl. Sultan Hasanuddin No. 28, Gowa",
+      "is_active": 0,
+      "created_at": "2026-03-09 09:00:00",
+      "updated_at": "2026-03-09 09:00:00"
+    }
+  ],
+  "investors": [
+    {
+      "id": 1,
+      "investor_code": "INV-001",
+      "full_name": "Budi Santoso",
+      "phone_number": "081241110001",
+      "address": "Perumahan Graha Indah Blok A1, Makassar",
+      "is_active": 1,
+      "created_at": "2026-03-09 09:00:00",
+      "updated_at": "2026-03-09 09:00:00"
+    },
+    {
+      "id": 2,
+      "investor_code": "INV-002",
+      "full_name": "Siti Aminah",
+      "phone_number": "081241110002",
+      "address": "Jl. Tun Abdul Razak No. 15, Gowa",
+      "is_active": 0,
+      "created_at": "2026-03-08 09:00:00",
+      "updated_at": "2026-03-08 09:00:00"
+    }
+  ],
+  "branch_investors": [
+    {
+      "id": 1,
+      "branch_id": 1,
+      "investor_id": 1,
+      "ownership_percentage": 60.0,
+      "start_date": "2026-01-01",
+      "end_date": null,
+      "is_primary": 1,
+      "notes": "Catatan contoh untuk Branch Investors 1.",
+      "created_at": "2026-03-08 09:00:00",
+      "updated_at": "2026-03-08 09:00:00"
+    },
+    {
+      "id": 2,
+      "branch_id": 2,
+      "investor_id": 2,
+      "ownership_percentage": 40.0,
+      "start_date": "2026-01-02",
+      "end_date": "2026-12-22",
+      "is_primary": 0,
+      "notes": null,
+      "created_at": "2026-03-07 09:00:00",
+      "updated_at": "2026-03-07 09:00:00"
+    }
+  ],
+  "roles": [
+    {
+      "id": 1,
+      "role_code": "ADMIN",
+      "role_name": "Administrator",
+      "created_at": "2026-03-07 09:00:00",
+      "updated_at": "2026-03-07 09:00:00"
+    },
+    {
+      "id": 2,
+      "role_code": "MANAGER",
+      "role_name": "Branch Manager",
+      "created_at": "2026-03-06 09:00:00",
+      "updated_at": "2026-03-06 09:00:00"
+    }
+  ],
+  "users": [
+    {
+      "id": 1,
+      "username": "admin.root",
+      "password_hash": "$2b$10$dummyAdminRootHash",
+      "full_name": "Root Admin",
+      "email": "admin.root@pawnshop.local",
+      "phone_number": "081355500001",
+      "remember_token": "remember-admin-root",
+      "is_active": 1,
+      "created_at": "2026-03-06 09:00:00",
+      "updated_at": "2026-03-06 09:00:00"
+    },
+    {
+      "id": 2,
+      "username": "manager.branch",
+      "password_hash": "$2b$10$dummyBranchManagerHash",
+      "full_name": "Rina Maharani",
+      "email": "manager.branch@pawnshop.local",
+      "phone_number": "081355500002",
+      "remember_token": "remember-manager-branch",
+      "is_active": 0,
+      "created_at": "2026-03-05 09:00:00",
+      "updated_at": "2026-03-05 09:00:00"
+    }
+  ],
+  "user_roles": [
+    {
+      "user_id": 1,
+      "role_id": 1,
+      "created_at": "2026-03-05 09:00:00"
+    },
+    {
+      "user_id": 2,
+      "role_id": 2,
+      "created_at": "2026-03-04 09:00:00"
+    }
+  ],
+  "user_branch_assignments": [
+    {
+      "id": 1,
+      "user_id": 1,
+      "branch_id": 1,
+      "is_primary": 1,
+      "assigned_at": "2026-03-04 08:00:00",
+      "unassigned_at": null,
+      "created_at": "2026-03-04 09:00:00",
+      "updated_at": "2026-03-04 09:00:00"
+    },
+    {
+      "id": 2,
+      "user_id": 2,
+      "branch_id": 2,
+      "is_primary": 0,
+      "assigned_at": "2026-03-03 08:00:00",
+      "unassigned_at": "2026-03-04 09:00:00",
+      "created_at": "2026-03-03 09:00:00",
+      "updated_at": "2026-03-03 09:00:00"
+    }
+  ],
+  "login_sessions": [
+    {
+      "id": 1,
+      "user_id": 1,
+      "session_token": "session-token-0001",
+      "ip_address": "10.10.0.10",
+      "user_agent": "Chrome/136 Windows 11",
+      "login_at": "2026-03-03 09:00:00",
+      "logout_at": null,
+      "session_status": "active",
+      "created_at": "2026-03-03 09:00:00",
+      "updated_at": "2026-03-03 09:00:00"
+    },
+    {
+      "id": 2,
+      "user_id": 2,
+      "session_token": "session-token-0012",
+      "ip_address": "10.10.1.11",
+      "user_agent": "Edge/135 Windows 11",
+      "login_at": "2026-03-02 09:00:00",
+      "logout_at": "2026-03-02 17:00:00",
+      "session_status": "closed",
+      "created_at": "2026-03-02 09:00:00",
+      "updated_at": "2026-03-02 09:00:00"
+    }
+  ],
+  "customers": [
+    {
+      "id": 1,
+      "customer_code": "CUST-0001",
+      "full_name": "Andi Saputra",
+      "gender": "male",
+      "birth_date": "1990-04-12",
+      "city": "Makassar",
+      "address": "Jl. Veteran Selatan No. 44, Makassar",
+      "customer_status": "active",
+      "created_at": "2026-03-02 09:00:00",
+      "updated_at": "2026-03-02 09:00:00"
+    },
+    {
+      "id": 2,
+      "customer_code": "CUST-0002",
+      "full_name": "Nur Aisyah",
+      "gender": "female",
+      "birth_date": "1991-05-13",
+      "city": "Gowa",
+      "address": "Jl. Pallantikang No. 21, Gowa",
+      "customer_status": "inactive",
+      "created_at": "2026-03-01 09:00:00",
+      "updated_at": "2026-03-01 09:00:00"
+    }
+  ],
+  "customer_documents": [
+    {
+      "id": 1,
+      "customer_id": 1,
+      "document_type": "KTP",
+      "document_number": "CUSDOC-0001",
+      "is_primary": 1,
+      "issued_date": "2021-01-10",
+      "expired_date": "2031-01-10",
+      "created_at": "2026-03-01 09:00:00",
+      "updated_at": "2026-03-01 09:00:00"
+    },
+    {
+      "id": 2,
+      "customer_id": 2,
+      "document_type": "NPWP",
+      "document_number": "CUSDOC-0002",
+      "is_primary": 0,
+      "issued_date": "2021-02-10",
+      "expired_date": "2031-02-10",
+      "created_at": "2026-02-28 09:00:00",
+      "updated_at": "2026-02-28 09:00:00"
+    }
+  ],
+  "customer_contacts": [
+    {
+      "id": 1,
+      "customer_id": 1,
+      "contact_type": "phone",
+      "contact_value": "081298700001",
+      "is_primary": 1,
+      "created_at": "2026-02-28 09:00:00",
+      "updated_at": "2026-02-28 09:00:00"
+    },
+    {
+      "id": 2,
+      "customer_id": 2,
+      "contact_type": "email",
+      "contact_value": "user2@pawnshop.local",
+      "is_primary": 0,
+      "created_at": "2026-02-27 09:00:00",
+      "updated_at": "2026-02-27 09:00:00"
+    }
+  ],
+  "item_categories": [
+    {
+      "id": 1,
+      "category_code": "GOLD",
+      "category_name": "Emas",
+      "created_at": "2026-02-27 09:00:00",
+      "updated_at": "2026-02-27 09:00:00"
+    },
+    {
+      "id": 2,
+      "category_code": "ELEC",
+      "category_name": "Elektronik",
+      "created_at": "2026-02-26 09:00:00",
+      "updated_at": "2026-02-26 09:00:00"
+    }
+  ],
+  "item_types": [
+    {
+      "id": 1,
+      "category_id": 1,
+      "type_code": "GOLD-RING",
+      "type_name": "Cincin Emas",
+      "created_at": "2026-02-26 09:00:00",
+      "updated_at": "2026-02-26 09:00:00"
+    },
+    {
+      "id": 2,
+      "category_id": 2,
+      "type_code": "ELEC-LAPTOP",
+      "type_name": "Laptop",
+      "created_at": "2026-02-25 09:00:00",
+      "updated_at": "2026-02-25 09:00:00"
+    }
+  ],
+  "storage_locations": [
+    {
+      "id": 1,
+      "branch_id": 1,
+      "location_code": "OFF-MKS",
+      "location_name": "Counter Makassar",
+      "location_type": "office",
+      "is_active": 1,
+      "created_at": "2026-02-25 09:00:00",
+      "updated_at": "2026-02-25 09:00:00"
+    },
+    {
+      "id": 2,
+      "branch_id": 2,
+      "location_code": "WH-GOW",
+      "location_name": "Gudang Gowa",
+      "location_type": "warehouse",
+      "is_active": 0,
+      "created_at": "2026-02-24 09:00:00",
+      "updated_at": "2026-02-24 09:00:00"
+    }
+  ],
+  "pawn_contracts": [
+    {
+      "id": 1,
+      "contract_number": "CNTR-202603-0001",
+      "branch_id": 1,
+      "customer_id": 1,
+      "contract_date": "2026-02-06",
+      "maturity_date": "2026-03-21",
+      "term_days": 30,
+      "appraised_value": 1000000,
+      "disbursed_value": 1000000,
+      "storage_fee_amount": 250000,
+      "administration_fee_amount": 250000,
+      "payment_option_days": 7,
+      "amount_in_words": "Satu juta rupiah",
+      "contract_status": "draft",
+      "maintenance_required": 1,
+      "maintenance_report": "Laporan maintenance contoh untuk Pawn Contracts 1.",
+      "notes": "Catatan contoh untuk Pawn Contracts 1.",
+      "created_by_user_id": 1,
+      "created_at": "2026-02-24 09:00:00",
+      "updated_at": "2026-02-24 09:00:00"
+    },
+    {
+      "id": 2,
+      "contract_number": "CNTR-202603-0002",
+      "branch_id": 2,
+      "customer_id": 2,
+      "contract_date": "2026-02-07",
+      "maturity_date": "2026-03-22",
+      "term_days": 30,
+      "appraised_value": 2000000,
+      "disbursed_value": 2000000,
+      "storage_fee_amount": 500000,
+      "administration_fee_amount": 500000,
+      "payment_option_days": 7,
+      "amount_in_words": "Dua juta rupiah",
+      "contract_status": "active",
+      "maintenance_required": 0,
+      "maintenance_report": null,
+      "notes": null,
+      "created_by_user_id": 2,
+      "created_at": "2026-02-23 09:00:00",
+      "updated_at": "2026-02-23 09:00:00"
+    }
+  ],
+  "pawn_items": [
+    {
+      "id": 1,
+      "contract_id": 1,
+      "item_sequence": 1,
+      "item_name": "Cincin Emas 24K 5 gram",
+      "category_id": 1,
+      "item_type_id": 1,
+      "brand_name": "No Brand",
+      "model_name": "Model 1",
+      "serial_number": "PAWITE-0001",
+      "item_description": "Deskripsi item contoh 1.",
+      "quantity": 1,
+      "appraised_value": 1000000,
+      "disbursed_value": 1000000,
+      "condition_notes": "Kondisi item contoh 1.",
+      "missing_notes": "Catatan kekurangan item contoh 1.",
+      "specification_json": {
+        "table": "pawn_items",
+        "column": "specification_json",
+        "sampleIndex": 1
+      },
+      "current_location_id": 1,
+      "current_location_status": "in_office",
+      "created_at": "2026-02-23 09:00:00",
+      "updated_at": "2026-02-23 09:00:00"
+    },
+    {
+      "id": 2,
+      "contract_id": 2,
+      "item_sequence": 2,
+      "item_name": "Laptop ASUS Vivobook",
+      "category_id": 2,
+      "item_type_id": 2,
+      "brand_name": "ASUS",
+      "model_name": "Model 2",
+      "serial_number": "PAWITE-0002",
+      "item_description": "Deskripsi item contoh 2.",
+      "quantity": 2,
+      "appraised_value": 2000000,
+      "disbursed_value": 2000000,
+      "condition_notes": "Kondisi item contoh 2.",
+      "missing_notes": null,
+      "specification_json": {
+        "table": "pawn_items",
+        "column": "specification_json",
+        "sampleIndex": 2
+      },
+      "current_location_id": 2,
+      "current_location_status": "in_warehouse",
+      "created_at": "2026-02-22 09:00:00",
+      "updated_at": "2026-02-22 09:00:00"
+    }
+  ],
+  "pawn_item_accessories": [
+    {
+      "id": 1,
+      "pawn_item_id": 1,
+      "accessory_name": "Aksesori barang 1",
+      "accessory_condition": "Baik",
+      "notes": "Catatan contoh untuk Pawn Item Accessories 1.",
+      "sort_order": 1,
+      "created_at": "2026-02-22 09:00:00",
+      "updated_at": "2026-02-22 09:00:00"
+    },
+    {
+      "id": 2,
+      "pawn_item_id": 2,
+      "accessory_name": "Aksesori barang 2",
+      "accessory_condition": "Cukup",
+      "notes": null,
+      "sort_order": 2,
+      "created_at": "2026-02-21 09:00:00",
+      "updated_at": "2026-02-21 09:00:00"
+    }
+  ],
+  "pawn_item_issues": [
+    {
+      "id": 1,
+      "pawn_item_id": 1,
+      "issue_name": "Isu barang 1",
+      "issue_details": "Detail isu barang 1.",
+      "severity_level": "low",
+      "created_at": "2026-02-21 09:00:00",
+      "updated_at": "2026-02-21 09:00:00"
+    },
+    {
+      "id": 2,
+      "pawn_item_id": 2,
+      "issue_name": "Isu barang 2",
+      "issue_details": "Detail isu barang 2.",
+      "severity_level": "medium",
+      "created_at": "2026-02-20 09:00:00",
+      "updated_at": "2026-02-20 09:00:00"
+    }
+  ],
+  "pawn_item_location_movements": [
+    {
+      "id": 1,
+      "pawn_item_id": 1,
+      "from_location_id": 1,
+      "to_location_id": 1,
+      "from_status": "draft",
+      "to_status": "in_office",
+      "moved_at": "2026-02-20 10:00:00",
+      "moved_by_user_id": 1,
+      "notes": "Catatan contoh untuk Pawn Item Location Movements 1.",
+      "created_at": "2026-02-20 09:00:00",
+      "updated_at": "2026-02-20 09:00:00"
+    },
+    {
+      "id": 2,
+      "pawn_item_id": 2,
+      "from_location_id": 2,
+      "to_location_id": 2,
+      "from_status": "in_office",
+      "to_status": "in_warehouse",
+      "moved_at": "2026-02-19 10:00:00",
+      "moved_by_user_id": 2,
+      "notes": null,
+      "created_at": "2026-02-19 09:00:00",
+      "updated_at": "2026-02-19 09:00:00"
+    }
+  ],
+  "contract_payments": [
+    {
+      "id": 1,
+      "contract_id": 1,
+      "payment_type": "interest_payment",
+      "payment_reference": "PMT-20260310-001",
+      "amount": 250000,
+      "payment_date": "2026-02-19 11:00:00",
+      "notes": "Catatan contoh untuk Contract Payments 1.",
+      "created_by_user_id": 1,
+      "created_at": "2026-02-19 09:00:00",
+      "updated_at": "2026-02-19 09:00:00"
+    },
+    {
+      "id": 2,
+      "contract_id": 2,
+      "payment_type": "partial_payment",
+      "payment_reference": "PMT-20260309-002",
+      "amount": 500000,
+      "payment_date": "2026-02-18 11:00:00",
+      "notes": null,
+      "created_by_user_id": 2,
+      "created_at": "2026-02-18 09:00:00",
+      "updated_at": "2026-02-18 09:00:00"
+    }
+  ],
+  "contract_extensions": [
+    {
+      "id": 1,
+      "contract_id": 1,
+      "extension_date": "2026-03-07",
+      "previous_maturity_date": "2026-03-07",
+      "new_maturity_date": "2026-03-22",
+      "extension_term_days": 30,
+      "extension_fee_amount": 250000,
+      "notes": "Catatan contoh untuk Contract Extensions 1.",
+      "created_by_user_id": 1,
+      "created_at": "2026-02-18 09:00:00",
+      "updated_at": "2026-02-18 09:00:00"
+    },
+    {
+      "id": 2,
+      "contract_id": 2,
+      "extension_date": "2026-03-08",
+      "previous_maturity_date": "2026-03-08",
+      "new_maturity_date": "2026-03-23",
+      "extension_term_days": 30,
+      "extension_fee_amount": 500000,
+      "notes": null,
+      "created_by_user_id": 2,
+      "created_at": "2026-02-17 09:00:00",
+      "updated_at": "2026-02-17 09:00:00"
+    }
+  ],
+  "auction_transactions": [
+    {
+      "id": 1,
+      "contract_id": 1,
+      "auction_date": "2026-03-05",
+      "overdue_amount": 250000,
+      "auction_sale_amount": 250000,
+      "auction_fee_amount": 250000,
+      "refund_amount": 250000,
+      "notes": "Catatan contoh untuk Auction Transactions 1.",
+      "created_by_user_id": 1,
+      "created_at": "2026-02-17 09:00:00",
+      "updated_at": "2026-02-17 09:00:00"
+    },
+    {
+      "id": 2,
+      "contract_id": 2,
+      "auction_date": "2026-03-06",
+      "overdue_amount": 500000,
+      "auction_sale_amount": 500000,
+      "auction_fee_amount": 500000,
+      "refund_amount": 500000,
+      "notes": null,
+      "created_by_user_id": 2,
+      "created_at": "2026-02-16 09:00:00",
+      "updated_at": "2026-02-16 09:00:00"
+    }
+  ],
+  "branch_cash_accounts": [
+    {
+      "id": 1,
+      "branch_id": 1,
+      "account_code": "BRACASACC-001",
+      "account_name": "Kas Operasional",
+      "account_type": "cash",
+      "current_balance": 12500000,
+      "is_active": 1,
+      "created_at": "2026-02-16 09:00:00",
+      "updated_at": "2026-02-16 09:00:00"
+    },
+    {
+      "id": 2,
+      "branch_id": 2,
+      "account_code": "BRACASACC-002",
+      "account_name": "Rekening Bank",
+      "account_type": "bank",
+      "current_balance": 15000000,
+      "is_active": 0,
+      "created_at": "2026-02-15 09:00:00",
+      "updated_at": "2026-02-15 09:00:00"
+    }
+  ],
+  "branch_cash_transactions": [
+    {
+      "id": 1,
+      "branch_id": 1,
+      "cash_account_id": 1,
+      "transaction_type_code": "CAPITAL_IN",
+      "reference_table": "pawn_contracts",
+      "reference_id": 1,
+      "entry_direction": "debit",
+      "amount": 250000,
+      "transaction_date": "2026-02-15 10:00:00",
+      "description": "Deskripsi contoh untuk Branch Cash Transactions 1.",
+      "created_by_user_id": 1,
+      "created_at": "2026-02-15 09:00:00",
+      "updated_at": "2026-02-15 09:00:00"
+    },
+    {
+      "id": 2,
+      "branch_id": 2,
+      "cash_account_id": 2,
+      "transaction_type_code": "INTEREST_PAYMENT",
+      "reference_table": "contract_payments",
+      "reference_id": 2,
+      "entry_direction": "credit",
+      "amount": 500000,
+      "transaction_date": "2026-02-14 10:00:00",
+      "description": null,
+      "created_by_user_id": 2,
+      "created_at": "2026-02-14 09:00:00",
+      "updated_at": "2026-02-14 09:00:00"
+    }
+  ],
+  "branch_debts": [
+    {
+      "id": 1,
+      "branch_id": 1,
+      "creditor_branch_id": 1,
+      "debt_source_type": "inter_branch",
+      "debt_reference_number": "DEBT-MKS-001",
+      "debt_date": "2026-02-11",
+      "principal_amount": 1000000,
+      "outstanding_amount": 1000000,
+      "due_date": "2026-03-24",
+      "debt_status": "open",
+      "description": "Deskripsi contoh untuk Branch Debts 1.",
+      "created_by_user_id": 1,
+      "created_at": "2026-02-14 09:00:00",
+      "updated_at": "2026-02-14 09:00:00"
+    },
+    {
+      "id": 2,
+      "branch_id": 2,
+      "creditor_branch_id": 2,
+      "debt_source_type": "vendor",
+      "debt_reference_number": "DEBT-GOW-002",
+      "debt_date": "2026-02-12",
+      "principal_amount": 2000000,
+      "outstanding_amount": 2000000,
+      "due_date": "2026-03-25",
+      "debt_status": "partially_paid",
+      "description": null,
+      "created_by_user_id": 2,
+      "created_at": "2026-02-13 09:00:00",
+      "updated_at": "2026-02-13 09:00:00"
+    }
+  ],
+  "branch_debt_payments": [
+    {
+      "id": 1,
+      "debt_id": 1,
+      "payment_date": "2026-02-13 11:00:00",
+      "amount": 250000,
+      "notes": "Catatan contoh untuk Branch Debt Payments 1.",
+      "created_by_user_id": 1,
+      "created_at": "2026-02-13 09:00:00",
+      "updated_at": "2026-02-13 09:00:00"
+    },
+    {
+      "id": 2,
+      "debt_id": 2,
+      "payment_date": "2026-02-12 11:00:00",
+      "amount": 500000,
+      "notes": null,
+      "created_by_user_id": 2,
+      "created_at": "2026-02-12 09:00:00",
+      "updated_at": "2026-02-12 09:00:00"
+    }
+  ],
+  "inter_branch_transfers": [
+    {
+      "id": 1,
+      "source_branch_id": 1,
+      "target_branch_id": 1,
+      "transfer_number": "TRF-202603-001",
+      "transfer_date": "2026-02-12 10:00:00",
+      "amount": 250000,
+      "transfer_status": "draft",
+      "description": "Deskripsi contoh untuk Inter Branch Transfers 1.",
+      "created_by_user_id": 1,
+      "created_at": "2026-02-12 09:00:00",
+      "updated_at": "2026-02-12 09:00:00"
+    },
+    {
+      "id": 2,
+      "source_branch_id": 2,
+      "target_branch_id": 2,
+      "transfer_number": "TRF-202603-012",
+      "transfer_date": "2026-02-11 10:00:00",
+      "amount": 500000,
+      "transfer_status": "sent",
+      "description": null,
+      "created_by_user_id": 2,
+      "created_at": "2026-02-11 09:00:00",
+      "updated_at": "2026-02-11 09:00:00"
+    }
+  ],
+  "investor_capital_transactions": [
+    {
+      "id": 1,
+      "investor_id": 1,
+      "branch_id": 1,
+      "transfer_id": 1,
+      "transaction_type_code": "CAPITAL_IN",
+      "transaction_date": "2026-02-11 10:00:00",
+      "amount": 250000,
+      "description": "Deskripsi contoh untuk Investor Capital Transactions 1.",
+      "created_by_user_id": 1,
+      "created_at": "2026-02-11 09:00:00",
+      "updated_at": "2026-02-11 09:00:00"
+    },
+    {
+      "id": 2,
+      "investor_id": 2,
+      "branch_id": 2,
+      "transfer_id": 2,
+      "transaction_type_code": "INTEREST_PAYMENT",
+      "transaction_date": "2026-02-10 10:00:00",
+      "amount": 500000,
+      "description": null,
+      "created_by_user_id": 2,
+      "created_at": "2026-02-10 09:00:00",
+      "updated_at": "2026-02-10 09:00:00"
+    }
+  ],
+  "branch_item_settings": [
+    {
+      "id": 1,
+      "branch_id": 1,
+      "item_type_id": 1,
+      "margin_rate": 5.0,
+      "deduction_rate": 5.0,
+      "effective_from": "2026-01-01",
+      "effective_until": null,
+      "created_at": "2026-02-10 09:00:00",
+      "updated_at": "2026-02-10 09:00:00"
+    },
+    {
+      "id": 2,
+      "branch_id": 2,
+      "item_type_id": 2,
+      "margin_rate": 10.0,
+      "deduction_rate": 10.0,
+      "effective_from": "2026-01-02",
+      "effective_until": "2026-12-22",
+      "created_at": "2026-02-09 09:00:00",
+      "updated_at": "2026-02-09 09:00:00"
+    }
+  ],
+  "notifications": [
+    {
+      "id": 1,
+      "branch_id": 1,
+      "customer_id": 1,
+      "contract_id": 1,
+      "notification_type": "contract_due",
+      "message": "Notifikasi contoh untuk Notifications 1.",
+      "is_read": 1,
+      "read_at": null,
+      "read_by_user_id": 1,
+      "created_at": "2026-02-09 09:00:00",
+      "updated_at": "2026-02-09 09:00:00"
+    },
+    {
+      "id": 2,
+      "branch_id": 2,
+      "customer_id": 2,
+      "contract_id": 2,
+      "notification_type": "auction_completed",
+      "message": "Notifikasi contoh untuk Notifications 2.",
+      "is_read": 0,
+      "read_at": "2026-02-08 10:00:00",
+      "read_by_user_id": 2,
+      "created_at": "2026-02-08 09:00:00",
+      "updated_at": "2026-02-08 09:00:00"
+    }
+  ],
+  "audit_logs": [
+    {
+      "id": 1,
+      "user_id": 1,
+      "entity_type": "pawn_contracts",
+      "entity_id": 1,
+      "action_type": "create",
+      "ip_address": "10.10.0.10",
+      "action_at": "2026-02-08 10:00:00",
+      "summary": "Audit log untuk Audit Logs 1.",
+      "metadata_json": {
+        "table": "audit_logs",
+        "column": "metadata_json",
+        "sampleIndex": 1
+      },
+      "created_at": "2026-02-08 09:00:00"
+    },
+    {
+      "id": 2,
+      "user_id": 2,
+      "entity_type": "contract_payments",
+      "entity_id": 2,
+      "action_type": "update",
+      "ip_address": "10.10.1.11",
+      "action_at": "2026-02-07 10:00:00",
+      "summary": "Audit log untuk Audit Logs 2.",
+      "metadata_json": {
+        "table": "audit_logs",
+        "column": "metadata_json",
+        "sampleIndex": 2
+      },
+      "created_at": "2026-02-07 09:00:00"
+    }
+  ]
+}

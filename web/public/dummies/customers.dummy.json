@@ -1,0 +1,26 @@
+[
+  {
+    "id": 1,
+    "customer_code": "CUST-0001",
+    "full_name": "Andi Saputra",
+    "gender": "male",
+    "birth_date": "1990-04-12",
+    "city": "Makassar",
+    "address": "Jl. Veteran Selatan No. 44, Makassar",
+    "customer_status": "active",
+    "created_at": "2026-03-02 09:00:00",
+    "updated_at": "2026-03-02 09:00:00"
+  },
+  {
+    "id": 2,
+    "customer_code": "CUST-0002",
+    "full_name": "Nur Aisyah",
+    "gender": "female",
+    "birth_date": "1991-05-13",
+    "city": "Gowa",
+    "address": "Jl. Pallantikang No. 21, Gowa",
+    "customer_status": "inactive",
+    "created_at": "2026-03-01 09:00:00",
+    "updated_at": "2026-03-01 09:00:00"
+  }
+]

@@ -1,45 +1,19 @@
-
-
-/* CSS Reset untuk menghapus margin browser default */
 html, body {
     margin: 0;
     padding: 0;
-    /* Opsional: Membuat aplikasi menempati tinggi penuh viewport */
     height: 100%;
     width: 100%;
 }
 
-/* Menggunakan border-box untuk perhitungan ukuran yang lebih mudah */
 *, *::before, *::after {
     box-sizing: border-box;
 }
 
-/* Opsional: Font default agar konsisten */
 body {
-    /* Menggunakan font yang Anda tentukan di App.vue jika sudah diimpor */
-    font-family: sans-serif;
     line-height: 1.5;
+    text-rendering: optimizeLegibility;
 }
 
-/* Mengatur #app agar menempati seluruh body (Jika Anda menggunakan height: 100% pada body) */
 #app {
-    height: 100%;
-}
-
-.container-added {
-  background-color: #ffffff;
-  /* Latar belakang halaman putih */
-  font-family: sans-serif;
-  /* Font default */
-  height: 97vh; /* Contoh: Set tinggi penuh viewport */
-  display: flex;
-  flex-direction: column;
-}
-
-.scrollable-content {
-    /* Membuat elemen ini mengambil sisa ruang vertikal yang tersedia */
-    flex-grow: 1;
-    /* Inilah yang membuat konten di dalamnya bisa di-scroll */
-    overflow-y: auto;
-    /* Penting: Pastikan tidak ada margin/padding berlebihan di body/html yang mengganggu 100vh */
+    min-height: 100%;
 }

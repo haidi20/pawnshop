@@ -1,0 +1,22 @@
+[
+  {
+    "id": 1,
+    "user_id": 1,
+    "branch_id": 1,
+    "is_primary": 1,
+    "assigned_at": "2026-03-04 08:00:00",
+    "unassigned_at": null,
+    "created_at": "2026-03-04 09:00:00",
+    "updated_at": "2026-03-04 09:00:00"
+  },
+  {
+    "id": 2,
+    "user_id": 2,
+    "branch_id": 2,
+    "is_primary": 0,
+    "assigned_at": "2026-03-03 08:00:00",
+    "unassigned_at": "2026-03-04 09:00:00",
+    "created_at": "2026-03-03 09:00:00",
+    "updated_at": "2026-03-03 09:00:00"
+  }
+]

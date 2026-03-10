@@ -1,0 +1,16 @@
+[
+  {
+    "id": 1,
+    "category_code": "GOLD",
+    "category_name": "Emas",
+    "created_at": "2026-02-27 09:00:00",
+    "updated_at": "2026-02-27 09:00:00"
+  },
+  {
+    "id": 2,
+    "category_code": "ELEC",
+    "category_name": "Elektronik",
+    "created_at": "2026-02-26 09:00:00",
+    "updated_at": "2026-02-26 09:00:00"
+  }
+]

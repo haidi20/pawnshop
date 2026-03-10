@@ -1,0 +1,16 @@
+[
+  {
+    "id": 1,
+    "role_code": "ADMIN",
+    "role_name": "Administrator",
+    "created_at": "2026-03-07 09:00:00",
+    "updated_at": "2026-03-07 09:00:00"
+  },
+  {
+    "id": 2,
+    "role_code": "MANAGER",
+    "role_name": "Branch Manager",
+    "created_at": "2026-03-06 09:00:00",
+    "updated_at": "2026-03-06 09:00:00"
+  }
+]

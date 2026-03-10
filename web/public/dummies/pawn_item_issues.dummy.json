@@ -1,0 +1,20 @@
+[
+  {
+    "id": 1,
+    "pawn_item_id": 1,
+    "issue_name": "Isu barang 1",
+    "issue_details": "Detail isu barang 1.",
+    "severity_level": "low",
+    "created_at": "2026-02-21 09:00:00",
+    "updated_at": "2026-02-21 09:00:00"
+  },
+  {
+    "id": 2,
+    "pawn_item_id": 2,
+    "issue_name": "Isu barang 2",
+    "issue_details": "Detail isu barang 2.",
+    "severity_level": "medium",
+    "created_at": "2026-02-20 09:00:00",
+    "updated_at": "2026-02-20 09:00:00"
+  }
+]

@@ -1,0 +1,34 @@
+[
+  {
+    "id": 1,
+    "user_id": 1,
+    "entity_type": "pawn_contracts",
+    "entity_id": 1,
+    "action_type": "create",
+    "ip_address": "10.10.0.10",
+    "action_at": "2026-02-08 10:00:00",
+    "summary": "Audit log untuk Audit Logs 1.",
+    "metadata_json": {
+      "table": "audit_logs",
+      "column": "metadata_json",
+      "sampleIndex": 1
+    },
+    "created_at": "2026-02-08 09:00:00"
+  },
+  {
+    "id": 2,
+    "user_id": 2,
+    "entity_type": "contract_payments",
+    "entity_id": 2,
+    "action_type": "update",
+    "ip_address": "10.10.1.11",
+    "action_at": "2026-02-07 10:00:00",
+    "summary": "Audit log untuk Audit Logs 2.",
+    "metadata_json": {
+      "table": "audit_logs",
+      "column": "metadata_json",
+      "sampleIndex": 2
+    },
+    "created_at": "2026-02-07 09:00:00"
+  }
+]

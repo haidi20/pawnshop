@@ -1,0 +1,26 @@
+[
+  {
+    "id": 1,
+    "user_id": 1,
+    "session_token": "session-token-0001",
+    "ip_address": "10.10.0.10",
+    "user_agent": "Chrome/136 Windows 11",
+    "login_at": "2026-03-03 09:00:00",
+    "logout_at": null,
+    "session_status": "active",
+    "created_at": "2026-03-03 09:00:00",
+    "updated_at": "2026-03-03 09:00:00"
+  },
+  {
+    "id": 2,
+    "user_id": 2,
+    "session_token": "session-token-0012",
+    "ip_address": "10.10.1.11",
+    "user_agent": "Edge/135 Windows 11",
+    "login_at": "2026-03-02 09:00:00",
+    "logout_at": "2026-03-02 17:00:00",
+    "session_status": "closed",
+    "created_at": "2026-03-02 09:00:00",
+    "updated_at": "2026-03-02 09:00:00"
+  }
+]

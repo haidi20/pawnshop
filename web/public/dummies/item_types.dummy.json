@@ -1,0 +1,18 @@
+[
+  {
+    "id": 1,
+    "category_id": 1,
+    "type_code": "GOLD-RING",
+    "type_name": "Cincin Emas",
+    "created_at": "2026-02-26 09:00:00",
+    "updated_at": "2026-02-26 09:00:00"
+  },
+  {
+    "id": 2,
+    "category_id": 2,
+    "type_code": "ELEC-LAPTOP",
+    "type_name": "Laptop",
+    "created_at": "2026-02-25 09:00:00",
+    "updated_at": "2026-02-25 09:00:00"
+  }
+]

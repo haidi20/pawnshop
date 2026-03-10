@@ -1,9 +1,27 @@
 import { createRouter, createWebHistory, type RouteRecordRaw } from 'vue-router';
 import dashboardRoutes from '@feature/dashboard/util/dashboard_router';
+import masterBranchRoutes from '@feature/master_branch/util/master_branch_router';
+import customerRoutes from '@feature/customer/util/customer_router';
+import itemMasterRoutes from '@feature/item_master/util/item_master_router';
+import pawnContractRoutes from '@feature/pawn_contract/util/pawn_contract_router';
+import pawnTransactionRoutes from '@feature/pawn_transaction/util/pawn_transaction_router';
+import branchFinanceRoutes from '@feature/branch_finance/util/branch_finance_router';
+import masterInvestorRoutes from '@feature/master_investor/util/master_investor_router';
+import authAccessRoutes from '@feature/auth_access/util/auth_access_router';
+import supportRoutes from '@feature/support/util/support_router';
 
 // Kumpulkan semua rute fitur ke dalam satu array
 const featureRoutes: RouteRecordRaw[] = [
   ...dashboardRoutes,
+  ...masterBranchRoutes,
+  ...customerRoutes,
+  ...itemMasterRoutes,
+  ...pawnContractRoutes,
+  ...pawnTransactionRoutes,
+  ...branchFinanceRoutes,
+  ...masterInvestorRoutes,
+  ...authAccessRoutes,
+  ...supportRoutes,
 ];
 
 // Definisi rute umum atau global (misalnya: Home, 404 Not Found)

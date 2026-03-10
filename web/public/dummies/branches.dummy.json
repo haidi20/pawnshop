@@ -1,0 +1,24 @@
+[
+  {
+    "id": 1,
+    "branch_code": "BR-MKS-001",
+    "branch_number": "001",
+    "branch_name": "Pawnshop Makassar Utama",
+    "phone_number": "0411-800001",
+    "address": "Jl. Jenderal Sudirman No. 10, Makassar",
+    "is_active": 1,
+    "created_at": "2026-03-10 09:00:00",
+    "updated_at": "2026-03-10 09:00:00"
+  },
+  {
+    "id": 2,
+    "branch_code": "BR-GOW-002",
+    "branch_number": "002",
+    "branch_name": "Pawnshop Gowa Selatan",
+    "phone_number": "0411-800002",
+    "address": "Jl. Sultan Hasanuddin No. 28, Gowa",
+    "is_active": 0,
+    "created_at": "2026-03-09 09:00:00",
+    "updated_at": "2026-03-09 09:00:00"
+  }
+]
