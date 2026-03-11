@@ -18,6 +18,7 @@ export interface AppModuleEntityBlueprint {
     role: AppModuleEntityRole;
     description: string;
     columns: string[];
+    columnLabels?: Record<string, string>;
 }
 
 export interface AppModuleSummary {

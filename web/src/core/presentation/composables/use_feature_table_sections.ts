@@ -78,7 +78,7 @@ export const createFeatureTableSections = (data: FeatureModuleDataModel): Featur
         const rows = buildRows(resolveSourceRows(data, entity), entity);
         const fields = entity.columns.map((column) => ({
             key: toCamelCase(column),
-            label: toSentenceCase(column)
+            label: entity.columnLabels?.[column] ?? toSentenceCase(column)
         }));
 
         const service = new DataTableClientSideService<TableRow>(fields, rows);

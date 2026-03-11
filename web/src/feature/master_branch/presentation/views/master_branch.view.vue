@@ -29,32 +29,40 @@
     v-else-if="data"
     class="feature-data-page"
   >
-    <div class="module-stats-grid row row-cols-1 row-cols-md-2 row-cols-xl-4 g-3">
+    <div class="module-stats-grid row row-cols-1 row-cols-md-2 row-cols-xl-3 g-3">
       <article class="metric-card card col h-100">
         <div class="metric-label">
-          Total Rows
+          Total Cabang
         </div>
         <div class="metric-value">
-          {{ data.totalRows }}
+          {{ totalBranchCount }}
         </div>
         <div class="metric-note">
-          Seluruh row lokal yang dimuat oleh feature ini.
+          Seluruh cabang yang tersimpan pada database lokal perusahaan aktif.
         </div>
       </article>
 
-      <article
-        v-for="metric in data.tableCounts.slice(0, 3)"
-        :key="metric.key"
-        class="metric-card card col h-100"
-      >
+      <article class="metric-card card col h-100">
         <div class="metric-label">
-          {{ metric.label }}
+          Total Cabang Aktif
         </div>
         <div class="metric-value">
-          {{ metric.count }}
+          {{ activeBranchCount }}
         </div>
         <div class="metric-note">
-          Data lokal untuk tabel {{ metric.key }}.
+          Cabang yang siap dipakai untuk operasional dan assignment user.
+        </div>
+      </article>
+
+      <article class="metric-card card col h-100">
+        <div class="metric-label">
+          Total Cabang Belum Aktif
+        </div>
+        <div class="metric-value">
+          {{ inactiveBranchCount }}
+        </div>
+        <div class="metric-note">
+          Cabang yang masih tersimpan tetapi belum diaktifkan untuk operasional.
         </div>
       </article>
     </div>
@@ -63,12 +71,13 @@
       <article
         v-for="table in featureTables"
         :key="table.entity.key"
+        :id="getFeatureSectionId(table.entity.key)"
         class="feature-data-page__table-section"
       >
         <div class="feature-data-page__table-head d-flex flex-column flex-lg-row align-items-start justify-content-between gap-3">
           <div>
             <div class="table-card-role">
-              {{ table.entity.role }}
+              {{ getEntityRoleLabel(table.entity.role) }}
             </div>
             <h2 class="table-card-title">
               {{ table.entity.label }}
@@ -80,7 +89,7 @@
 
           <div class="feature-data-page__table-meta d-flex flex-wrap gap-2 align-items-center">
             <code class="table-card-name">{{ table.entity.tableName }}</code>
-            <span class="status-badge is-ready">{{ table.rows.length }} rows</span>
+            <span class="status-badge is-ready">{{ table.rows.length }} baris</span>
           </div>
         </div>
 
@@ -91,18 +100,65 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted } from 'vue';
+import { computed, nextTick, onMounted, watch } from 'vue';
 import { storeToRefs } from 'pinia';
+import { useRoute } from 'vue-router';
 
 import DataTableClientSideComponent from '@core/presentation/components/datatable_clientside.component.vue';
 import LocalDbFeedbackStateComponent from '@core/presentation/components/local_db_feedback_state.component.vue';
 import { useFeatureTableSections } from '@core/presentation/composables/use_feature_table_sections';
 import '@core/presentation/styles/feature_data_tables.css';
 import { masterBranchViewModel } from '@feature/master_branch/presentation/view_models/master_branch.vm';
+import type { AppModuleEntityRole } from '@core/domain/interfaces/app_module.interface';
 
 const vm = masterBranchViewModel();
+const route = useRoute();
 const { data, isLoading, error } = storeToRefs(vm);
 const featureTables = useFeatureTableSections(data);
+const totalBranchCount = computed(() => data.value?.branches.length ?? 0);
+const activeBranchCount = computed(() => data.value?.branches.filter((branch) => branch.isActive).length ?? 0);
+const inactiveBranchCount = computed(() => totalBranchCount.value - activeBranchCount.value);
+
+const getFeatureSectionId = (entityKey: string): string | undefined => {
+    switch (entityKey) {
+        case 'branches':
+            return 'data-cabang';
+        case 'storage_locations':
+            return 'lokasi-penyimpanan';
+        default:
+            return undefined;
+    }
+};
+
+const getEntityRoleLabel = (role: AppModuleEntityRole): string => {
+    switch (role) {
+        case 'primary':
+            return 'Utama';
+        case 'child':
+            return 'Turunan';
+        default:
+            return 'Pendukung';
+    }
+};
+
+const scrollToHashSection = async (hash: string): Promise<void> => {
+    if (typeof document === 'undefined' || !hash) {
+        return;
+    }
+
+    await nextTick();
+
+    const targetElement = document.getElementById(hash.replace(/^#/, ''));
+    targetElement?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+};
+
+watch(
+    () => route.hash,
+    (hash) => {
+        void scrollToHashSection(hash);
+    },
+    { immediate: true }
+);
 
 onMounted(() => {
     void vm.getMasterBranchData();

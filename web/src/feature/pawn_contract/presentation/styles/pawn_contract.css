@@ -188,6 +188,12 @@
   color: var(--primary);
 }
 
+.pawn-contract-page__section-actions {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 0.75rem;
+}
+
 .pawn-contract-page__section-title {
   color: var(--ink);
   font-size: 1.18rem;
@@ -834,5 +840,9 @@
   .pawn-contract-page__reset-button,
   .pawn-contract-page__table-filter-button {
     width: 100%;
+  }
+
+  .pawn-contract-page__section-actions {
+    justify-content: stretch;
   }
 }

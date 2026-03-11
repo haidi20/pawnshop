@@ -12,7 +12,10 @@ import {
     PawnContractIndexTabKeyEnum,
     PawnContractNasabahTabKeyEnum
 } from '@feature/pawn_contract/domain/models';
-import type { PawnContractStatusModel } from '@core/util/helpers';
+import {
+    createEmptyIndexTabFilters,
+    type PawnContractIndexTabFilterStateModel
+} from '@feature/pawn_contract/presentation/view_models/pawn_contract_index_filters';
 export type {
     PawnContractAjtTypeModel,
     PawnContractIndexTabKeyModel,
@@ -24,7 +27,6 @@ export type {
 
 export interface IPawnContractState {
     data: Ref<PawnContractDataModel | null>;
-    filteredData: Ref<PawnContractDataModel | null>;
     isLoading: Ref<boolean>;
     error: Ref<string | null>;
     activeIndexTab: Ref<PawnContractIndexTabKeyModel>;
@@ -32,8 +34,7 @@ export interface IPawnContractState {
     activeAjtType: Ref<PawnContractAjtTypeModel>;
     activeSettlementType: Ref<PawnContractSettlementTypeModel>;
     activeLocationTab: Ref<PawnContractLocationTabModel>;
-    branchFilter: Ref<string>;
-    statusFilter: Ref<'all' | PawnContractStatusModel>;
+    tableFilters: Ref<PawnContractIndexTabFilterStateModel>;
 }
 
 export type PawnContractTableField = {
@@ -113,7 +114,6 @@ export const maintenanceTableFields = [
 
 export const createPawnContractState = (): IPawnContractState => ({
     data: ref(null),
-    filteredData: ref(null),
     isLoading: ref(false),
     error: ref(null),
     activeIndexTab: ref(PawnContractIndexTabKeyEnum.CustomerContracts),
@@ -121,6 +121,5 @@ export const createPawnContractState = (): IPawnContractState => ({
     activeAjtType: ref('30'),
     activeSettlementType: ref('lunas'),
     activeLocationTab: ref('kantor'),
-    branchFilter: ref('all'),
-    statusFilter: ref('all')
+    tableFilters: ref(createEmptyIndexTabFilters())
 });

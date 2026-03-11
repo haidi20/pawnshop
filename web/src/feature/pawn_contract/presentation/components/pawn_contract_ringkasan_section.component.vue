@@ -36,6 +36,21 @@
       </div>
     </section>
 
+    <div class="pawn-contract-page__section-actions">
+      <button
+        class="btn btn-outline-secondary pawn-contract-page__table-filter-button"
+        :class="{ 'is-active': hasActiveFilters }"
+        type="button"
+        @click="emit('open-filter')"
+      >
+        <i
+          class="bi bi-sliders"
+          aria-hidden="true"
+        />
+        <span>Filter gadai</span>
+      </button>
+    </div>
+
     <section class="row g-3">
       <div
         v-for="sectionTable in sectionTables"
@@ -53,20 +68,6 @@
             :vm="sectionTable.vm"
             class="pawn-contract-page__datatable"
           >
-            <template #extra-actions>
-              <button
-                class="btn btn-outline-secondary pawn-contract-page__table-filter-button"
-                :class="{ 'is-active': hasActiveFilters }"
-                type="button"
-                @click="emit('open-filter')"
-              >
-                <i
-                  class="bi bi-sliders"
-                  aria-hidden="true"
-                />
-                <span>Filter gadai</span>
-              </button>
-            </template>
             <template #body="{ item }">
               <tr>
                 <td data-label="No. Gadai">
@@ -117,20 +118,6 @@
         :vm="pendapatanVm"
         class="mt-3 pawn-contract-page__datatable"
       >
-        <template #extra-actions>
-          <button
-            class="btn btn-outline-secondary pawn-contract-page__table-filter-button"
-            :class="{ 'is-active': hasActiveFilters }"
-            type="button"
-            @click="emit('open-filter')"
-          >
-            <i
-              class="bi bi-sliders"
-              aria-hidden="true"
-            />
-            <span>Filter gadai</span>
-          </button>
-        </template>
         <template #empty>
           <LocalDbFeedbackStateComponent
             state="empty"

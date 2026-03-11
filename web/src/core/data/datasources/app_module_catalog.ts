@@ -46,6 +46,20 @@ export const appNavigationItems: AppNavigationItem[] = [
                 route: '/system/users',
                 icon: 'bi-people',
                 caption: 'Atur user pegawai dan cabangnya'
+            },
+            {
+                key: 'system-branches',
+                label: 'Cabang',
+                route: '/branches#data-cabang',
+                icon: 'bi-diagram-3',
+                caption: 'Kelola master cabang operasional'
+            },
+            {
+                key: 'system-locations',
+                label: 'Lokasi',
+                route: '/branches#lokasi-penyimpanan',
+                icon: 'bi-pin-map',
+                caption: 'Kelola lokasi penyimpanan per cabang'
             }
         ]
     }
@@ -57,8 +71,8 @@ const flattenNavigationItems = (items: AppNavigationItem[]): AppNavigationItem[]
 export const appModules: AppModuleSummary[] = [
     {
         key: 'master-branch',
-        title: 'Master Branch',
-        shortTitle: 'Branch',
+        title: 'Master Cabang',
+        shortTitle: 'Cabang',
         route: '/branches',
         icon: 'bi-diagram-3-fill',
         phase: 'Fase 1',
@@ -74,19 +88,33 @@ export const appModules: AppModuleSummary[] = [
         entities: [
             {
                 key: 'branches',
-                label: 'Branches',
+                label: 'Cabang',
                 tableName: 'branches',
                 role: 'primary',
                 description: 'Data identitas cabang, kode, nomor, alamat, telepon, dan status aktif.',
-                columns: ['branch_code', 'branch_number', 'branch_name', 'phone_number', 'is_active']
+                columns: ['branch_code', 'branch_number', 'branch_name', 'phone_number', 'is_active'],
+                columnLabels: {
+                    branch_code: 'Kode Cabang',
+                    branch_number: 'Nomor Cabang',
+                    branch_name: 'Nama Cabang',
+                    phone_number: 'Nomor Telepon',
+                    is_active: 'Status Aktif'
+                }
             },
             {
                 key: 'storage_locations',
-                label: 'Storage Locations',
+                label: 'Lokasi Penyimpanan',
                 tableName: 'storage_locations',
                 role: 'child',
-                description: 'Lokasi penyimpanan barang per cabang, seperti office, warehouse, atau lokasi lain.',
-                columns: ['branch_id', 'location_code', 'location_name', 'location_type', 'is_active']
+                description: 'Lokasi penyimpanan barang per cabang, seperti kantor, gudang, atau lokasi lain.',
+                columns: ['branch_id', 'location_code', 'location_name', 'location_type', 'is_active'],
+                columnLabels: {
+                    branch_id: 'ID Cabang',
+                    location_code: 'Kode Lokasi',
+                    location_name: 'Nama Lokasi',
+                    location_type: 'Tipe Lokasi',
+                    is_active: 'Status Aktif'
+                }
             }
         ],
         nextSteps: [

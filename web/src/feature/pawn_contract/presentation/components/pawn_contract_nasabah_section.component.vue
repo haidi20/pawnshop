@@ -37,6 +37,21 @@
       </div>
     </div>
 
+    <div class="pawn-contract-page__section-actions">
+      <button
+        class="btn btn-outline-secondary pawn-contract-page__table-filter-button"
+        :class="{ 'is-active': hasActiveFilters }"
+        type="button"
+        @click="emit('open-filter')"
+      >
+        <i
+          class="bi bi-sliders"
+          aria-hidden="true"
+        />
+        <span>Filter gadai</span>
+      </button>
+    </div>
+
     <div class="d-grid gap-3 mt-3">
       <article
         v-for="sectionTable in sectionTables"
@@ -61,20 +76,6 @@
           :vm="sectionTable.vm"
           class="pawn-contract-page__datatable"
         >
-          <template #extra-actions>
-            <button
-              class="btn btn-outline-secondary pawn-contract-page__table-filter-button"
-              :class="{ 'is-active': hasActiveFilters }"
-              type="button"
-              @click="emit('open-filter')"
-            >
-              <i
-                class="bi bi-sliders"
-                aria-hidden="true"
-              />
-              <span>Filter gadai</span>
-            </button>
-          </template>
           <template #body="{ item }">
             <tr>
               <td

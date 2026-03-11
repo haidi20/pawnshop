@@ -14,8 +14,8 @@ export const createMasterBranchDataModel = (params: {
     storageLocations: StorageLocationModel[];
 }): MasterBranchDataModel => {
     const tableCounts: FeatureTableCountModel[] = [
-        { key: 'branches', label: 'Branches', count: params.branches.length },
-        { key: 'storage_locations', label: 'Storage Locations', count: params.storageLocations.length },
+        { key: 'branches', label: 'Cabang', count: params.branches.length },
+        { key: 'storage_locations', label: 'Lokasi penyimpanan', count: params.storageLocations.length },
     ];
 
     return {

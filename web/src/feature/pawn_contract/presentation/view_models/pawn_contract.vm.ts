@@ -23,7 +23,6 @@ import {
     readAuthPortalStoredSession
 } from '@feature/auth_portal/util/auth_portal_session';
 import type {
-    PawnContractDataFilterModel,
     PawnContractLocationRowModel,
     PawnContractMaintenanceRowModel,
     PawnContractNasabahSectionModel,
@@ -43,6 +42,12 @@ import {
     getPawnContractSummariesUsecase
 } from '@feature/pawn_contract/presentation/di/pawn_contract.di';
 import {
+    createDefaultIndexTabFilters,
+    filterContractSummariesByTableFilter,
+    hasActiveIndexTabFilters,
+    type PawnContractIndexTabFilterModel
+} from '@feature/pawn_contract/presentation/view_models/pawn_contract_index_filters';
+import {
     ajtTableFields,
     createPawnContractState,
     locationTableFields,
@@ -58,6 +63,7 @@ import {
     type PawnContractSettlementTypeModel,
     type PawnContractTableField
 } from '@feature/pawn_contract/presentation/view_models/pawn_contract.state';
+import { PawnContractIndexTabKeyEnum } from '@feature/pawn_contract/domain/models';
 
 export type PawnContractClientTableRow<TSource = unknown> = Record<string, unknown> & {
     id: number | string;
@@ -172,7 +178,7 @@ export const pawnContractViewModel = defineStore('pawnContractStore', () => {
         ].join(':');
     });
 
-    state.branchFilter.value = resolveDefaultBranchFilter(branchAccess.value);
+    state.tableFilters.value = createDefaultIndexTabFilters(branchAccess.value);
 
     const setters = {
         setError: (message: string | null): void => {
@@ -195,23 +201,77 @@ export const pawnContractViewModel = defineStore('pawnContractStore', () => {
         }
     };
 
-    const activeData = computed(() => state.filteredData.value ?? state.data.value);
     const sortedBranches = computed(() =>
         [...(state.data.value?.branches ?? [])].sort((left, right) =>
             left.branchName.localeCompare(right.branchName, 'id-ID')
         )
     );
     const contractSummaries = computed(() =>
-        unwrapEitherOrThrow(getPawnContractSummariesUsecase.execute(activeData.value))
+        unwrapEitherOrThrow(getPawnContractSummariesUsecase.execute(state.data.value))
     );
-    const openContractSummaries = computed(() =>
-        contractSummaries.value.filter((item) => item.isOpenContract)
+    const filteredSummariesByTab = computed(
+        (): Record<PawnContractIndexTabKeyModel, PawnContractSummaryModel[]> => ({
+            [PawnContractIndexTabKeyEnum.CustomerContracts]: filterContractSummariesByTableFilter(
+                contractSummaries.value,
+                state.tableFilters.value[PawnContractIndexTabKeyEnum.CustomerContracts],
+                branchAccess.value
+            ),
+            [PawnContractIndexTabKeyEnum.DailySummary]: filterContractSummariesByTableFilter(
+                contractSummaries.value,
+                state.tableFilters.value[PawnContractIndexTabKeyEnum.DailySummary],
+                branchAccess.value
+            ),
+            [PawnContractIndexTabKeyEnum.DueContracts]: filterContractSummariesByTableFilter(
+                contractSummaries.value,
+                state.tableFilters.value[PawnContractIndexTabKeyEnum.DueContracts],
+                branchAccess.value
+            ),
+            [PawnContractIndexTabKeyEnum.SettlementAuction]: filterContractSummariesByTableFilter(
+                contractSummaries.value,
+                state.tableFilters.value[PawnContractIndexTabKeyEnum.SettlementAuction],
+                branchAccess.value
+            ),
+            [PawnContractIndexTabKeyEnum.LocationDistribution]: filterContractSummariesByTableFilter(
+                contractSummaries.value,
+                state.tableFilters.value[PawnContractIndexTabKeyEnum.LocationDistribution],
+                branchAccess.value
+            ),
+            [PawnContractIndexTabKeyEnum.Maintenance]: filterContractSummariesByTableFilter(
+                contractSummaries.value,
+                state.tableFilters.value[PawnContractIndexTabKeyEnum.Maintenance],
+                branchAccess.value
+            )
+        })
+    );
+    const customerContractSummaries = computed(
+        () => filteredSummariesByTab.value[PawnContractIndexTabKeyEnum.CustomerContracts]
+    );
+    const openCustomerContractSummaries = computed(() =>
+        customerContractSummaries.value.filter((item) => item.isOpenContract)
+    );
+    const dailySummarySummaries = computed(
+        () => filteredSummariesByTab.value[PawnContractIndexTabKeyEnum.DailySummary]
+    );
+    const dueContractSummaries = computed(
+        () => filteredSummariesByTab.value[PawnContractIndexTabKeyEnum.DueContracts]
+    );
+    const openDueContractSummaries = computed(() =>
+        dueContractSummaries.value.filter((item) => item.isOpenContract)
+    );
+    const settlementSummaries = computed(
+        () => filteredSummariesByTab.value[PawnContractIndexTabKeyEnum.SettlementAuction]
+    );
+    const locationSummaries = computed(
+        () => filteredSummariesByTab.value[PawnContractIndexTabKeyEnum.LocationDistribution]
+    );
+    const maintenanceSummaries = computed(
+        () => filteredSummariesByTab.value[PawnContractIndexTabKeyEnum.Maintenance]
     );
 
     const nasabahTable = computed(() =>
         unwrapEitherOrThrow(
             getPawnContractNasabahTableUsecase.execute({
-                summaries: openContractSummaries.value,
+                summaries: openCustomerContractSummaries.value,
                 activeTab: state.activeNasabahTab.value
             })
         )
@@ -219,14 +279,14 @@ export const pawnContractViewModel = defineStore('pawnContractStore', () => {
     const ringkasanTable = computed(() =>
         unwrapEitherOrThrow(
             getPawnContractRingkasanTableUsecase.execute({
-                summaries: contractSummaries.value
+                summaries: dailySummarySummaries.value
             })
         )
     );
     const ajtTable = computed(() =>
         unwrapEitherOrThrow(
             getPawnContractAjtTableUsecase.execute({
-                summaries: openContractSummaries.value,
+                summaries: openDueContractSummaries.value,
                 activeType: state.activeAjtType.value
             })
         )
@@ -234,7 +294,7 @@ export const pawnContractViewModel = defineStore('pawnContractStore', () => {
     const settlementTable = computed(() =>
         unwrapEitherOrThrow(
             getPawnContractSettlementTableUsecase.execute({
-                summaries: contractSummaries.value,
+                summaries: settlementSummaries.value,
                 activeType: state.activeSettlementType.value
             })
         )
@@ -242,7 +302,7 @@ export const pawnContractViewModel = defineStore('pawnContractStore', () => {
     const locationTable = computed(() =>
         unwrapEitherOrThrow(
             getPawnContractLocationTableUsecase.execute({
-                summaries: contractSummaries.value,
+                summaries: locationSummaries.value,
                 activeTab: state.activeLocationTab.value
             })
         )
@@ -250,7 +310,7 @@ export const pawnContractViewModel = defineStore('pawnContractStore', () => {
     const maintenanceTable = computed(() =>
         unwrapEitherOrThrow(
             getPawnContractMaintenanceTableUsecase.execute({
-                summaries: contractSummaries.value
+                summaries: maintenanceSummaries.value
             })
         )
     );
@@ -258,7 +318,7 @@ export const pawnContractViewModel = defineStore('pawnContractStore', () => {
     const indexTabs = computed(() =>
         unwrapEitherOrThrow(
             getPawnContractIndexTabsUsecase.execute({
-                openContractCount: openContractSummaries.value.length,
+                openContractCount: openCustomerContractSummaries.value.length,
                 ringkasanRowCount: ringkasanTable.value.sections.reduce(
                     (total, section) => total + section.rows.length,
                     0
@@ -448,25 +508,20 @@ export const pawnContractViewModel = defineStore('pawnContractStore', () => {
     );
     const canAccessAllBranches = computed(() => branchAccess.value.canAccessAllBranches);
     const isBranchLocked = computed(() => !branchAccess.value.canAccessAllBranches);
+    const activeTableFilter = computed(
+        (): PawnContractIndexTabFilterModel => state.tableFilters.value[state.activeIndexTab.value]
+    );
+    const activeTableBranchFilter = computed(() => activeTableFilter.value.branchFilter);
+    const activeTableStatusFilter = computed(() => activeTableFilter.value.statusFilter);
 
     const hasActiveFilters = computed(
-        () =>
-            state.branchFilter.value !== resolveDefaultBranchFilter(branchAccess.value) ||
-            state.statusFilter.value !== 'all'
-    );
-
-    watch(
-        [state.branchFilter, state.statusFilter],
-        async () => {
-            await actions.loadFilteredData();
-        }
+        () => hasActiveIndexTabFilters(activeTableFilter.value, branchAccess.value)
     );
 
     const actions = {
         loadData: async (): Promise<void> => {
             if (!hasActiveScopedSession(currentSession.value ?? readAuthPortalStoredSession())) {
                 state.data.value = null;
-                state.filteredData.value = null;
                 setters.setError(null);
                 return;
             }
@@ -476,65 +531,43 @@ export const pawnContractViewModel = defineStore('pawnContractStore', () => {
 
             try {
                 state.data.value = unwrapEitherOrThrow(await getPawnContractDataUsecase.execute());
-                const dataFilter = buildDataFilter({
-                    branchFilter: state.branchFilter.value,
-                    statusFilter: state.statusFilter.value
-                }, branchAccess.value);
-
-                state.filteredData.value = isDefaultDataFilter(dataFilter, branchAccess.value)
-                    ? state.data.value
-                    : unwrapEitherOrThrow(await getPawnContractDataUsecase.execute(dataFilter));
             } catch (error) {
                 setters.setError(error instanceof Error ? error.message : String(error));
             } finally {
                 state.isLoading.value = false;
             }
         },
-        loadFilteredData: async (): Promise<void> => {
-            if (!hasActiveScopedSession(currentSession.value ?? readAuthPortalStoredSession()) || !state.data.value) {
-                return;
-            }
-
-            const dataFilter = buildDataFilter({
-                branchFilter: state.branchFilter.value,
-                statusFilter: state.statusFilter.value
-            }, branchAccess.value);
-
-            if (isDefaultDataFilter(dataFilter, branchAccess.value)) {
-                state.filteredData.value = state.data.value;
-                return;
-            }
-
-            setters.setError(null);
-
-            try {
-                state.filteredData.value = unwrapEitherOrThrow(
-                    await getPawnContractDataUsecase.execute(dataFilter)
-                );
-            } catch (error) {
-                setters.setError(error instanceof Error ? error.message : String(error));
-            }
+        setActiveIndexTabFilters: (filter: PawnContractIndexTabFilterModel): void => {
+            state.tableFilters.value = {
+                ...state.tableFilters.value,
+                [state.activeIndexTab.value]: {
+                    branchFilter: filter.branchFilter,
+                    statusFilter: filter.statusFilter
+                }
+            };
         },
-        resetFilters: (): void => {
-            state.branchFilter.value = resolveDefaultBranchFilter(branchAccess.value);
-            state.statusFilter.value = 'all';
+        resetActiveFilters: (): void => {
+            const defaultFilters = createDefaultIndexTabFilters(branchAccess.value);
+
+            state.tableFilters.value = {
+                ...state.tableFilters.value,
+                [state.activeIndexTab.value]: defaultFilters[state.activeIndexTab.value]
+            };
         }
     };
 
     watch(
         accessSessionKey,
         () => {
-            state.branchFilter.value = resolveDefaultBranchFilter(branchAccess.value);
-            state.statusFilter.value = 'all';
+            state.tableFilters.value = createDefaultIndexTabFilters(branchAccess.value);
             setters.setError(null);
 
             if (!hasActiveScopedSession(currentSession.value ?? readAuthPortalStoredSession())) {
                 state.data.value = null;
-                state.filteredData.value = null;
                 return;
             }
 
-            if (state.data.value !== null || state.filteredData.value !== null) {
+            if (state.data.value !== null) {
                 void actions.loadData();
             }
         },
@@ -562,6 +595,8 @@ export const pawnContractViewModel = defineStore('pawnContractStore', () => {
         locationOptions,
         locationDataTableVm,
         maintenanceDataTableVm,
+        activeTableBranchFilter,
+        activeTableStatusFilter,
         hasActiveFilters,
         canAccessAllBranches,
         isBranchLocked,
@@ -572,45 +607,4 @@ export const pawnContractViewModel = defineStore('pawnContractStore', () => {
 
 function hasActiveScopedSession(session: ReturnType<typeof readAuthPortalStoredSession>): boolean {
     return typeof session?.company.id === 'number' && typeof session?.user.id === 'number';
-}
-
-function resolveDefaultBranchFilter(branchAccess: ReturnType<typeof getCurrentAuthPortalBranchAccess>): string {
-    return !branchAccess.canAccessAllBranches && branchAccess.assignedBranchId !== null
-        ? String(branchAccess.assignedBranchId)
-        : 'all';
-}
-
-function buildDataFilter(params: {
-    branchFilter: string;
-    statusFilter: 'all' | PawnContractStatusModel;
-}, branchAccess: ReturnType<typeof getCurrentAuthPortalBranchAccess>): PawnContractDataFilterModel {
-    return {
-        branchId:
-            branchAccess.canAccessAllBranches
-                ? params.branchFilter !== 'all' && Number.isFinite(Number(params.branchFilter))
-                    ? Number(params.branchFilter)
-                    : null
-                : branchAccess.assignedBranchId,
-        contractStatus: params.statusFilter === 'all' ? null : params.statusFilter,
-        onlyOpenContracts: false,
-        dueWithinDays: null,
-        maintenanceRequired: false,
-        warehouseOnly: false
-    };
-}
-
-function isDefaultDataFilter(
-    filter: PawnContractDataFilterModel,
-    branchAccess: ReturnType<typeof getCurrentAuthPortalBranchAccess>
-): boolean {
-    return (
-        (branchAccess.canAccessAllBranches
-            ? filter.branchId === null
-            : filter.branchId === branchAccess.assignedBranchId) &&
-        filter.contractStatus === null &&
-        !filter.onlyOpenContracts &&
-        filter.dueWithinDays === null &&
-        !filter.maintenanceRequired &&
-        !filter.warehouseOnly
-    );
 }

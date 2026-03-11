@@ -192,8 +192,8 @@
       :is-open="isFilterModalOpen"
       :branches="sortedBranches"
       :status-options="contractStatusOptions"
-      :branch-filter="branchFilter"
-      :status-filter="statusFilter"
+      :branch-filter="activeTableBranchFilter"
+      :status-filter="activeTableStatusFilter"
       :has-active-filters="hasActiveFilters"
       :allow-all-branches="canAccessAllBranches"
       :is-branch-locked="isBranchLocked"
@@ -244,8 +244,8 @@ const {
   activeAjtType,
   activeSettlementType,
   activeLocationTab,
-  branchFilter,
-  statusFilter,
+  activeTableBranchFilter,
+  activeTableStatusFilter,
   sortedBranches,
   indexTabs,
   activeIndexTabMeta,
@@ -282,7 +282,8 @@ const {
   getDueStateClass,
   getLocationStatusClass,
   getTermLabel,
-  resetFilters,
+  resetActiveFilters,
+  setActiveIndexTabFilters,
   setActiveIndexTab,
   setActiveNasabahTab,
   setActiveAjtType,
@@ -310,13 +311,12 @@ const applyFilterModal = (payload: {
   branchFilter: string;
   statusFilter: 'all' | PawnContractStatusModel;
 }): void => {
-  branchFilter.value = payload.branchFilter;
-  statusFilter.value = payload.statusFilter;
+  setActiveIndexTabFilters(payload);
   closeFilterModal();
 };
 
 const resetFilterModal = (): void => {
-  resetFilters();
+  resetActiveFilters();
   closeFilterModal();
 };
 

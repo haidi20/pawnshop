@@ -4,7 +4,7 @@
     :class="{ 'is-sidebar-collapsed': isSidebarCollapsed }"
   >
     <AppSidebar
-      :active-path="route.path"
+      :active-path="route.fullPath"
       :is-open="isSidebarOpen"
       :is-collapsed="isSidebarCollapsed"
       :items="navigationItems"
@@ -69,15 +69,6 @@
               >
                 <i class="bi bi-person-vcard" />
                 <span>Profile</span>
-              </button>
-
-              <button
-                class="admin-header-user-dropdown-item"
-                type="button"
-                role="menuitem"
-              >
-                <i class="bi bi-sliders" />
-                <span>Pengaturan</span>
               </button>
 
               <div class="admin-header-user-dropdown-divider" />
@@ -383,12 +374,12 @@ const handleLogout = async (): Promise<void> => {
 
   try {
     await authVm.logout();
+    await router.replace('/login');
     await showSuccessMessage('Logout berhasil', 'Sesi Anda sudah ditutup.', {
       toast: true,
       timer: 1600,
       position: 'top-end',
     });
-    await router.replace('/login');
   } catch (error) {
     await showErrorMessage('Logout gagal', error instanceof Error ? error.message : String(error));
   }

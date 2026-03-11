@@ -214,8 +214,30 @@ const activePath = computed<string>(() => props.activePath);
 const isCollapsed = computed<boolean>(() => props.isCollapsed);
 const authVm = authPortalViewModel();
 
-const isItemActive = (route?: string): boolean =>
-  route !== undefined && (activePath.value === route || activePath.value.startsWith(`${route}/`));
+const parseNavigationRoute = (value: string): { path: string; hash: string } => {
+  const [pathWithQuery, hash = ''] = value.split('#');
+  const [path] = pathWithQuery.split('?');
+
+  return {
+    path,
+    hash: hash ? `#${hash}` : ''
+  };
+};
+
+const isItemActive = (route?: string): boolean => {
+  if (route === undefined) {
+    return false;
+  }
+
+  const activeRoute = parseNavigationRoute(activePath.value);
+  const targetRoute = parseNavigationRoute(route);
+
+  if (targetRoute.hash) {
+    return activeRoute.path === targetRoute.path && activeRoute.hash === targetRoute.hash;
+  }
+
+  return activeRoute.path === targetRoute.path || activeRoute.path.startsWith(`${targetRoute.path}/`);
+};
 
 const isNavigationItemActive = (item: AppNavigationItem): boolean =>
   isItemActive(item.route) || item.children?.some((child) => isNavigationItemActive(child)) || false;
@@ -266,12 +288,12 @@ const resetLocalData = async (): Promise<void> => {
     }
 
     await authVm.logout();
+    await router.replace('/login');
     await showSuccessMessage('Data lokal berhasil dihapus', 'Sesi Anda sudah ditutup.', {
       toast: true,
       timer: 1800,
       position: 'top-end'
     });
-    await router.replace('/login');
   } catch (error) {
     await showErrorMessage(
       'Gagal menghapus data lokal',
