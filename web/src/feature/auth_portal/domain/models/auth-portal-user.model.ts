@@ -4,6 +4,8 @@ export interface AuthPortalUserModel {
     id: number;
     companyId: number;
     role: AuthPortalUserRoleModel;
+    assignedBranchId: number | null;
+    assignedBranchName: string | null;
     username: string;
     passwordHash: string;
     fullName: string;

@@ -10,7 +10,10 @@ import masterInvestorRoutes from '@feature/master_investor/util/master_investor_
 import authAccessRoutes from '@feature/auth_access/util/auth_access_router';
 import authPortalRoutes from '@feature/auth_portal/util/auth_portal_router';
 import supportRoutes from '@feature/support/util/support_router';
-import { hasAuthPortalStoredSession } from '@feature/auth_portal/util/auth_portal_session';
+import {
+  hasAuthPortalStoredSession,
+  isCurrentAuthPortalOwner
+} from '@feature/auth_portal/util/auth_portal_session';
 
 // Kumpulkan semua rute fitur ke dalam satu array
 const featureRoutes: RouteRecordRaw[] = [
@@ -73,6 +76,11 @@ router.beforeEach((to, _from, next) => {
         ? { redirect: to.fullPath }
         : undefined,
     });
+    return;
+  }
+
+  if (to.meta.ownerOnly && !isCurrentAuthPortalOwner()) {
+    next({ path: '/dashboard' });
     return;
   }
 

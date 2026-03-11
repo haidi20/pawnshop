@@ -1,5 +1,5 @@
 import { computed, watch, type ComputedRef, type Ref } from 'vue';
-import { defineStore } from 'pinia';
+import { defineStore, storeToRefs } from 'pinia';
 
 import { DataTableClientSideService } from '@core/presentation/services/datatable_clientside.service';
 import type { DataTableClientSideVM } from '@core/presentation/view_models/datatable_clientside.vm';
@@ -17,6 +17,11 @@ import {
     type PawnContractDueStateModel,
     type PawnContractStatusModel
 } from '@core/util/helpers';
+import { authPortalViewModel } from '@feature/auth_portal/presentation/view_models/auth_portal.vm';
+import {
+    getCurrentAuthPortalBranchAccess,
+    readAuthPortalStoredSession
+} from '@feature/auth_portal/util/auth_portal_session';
 import type {
     PawnContractDataFilterModel,
     PawnContractLocationRowModel,
@@ -141,6 +146,33 @@ const createSectionTableRegistry = <
 
 export const pawnContractViewModel = defineStore('pawnContractStore', () => {
     const state = createPawnContractState();
+    const authVm = authPortalViewModel();
+    const { currentSession } = storeToRefs(authVm);
+    const branchAccess = computed(() => {
+        const session = currentSession.value;
+
+        if (session) {
+            return {
+                canAccessAllBranches: session.user.role === 'owner',
+                assignedBranchId: session.user.assignedBranchId,
+                assignedBranchName: session.user.assignedBranchName
+            };
+        }
+
+        return getCurrentAuthPortalBranchAccess();
+    });
+    const accessSessionKey = computed(() => {
+        const session = currentSession.value ?? readAuthPortalStoredSession();
+
+        return [
+            session?.company.id ?? 'public',
+            session?.user.id ?? 'guest',
+            session?.user.role ?? 'guest',
+            session?.user.assignedBranchId ?? 'none'
+        ].join(':');
+    });
+
+    state.branchFilter.value = resolveDefaultBranchFilter(branchAccess.value);
 
     const setters = {
         setError: (message: string | null): void => {
@@ -414,9 +446,13 @@ export const pawnContractViewModel = defineStore('pawnContractStore', () => {
         maintenanceTableFields,
         mapMaintenanceTableRow
     );
+    const canAccessAllBranches = computed(() => branchAccess.value.canAccessAllBranches);
+    const isBranchLocked = computed(() => !branchAccess.value.canAccessAllBranches);
 
     const hasActiveFilters = computed(
-        () => state.branchFilter.value !== 'all' || state.statusFilter.value !== 'all'
+        () =>
+            state.branchFilter.value !== resolveDefaultBranchFilter(branchAccess.value) ||
+            state.statusFilter.value !== 'all'
     );
 
     watch(
@@ -428,6 +464,13 @@ export const pawnContractViewModel = defineStore('pawnContractStore', () => {
 
     const actions = {
         loadData: async (): Promise<void> => {
+            if (!hasActiveScopedSession(currentSession.value ?? readAuthPortalStoredSession())) {
+                state.data.value = null;
+                state.filteredData.value = null;
+                setters.setError(null);
+                return;
+            }
+
             state.isLoading.value = true;
             setters.setError(null);
 
@@ -436,9 +479,9 @@ export const pawnContractViewModel = defineStore('pawnContractStore', () => {
                 const dataFilter = buildDataFilter({
                     branchFilter: state.branchFilter.value,
                     statusFilter: state.statusFilter.value
-                });
+                }, branchAccess.value);
 
-                state.filteredData.value = isDefaultDataFilter(dataFilter)
+                state.filteredData.value = isDefaultDataFilter(dataFilter, branchAccess.value)
                     ? state.data.value
                     : unwrapEitherOrThrow(await getPawnContractDataUsecase.execute(dataFilter));
             } catch (error) {
@@ -448,16 +491,16 @@ export const pawnContractViewModel = defineStore('pawnContractStore', () => {
             }
         },
         loadFilteredData: async (): Promise<void> => {
-            if (!state.data.value) {
+            if (!hasActiveScopedSession(currentSession.value ?? readAuthPortalStoredSession()) || !state.data.value) {
                 return;
             }
 
             const dataFilter = buildDataFilter({
                 branchFilter: state.branchFilter.value,
                 statusFilter: state.statusFilter.value
-            });
+            }, branchAccess.value);
 
-            if (isDefaultDataFilter(dataFilter)) {
+            if (isDefaultDataFilter(dataFilter, branchAccess.value)) {
                 state.filteredData.value = state.data.value;
                 return;
             }
@@ -473,10 +516,30 @@ export const pawnContractViewModel = defineStore('pawnContractStore', () => {
             }
         },
         resetFilters: (): void => {
-            state.branchFilter.value = 'all';
+            state.branchFilter.value = resolveDefaultBranchFilter(branchAccess.value);
             state.statusFilter.value = 'all';
         }
     };
+
+    watch(
+        accessSessionKey,
+        () => {
+            state.branchFilter.value = resolveDefaultBranchFilter(branchAccess.value);
+            state.statusFilter.value = 'all';
+            setters.setError(null);
+
+            if (!hasActiveScopedSession(currentSession.value ?? readAuthPortalStoredSession())) {
+                state.data.value = null;
+                state.filteredData.value = null;
+                return;
+            }
+
+            if (state.data.value !== null || state.filteredData.value !== null) {
+                void actions.loadData();
+            }
+        },
+        { immediate: true }
+    );
 
     return {
         ...state,
@@ -500,20 +563,34 @@ export const pawnContractViewModel = defineStore('pawnContractStore', () => {
         locationDataTableVm,
         maintenanceDataTableVm,
         hasActiveFilters,
+        canAccessAllBranches,
+        isBranchLocked,
         contractStatusOptions: pawnContractStatusOptions,
         getPawnContractData: actions.loadData
     };
 });
 
+function hasActiveScopedSession(session: ReturnType<typeof readAuthPortalStoredSession>): boolean {
+    return typeof session?.company.id === 'number' && typeof session?.user.id === 'number';
+}
+
+function resolveDefaultBranchFilter(branchAccess: ReturnType<typeof getCurrentAuthPortalBranchAccess>): string {
+    return !branchAccess.canAccessAllBranches && branchAccess.assignedBranchId !== null
+        ? String(branchAccess.assignedBranchId)
+        : 'all';
+}
+
 function buildDataFilter(params: {
     branchFilter: string;
     statusFilter: 'all' | PawnContractStatusModel;
-}): PawnContractDataFilterModel {
+}, branchAccess: ReturnType<typeof getCurrentAuthPortalBranchAccess>): PawnContractDataFilterModel {
     return {
         branchId:
-            params.branchFilter !== 'all' && Number.isFinite(Number(params.branchFilter))
-                ? Number(params.branchFilter)
-                : null,
+            branchAccess.canAccessAllBranches
+                ? params.branchFilter !== 'all' && Number.isFinite(Number(params.branchFilter))
+                    ? Number(params.branchFilter)
+                    : null
+                : branchAccess.assignedBranchId,
         contractStatus: params.statusFilter === 'all' ? null : params.statusFilter,
         onlyOpenContracts: false,
         dueWithinDays: null,
@@ -522,9 +599,14 @@ function buildDataFilter(params: {
     };
 }
 
-function isDefaultDataFilter(filter: PawnContractDataFilterModel): boolean {
+function isDefaultDataFilter(
+    filter: PawnContractDataFilterModel,
+    branchAccess: ReturnType<typeof getCurrentAuthPortalBranchAccess>
+): boolean {
     return (
-        filter.branchId === null &&
+        (branchAccess.canAccessAllBranches
+            ? filter.branchId === null
+            : filter.branchId === branchAccess.assignedBranchId) &&
         filter.contractStatus === null &&
         !filter.onlyOpenContracts &&
         filter.dueWithinDays === null &&

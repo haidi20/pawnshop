@@ -43,6 +43,7 @@ export const buildAuthPortalDemoSeedDataset = (): AuthPortalDemoSeedDataset => {
                 id: userId,
                 company_id: companyId,
                 role: user.role,
+                assigned_branch_id: user.assignedBranchId,
                 username: user.username,
                 password_hash: hashAuthPortalPassword(AUTH_PORTAL_DEMO_PASSWORD),
                 full_name: user.fullName,

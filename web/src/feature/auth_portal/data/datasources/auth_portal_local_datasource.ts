@@ -1,4 +1,5 @@
 import { v4 as uuidv4 } from 'uuid';
+import { seedFeatureTablesIfEmpty } from '@core/data/datasources/db/feature_table_seeder';
 import {
     authPortalCompaniesDao,
     authPortalSessionsDao,
@@ -12,14 +13,18 @@ import {
     verifyAuthPortalPassword
 } from '@feature/auth_portal/data/helpers/auth_portal_password';
 import { buildAuthPortalDemoSeedDataset } from '@feature/auth_portal/data/seeders/auth_portal_demo_data.seeder';
+import { branchesDao } from '@feature/master_branch/data/db';
 import type {
+    AuthPortalCompanyUsersDataModel,
     AuthPortalLoginPayloadModel,
     AuthPortalRegisterPayloadModel,
     AuthPortalSessionSnapshotModel,
+    AuthPortalUpdateUserBranchPayloadModel,
     AuthPortalUserRoleModel
 } from '@feature/auth_portal/domain/models';
 import {
     clearAuthPortalStoredSession,
+    readCompanyAssignedBranchName,
     readAuthPortalStoredSession,
     writeAuthPortalStoredSession
 } from '@feature/auth_portal/util/auth_portal_session';
@@ -161,6 +166,7 @@ export class AuthPortalLocalDatasource {
             id: ownerUserId,
             companyId,
             role: 'owner',
+            assignedBranchId: null,
             fullName: payload.ownerFullName,
             username: payload.ownerUsername,
             email: payload.ownerEmail,
@@ -174,6 +180,7 @@ export class AuthPortalLocalDatasource {
                 id: ownerUserId + index + 1,
                 companyId,
                 role: employee.role,
+                assignedBranchId: null,
                 fullName: employee.fullName,
                 username: employee.username,
                 email: employee.email,
@@ -219,6 +226,131 @@ export class AuthPortalLocalDatasource {
         clearAuthPortalStoredSession();
     }
 
+    async getCompanyUsers(): Promise<AuthPortalCompanyUsersDataModel> {
+        await this.ensureDemoDataSeeded();
+        await seedFeatureTablesIfEmpty('AuthPortalLocalDatasource', [branchesDao]);
+
+        const session = await this.getCurrentSession();
+        if (!session) {
+            throw new Error('Sesi login tidak ditemukan.');
+        }
+
+        if (session.user.role !== 'owner') {
+            throw new Error('Hanya owner yang dapat mengelola user perusahaan.');
+        }
+
+        const [userRows, branchRows] = await Promise.all([
+            authPortalUsersDao.getAll(),
+            branchesDao.getAll()
+        ]);
+
+        const activeBranchRows = branchRows
+            .filter((item) => item.is_active === 1)
+            .sort((left, right) => left.branch_name.localeCompare(right.branch_name, 'id-ID'));
+
+        const companyUsers = userRows
+            .filter((item) => item.company_id === session.company.id)
+            .sort((left, right) => {
+                if (left.role === 'owner' && right.role !== 'owner') {
+                    return -1;
+                }
+
+                if (left.role !== 'owner' && right.role === 'owner') {
+                    return 1;
+                }
+
+                return left.full_name.localeCompare(right.full_name, 'id-ID');
+            });
+
+        return {
+            companyId: session.company.id,
+            companyName: session.company.name,
+            branches: activeBranchRows.map((item) => ({
+                id: item.id,
+                branchCode: item.branch_code,
+                branchName: item.branch_name
+            })),
+            users: companyUsers.map((item) => ({
+                id: item.id,
+                role: item.role as AuthPortalUserRoleModel,
+                fullName: item.full_name,
+                username: item.username,
+                email: item.email,
+                phoneNumber: item.phone_number,
+                isActive: item.is_active === 1,
+                assignedBranchId: item.assigned_branch_id ?? null,
+                assignedBranchName:
+                    activeBranchRows.find((branch) => branch.id === (item.assigned_branch_id ?? null))?.branch_name ??
+                    null
+            }))
+        };
+    }
+
+    async updateUserBranchAssignment(payload: AuthPortalUpdateUserBranchPayloadModel): Promise<void> {
+        await this.ensureDemoDataSeeded();
+        await seedFeatureTablesIfEmpty('AuthPortalLocalDatasource', [branchesDao]);
+
+        const session = await this.getCurrentSession();
+        if (!session) {
+            throw new Error('Sesi login tidak ditemukan.');
+        }
+
+        if (session.user.role !== 'owner') {
+            throw new Error('Hanya owner yang dapat mengubah assignment cabang user.');
+        }
+
+        const [userRows, branchRows] = await Promise.all([
+            authPortalUsersDao.getAll(),
+            branchesDao.getAll()
+        ]);
+
+        const targetUser = userRows.find(
+            (item) => item.id === payload.userId && item.company_id === session.company.id
+        );
+
+        if (!targetUser) {
+            throw new Error('User perusahaan tidak ditemukan.');
+        }
+
+        if (targetUser.role === 'owner') {
+            throw new Error('Owner selalu memiliki akses ke semua cabang.');
+        }
+
+        const nextBranchId = typeof payload.branchId === 'number' ? payload.branchId : null;
+        if (
+            nextBranchId !== null &&
+            !branchRows.some((item) => item.id === nextBranchId && item.is_active === 1)
+        ) {
+            throw new Error('Cabang aktif yang dipilih tidak ditemukan.');
+        }
+
+        const timestamp = createTimestamp();
+        const updatedRows = userRows.map((item) =>
+            item.id === targetUser.id
+                ? {
+                    ...item,
+                    assigned_branch_id: nextBranchId,
+                    updated_at: timestamp
+                }
+                : item
+        );
+
+        await authPortalUsersDao.replaceAll(updatedRows);
+
+        const storedSession = readAuthPortalStoredSession();
+        if (storedSession?.user.id === targetUser.id) {
+            writeAuthPortalStoredSession({
+                ...storedSession,
+                user: {
+                    ...storedSession.user,
+                    assignedBranchId: nextBranchId,
+                    assignedBranchName:
+                        branchRows.find((item) => item.id === nextBranchId)?.branch_name ?? null
+                }
+            });
+        }
+    }
+
     private async ensureDemoDataSeeded(): Promise<void> {
         const [companyRows, userRows, sessionRows] = await Promise.all([
             authPortalCompaniesDao.getAll(),
@@ -241,6 +373,7 @@ export class AuthPortalLocalDatasource {
         id: number;
         companyId: number;
         role: AuthPortalUserRoleModel;
+        assignedBranchId?: number | null;
         fullName: string;
         username: string;
         email: string | null;
@@ -252,6 +385,7 @@ export class AuthPortalLocalDatasource {
             id: input.id,
             company_id: input.companyId,
             role: input.role,
+            assigned_branch_id: input.assignedBranchId ?? null,
             username: normalizeValue(input.username),
             password_hash: hashAuthPortalPassword(input.password),
             full_name: normalizeValue(input.fullName),
@@ -275,6 +409,11 @@ export class AuthPortalLocalDatasource {
                 id: userRow.id,
                 companyId: userRow.company_id,
                 role: userRow.role as AuthPortalUserRoleModel,
+                assignedBranchId: userRow.assigned_branch_id ?? null,
+                assignedBranchName: readCompanyAssignedBranchName(
+                    userRow.company_id,
+                    userRow.assigned_branch_id ?? null
+                ),
                 fullName: userRow.full_name,
                 username: userRow.username,
                 email: userRow.email,

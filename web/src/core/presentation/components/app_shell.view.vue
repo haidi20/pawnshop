@@ -168,6 +168,10 @@
               <dd>{{ currentUserRoleLabel }}</dd>
             </div>
             <div class="admin-profile-row">
+              <dt>Akses Cabang</dt>
+              <dd>{{ currentUserBranchAccessLabel }}</dd>
+            </div>
+            <div class="admin-profile-row">
               <dt>Username</dt>
               <dd>@{{ currentSession.user.username }}</dd>
             </div>
@@ -235,7 +239,7 @@ import { authPortalViewModel } from '@feature/auth_portal/presentation/view_mode
 
 const route = useRoute();
 const router = useRouter();
-const navigationItems = getAppNavigationItems();
+const baseNavigationItems = getAppNavigationItems();
 const isSidebarOpen = ref(false);
 const isSidebarCollapsed = ref(false);
 const isUserMenuOpen = ref(false);
@@ -244,6 +248,18 @@ const userMenuRef = ref<HTMLElement | null>(null);
 const mobileSidebarBreakpoint = 920;
 const authVm = authPortalViewModel();
 const { currentSession, isSubmitting } = storeToRefs(authVm);
+
+const navigationItems = computed(() =>
+  baseNavigationItems
+    .filter((item) => item.key !== 'system' || currentSession.value?.user.role === 'owner')
+    .map((item) => ({
+      ...item,
+      children: item.children?.filter(
+        (child) => child.key !== 'system-users' || currentSession.value?.user.role === 'owner'
+      )
+    }))
+    .filter((item) => (item.children ? item.children.length > 0 || item.route : true))
+);
 
 const toggleSidebar = (): void => {
   isSidebarOpen.value = !isSidebarOpen.value;
@@ -326,6 +342,20 @@ const currentUserRoleLabel = computed<string>(() => {
   };
 
   return roleLabels[normalizedRole] ?? `${normalizedRole.charAt(0).toUpperCase()}${normalizedRole.slice(1)}`;
+});
+
+const currentUserBranchAccessLabel = computed<string>(() => {
+  const session = currentSession.value;
+  if (!session) {
+    return '-';
+  }
+
+  if (session.user.role === 'owner') {
+    return 'Semua cabang';
+  }
+
+  return session.user.assignedBranchName ??
+    (session.user.assignedBranchId !== null ? `Cabang #${session.user.assignedBranchId}` : 'Belum diatur');
 });
 
 const handleDocumentPointerDown = (event: MouseEvent): void => {

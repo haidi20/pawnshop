@@ -3,6 +3,7 @@ import { PawnContractLocalDatasource } from '@feature/pawn_contract/data/datasou
 import { PawnContractRepositoryImpl } from '@feature/pawn_contract/data/repositories/pawn_contract_repository_impl';
 import { GetPawnContractAjtTableUsecase } from '@feature/pawn_contract/domain/usecases/get_pawn_contract_ajt_table.usecase';
 import { GetPawnContractDataUsecase } from '@feature/pawn_contract/domain/usecases/get_pawn_contract_data.usecase';
+import { GetPawnContractHistoryUsecase } from '@feature/pawn_contract/domain/usecases/get_pawn_contract_history.usecase';
 import { GetPawnContractIndexTabsUsecase } from '@feature/pawn_contract/domain/usecases/get_pawn_contract_index_tabs.usecase';
 import { GetPawnContractLocationTableUsecase } from '@feature/pawn_contract/domain/usecases/get_pawn_contract_location_table.usecase';
 import { GetPawnContractMaintenanceTableUsecase } from '@feature/pawn_contract/domain/usecases/get_pawn_contract_maintenance_table.usecase';
@@ -19,6 +20,7 @@ export const pawnContractRepository = new PawnContractRepositoryImpl(
 );
 
 export const getPawnContractDataUsecase = new GetPawnContractDataUsecase(pawnContractRepository);
+export const getPawnContractHistoryUsecase = new GetPawnContractHistoryUsecase(pawnContractRepository);
 export const getPawnContractSummariesUsecase = new GetPawnContractSummariesUsecase(pawnContractRepository);
 export const getPawnContractNasabahTableUsecase = new GetPawnContractNasabahTableUsecase(pawnContractRepository);
 export const getPawnContractRingkasanTableUsecase = new GetPawnContractRingkasanTableUsecase(pawnContractRepository);

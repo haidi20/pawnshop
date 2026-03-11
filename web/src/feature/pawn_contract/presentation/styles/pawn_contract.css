@@ -509,7 +509,7 @@
 }
 
 .pawn-contract-page__action-dialog {
-  max-width: min(960px, calc(100vw - 2rem));
+  max-width: min(620px, calc(100vw - 2rem));
 }
 
 .pawn-contract-page__action-content {
@@ -527,43 +527,55 @@
   padding: 1.5rem;
 }
 
-.pawn-contract-page__action-layout {
-  display: grid;
-  gap: 1rem;
-  grid-template-columns: minmax(0, 16rem) minmax(0, 1fr);
-}
-
-.pawn-contract-page__action-list,
+.pawn-contract-page__action-grid,
 .pawn-contract-page__history-list {
   display: grid;
   gap: 0.75rem;
 }
 
-.pawn-contract-page__action-item,
+.pawn-contract-page__action-choice,
 .pawn-contract-page__history-item {
   background: var(--surface-soft);
   border: 1px solid rgba(217, 231, 242, 0.92);
   border-radius: 1rem;
-  display: grid;
-  gap: 0.35rem;
+  color: var(--ink);
   padding: 0.9rem 1rem;
-  text-align: left;
 }
 
-.pawn-contract-page__action-item {
+.pawn-contract-page__action-choice {
+  appearance: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  justify-content: flex-start;
+  min-height: 56px;
+  text-align: left;
+  text-decoration: none;
+  width: 100%;
   transition:
     border-color var(--transition-soft),
     background var(--transition-soft),
-    box-shadow var(--transition-soft);
+    box-shadow var(--transition-soft),
+    color var(--transition-soft),
+    transform var(--transition-soft);
 }
 
-.pawn-contract-page__action-item.is-active {
+.pawn-contract-page__action-choice:hover,
+.pawn-contract-page__action-choice:focus-visible {
   background: rgba(0, 94, 170, 0.08);
   border-color: rgba(0, 94, 170, 0.28);
-  box-shadow: inset 0 0 0 1px rgba(0, 94, 170, 0.05);
+  box-shadow: 0 12px 22px rgba(0, 94, 170, 0.08);
+  color: var(--primary);
+  transform: translateY(-1px);
 }
 
-.pawn-contract-page__action-item-label,
+.pawn-contract-page__action-choice i {
+  color: var(--primary);
+  font-size: 1.05rem;
+}
+
+.pawn-contract-page__action-choice span,
 .pawn-contract-page__history-item strong {
   color: var(--ink);
   font-weight: 700;
@@ -577,14 +589,81 @@
   text-transform: uppercase;
 }
 
-.pawn-contract-page__action-detail {
-  min-width: 0;
-}
-
 .pawn-contract-page__action-cta {
   display: flex;
   flex-wrap: wrap;
   gap: 0.75rem;
+}
+
+.pawn-contract-history-page__toolbar-actions {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  justify-content: flex-end;
+}
+
+.pawn-contract-history-page__timeline {
+  display: grid;
+  gap: 0.9rem;
+}
+
+.pawn-contract-history-page__timeline-item {
+  background: #ffffff;
+  border: 1px solid rgba(217, 231, 242, 0.92);
+  border-radius: 1rem;
+  display: grid;
+  gap: 0.85rem;
+  grid-template-columns: minmax(0, 12rem) minmax(0, 1fr);
+  padding: 1rem;
+}
+
+.pawn-contract-history-page__timeline-date {
+  color: var(--primary);
+  font-size: 0.85rem;
+  font-weight: 700;
+}
+
+.pawn-contract-history-page__timeline-content {
+  display: grid;
+  gap: 0.85rem;
+  min-width: 0;
+}
+
+.pawn-contract-history-page__timeline-meta,
+.pawn-contract-history-page__item-grid {
+  display: grid;
+  gap: 0.75rem;
+}
+
+.pawn-contract-history-page__item-grid {
+  grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr));
+}
+
+.pawn-contract-history-page__timeline-meta {
+  grid-template-columns: repeat(auto-fit, minmax(9rem, 1fr));
+}
+
+.pawn-contract-history-page__timeline-meta-item,
+.pawn-contract-history-page__item-card {
+  background: var(--surface-soft);
+  border: 1px solid rgba(217, 231, 242, 0.92);
+  border-radius: 0.9rem;
+  display: grid;
+  gap: 0.3rem;
+  padding: 0.8rem 0.9rem;
+}
+
+.pawn-contract-history-page__timeline-meta-item span {
+  color: var(--muted);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.pawn-contract-history-page__timeline-meta-item strong {
+  color: var(--ink);
 }
 
 .pawn-contract-page__totals {
@@ -716,7 +795,7 @@
     padding: 1rem;
   }
 
-  .pawn-contract-page__action-layout {
+  .pawn-contract-history-page__timeline-item {
     grid-template-columns: 1fr;
   }
 

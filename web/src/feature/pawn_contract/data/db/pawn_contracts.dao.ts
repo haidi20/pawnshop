@@ -26,6 +26,11 @@ export class PawnContractsDao extends FeatureTableDao<PawnContractsRow> {
         super(pawnContractsTable);
     }
 
+    async findById(contractId: number): Promise<PawnContractsRow | null> {
+        const rows = await this.getAll();
+        return rows.find((row) => row.id === contractId) ?? null;
+    }
+
     async findByFilters(filters: PawnContractDaoFilterParams = {}): Promise<PawnContractsRow[]> {
         let rows = await this.getAll();
 

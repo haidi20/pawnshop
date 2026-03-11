@@ -7,6 +7,8 @@ export interface AuthPortalSessionSnapshotModel {
         id: number;
         companyId: number;
         role: AuthPortalUserRoleModel;
+        assignedBranchId: number | null;
+        assignedBranchName: string | null;
         fullName: string;
         username: string;
         email: string | null;

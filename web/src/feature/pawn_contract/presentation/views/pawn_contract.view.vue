@@ -187,6 +187,8 @@
       :branch-filter="branchFilter"
       :status-filter="statusFilter"
       :has-active-filters="hasActiveFilters"
+      :allow-all-branches="canAccessAllBranches"
+      :is-branch-locked="isBranchLocked"
       @close="closeFilterModal()"
       @reset="resetFilterModal()"
       @apply="applyFilterModal($event)"
@@ -251,7 +253,9 @@ const {
   locationDataTableVm,
   maintenanceDataTableVm,
   ringkasanPendapatanTableVm,
-  hasActiveFilters
+  hasActiveFilters,
+  canAccessAllBranches,
+  isBranchLocked
 } = storeToRefs(vm);
 
 const contractStatusOptions = vm.contractStatusOptions;

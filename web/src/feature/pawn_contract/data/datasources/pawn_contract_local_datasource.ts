@@ -32,6 +32,7 @@ import {
     type ItemCategoriesRow,
     type ItemTypesRow
 } from '@feature/item_master/data/db';
+import { getCurrentAuthPortalBranchAccess } from '@feature/auth_portal/util/auth_portal_session';
 import { branchesDao, type BranchesRow } from '@feature/master_branch/data/db';
 import {
     pawnContractsDao,
@@ -236,6 +237,39 @@ const supportedIdentityTypes = new Set<PawnContractIdentityTypeModel>([
 export class PawnContractLocalDatasource {
     async getData(filters?: PawnContractDataFilterModel): Promise<PawnContractDataModel> {
         const contractRows = await this.getFilteredContractRows(filters);
+        return this.buildDataModel(contractRows);
+    }
+
+    async getDataByContractId(contractId: number): Promise<PawnContractDataModel | null> {
+        const contractRow = await pawnContractsDao.findById(contractId);
+        if (!contractRow || !this.canAccessBranch(contractRow.branch_id)) {
+            return null;
+        }
+
+        return this.buildDataModel([contractRow]);
+    }
+
+    private async getFilteredContractRows(
+        filters?: PawnContractDataFilterModel
+    ): Promise<PawnContractsRow[]> {
+        const contractIds = await this.resolveFilteredContractIds(filters);
+        const effectiveBranchId = this.resolveAccessibleBranchId(filters?.branchId ?? null);
+
+        if (effectiveBranchId === 'no-access') {
+            return [];
+        }
+
+        return pawnContractsDao.findByFilters({
+            branchId: effectiveBranchId,
+            contractStatus: filters?.contractStatus ?? null,
+            onlyOpenContracts: filters?.onlyOpenContracts ?? false,
+            dueWithinDays: filters?.dueWithinDays ?? null,
+            maintenanceRequired: filters?.maintenanceRequired ?? false,
+            contractIds
+        });
+    }
+
+    private async buildDataModel(contractRows: PawnContractsRow[]): Promise<PawnContractDataModel> {
         const itemRows = await pawnItemsDao.findByContractIds(contractRows.map((row) => row.id));
 
         const [
@@ -258,7 +292,7 @@ export class PawnContractLocalDatasource {
             pawnItemLocationMovementsDao.findByPawnItemIds(itemRows.map((row) => row.id))
         ]);
 
-        const branches = branchRows.map((branchRow) => {
+        const branches = branchRows.filter((branchRow) => this.canAccessBranch(branchRow.id)).map((branchRow) => {
             const primaryCashAccount =
                 cashAccountRows.find((row) => row.branch_id === branchRow.id && row.is_active === 1) ?? null;
 
@@ -284,21 +318,6 @@ export class PawnContractLocalDatasource {
         });
     }
 
-    private async getFilteredContractRows(
-        filters?: PawnContractDataFilterModel
-    ): Promise<PawnContractsRow[]> {
-        const contractIds = await this.resolveFilteredContractIds(filters);
-
-        return pawnContractsDao.findByFilters({
-            branchId: filters?.branchId ?? null,
-            contractStatus: filters?.contractStatus ?? null,
-            onlyOpenContracts: filters?.onlyOpenContracts ?? false,
-            dueWithinDays: filters?.dueWithinDays ?? null,
-            maintenanceRequired: filters?.maintenanceRequired ?? false,
-            contractIds
-        });
-    }
-
     private async resolveFilteredContractIds(
         filters?: PawnContractDataFilterModel
     ): Promise<number[] | null> {
@@ -315,7 +334,9 @@ export class PawnContractLocalDatasource {
         const { branchRows, cashAccountRows, customerRows, contactRows, documentRows, contractRows, itemTypeRows, itemSettingRows } =
             await this.getFormCollections();
 
-        const activeBranchRows = branchRows.filter((row) => row.is_active === 1);
+        const activeBranchRows = branchRows.filter(
+            (row) => row.is_active === 1 && this.canAccessBranch(row.id)
+        );
         const branches = this.buildBranchReferences(activeBranchRows, cashAccountRows);
         const defaultBranchId = branches[0]?.id ?? null;
         const customers = this.buildCustomerReferences(customerRows, contactRows, documentRows);
@@ -345,6 +366,10 @@ export class PawnContractLocalDatasource {
         const contractRow = contractRows.find((row) => row.id === contractId) ?? null;
         if (!contractRow) {
             throw new Error('Data gadai yang akan diubah tidak ditemukan.');
+        }
+
+        if (!this.canAccessBranch(contractRow.branch_id)) {
+            throw new Error('User ini tidak memiliki akses ke cabang data gadai tersebut.');
         }
 
         const itemRow = itemRows.find((row) => row.contract_id === contractId) ?? null;
@@ -435,6 +460,10 @@ export class PawnContractLocalDatasource {
         const targetBranch = branchRows.find((row) => row.id === payload.branchId && row.is_active === 1) ?? null;
         if (!targetBranch) {
             throw new Error('Cabang aktif untuk data gadai ini tidak ditemukan.');
+        }
+
+        if (!this.canAccessBranch(payload.branchId)) {
+            throw new Error('User ini tidak memiliki akses ke cabang yang dipilih.');
         }
 
         const targetCashAccount = this.findBranchCashAccount(cashAccountRows, payload.branchId);
@@ -1079,5 +1108,25 @@ export class PawnContractLocalDatasource {
                 await branchItemSettingsDao.upsert(newSetting);
             }
         }
+    }
+
+    private resolveAccessibleBranchId(requestedBranchId: number | null): number | null | 'no-access' {
+        const branchAccess = getCurrentAuthPortalBranchAccess();
+
+        if (branchAccess.canAccessAllBranches) {
+            return requestedBranchId;
+        }
+
+        if (branchAccess.assignedBranchId === null) {
+            return 'no-access';
+        }
+
+        return branchAccess.assignedBranchId;
+    }
+
+    private canAccessBranch(branchId: number): boolean {
+        const branchAccess = getCurrentAuthPortalBranchAccess();
+
+        return branchAccess.canAccessAllBranches || branchAccess.assignedBranchId === branchId;
     }
 }

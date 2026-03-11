@@ -1,4 +1,5 @@
 import { seedFeatureTablesIfEmpty } from '@core/data/datasources/db/feature_table_seeder';
+import { getCurrentAuthPortalBranchAccess } from '@feature/auth_portal/util/auth_portal_session';
 import {
     auctionTransactionsDao,
     contractExtensionsDao,
@@ -12,6 +13,8 @@ import type {
     DashboardLinePointModel,
     DashboardRecentTransactionModel
 } from '@feature/dashboard/domain/models';
+import { pawnContractsDao } from '@feature/pawn_contract/data/db';
+import { ensurePawnContractDemoDataSeed } from '@feature/pawn_contract/data/seeders/pawn_contract_demo_data.seeder';
 
 interface DashboardPawnTransactionSnapshot {
     chartItems: DashboardChartItemModel[];
@@ -94,6 +97,8 @@ export class DashboardPawnTransactionDao {
 
     async getSnapshot(linePointLimit = 10, recentTransactionLimit = 5): Promise<DashboardPawnTransactionSnapshot> {
         await this.ensureMinimumSeed(linePointLimit);
+        await ensurePawnContractDemoDataSeed();
+        await seedFeatureTablesIfEmpty('DashboardPawnTransactionDao', [pawnContractsDao]);
 
         const [contractPaymentsRows, contractExtensionsRows, auctionTransactionsRows] = await Promise.all([
             contractPaymentsDao.getAll(),
@@ -101,10 +106,16 @@ export class DashboardPawnTransactionDao {
             auctionTransactionsDao.getAll()
         ]);
 
-        const transactions = buildTransactions({
+        const scopedRows = await this.applyBranchAccess({
             contractPaymentsRows,
             contractExtensionsRows,
             auctionTransactionsRows
+        });
+
+        const transactions = buildTransactions({
+            contractPaymentsRows: scopedRows.contractPaymentsRows,
+            contractExtensionsRows: scopedRows.contractExtensionsRows,
+            auctionTransactionsRows: scopedRows.auctionTransactionsRows
         });
 
         const latestLineTransactions = [...transactions]
@@ -120,12 +131,46 @@ export class DashboardPawnTransactionDao {
 
         return {
             chartItems: [
-                { key: 'contract_payments', label: 'Pembayaran', count: contractPaymentsRows.length },
-                { key: 'contract_extensions', label: 'Perpanjangan', count: contractExtensionsRows.length },
-                { key: 'auction_transactions', label: 'Lelang', count: auctionTransactionsRows.length }
+                { key: 'contract_payments', label: 'Pembayaran', count: scopedRows.contractPaymentsRows.length },
+                { key: 'contract_extensions', label: 'Perpanjangan', count: scopedRows.contractExtensionsRows.length },
+                { key: 'auction_transactions', label: 'Lelang', count: scopedRows.auctionTransactionsRows.length }
             ],
             lineSeries: latestLineTransactions,
             recentTransactions: transactions.slice(0, recentTransactionLimit)
+        };
+    }
+
+    private async applyBranchAccess(params: {
+        contractPaymentsRows: ContractPaymentsRow[];
+        contractExtensionsRows: ContractExtensionsRow[];
+        auctionTransactionsRows: AuctionTransactionsRow[];
+    }): Promise<{
+        contractPaymentsRows: ContractPaymentsRow[];
+        contractExtensionsRows: ContractExtensionsRow[];
+        auctionTransactionsRows: AuctionTransactionsRow[];
+    }> {
+        const branchAccess = getCurrentAuthPortalBranchAccess();
+
+        if (branchAccess.canAccessAllBranches) {
+            return params;
+        }
+
+        if (branchAccess.assignedBranchId === null) {
+            return {
+                contractPaymentsRows: [],
+                contractExtensionsRows: [],
+                auctionTransactionsRows: []
+            };
+        }
+
+        const allowedContractIds = new Set(
+            (await pawnContractsDao.findByFilters({ branchId: branchAccess.assignedBranchId })).map((row) => row.id)
+        );
+
+        return {
+            contractPaymentsRows: params.contractPaymentsRows.filter((row) => allowedContractIds.has(row.contract_id)),
+            contractExtensionsRows: params.contractExtensionsRows.filter((row) => allowedContractIds.has(row.contract_id)),
+            auctionTransactionsRows: params.auctionTransactionsRows.filter((row) => allowedContractIds.has(row.contract_id))
         };
     }
 }

@@ -18,6 +18,15 @@ const authPortalRoutes: Array<RouteRecordRaw> = [
             title: 'Register',
             publicAuth: true
         }
+    },
+    {
+        path: '/system/users',
+        name: 'SystemUsers',
+        component: () => import('@feature/auth_portal/presentation/views/auth_portal_users.view.vue'),
+        meta: {
+            title: 'Sistem - User',
+            ownerOnly: true
+        }
     }
 ];
 

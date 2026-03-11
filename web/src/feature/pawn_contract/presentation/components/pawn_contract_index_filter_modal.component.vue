@@ -43,9 +43,19 @@
                   id="pawn-contract-table-branch-filter"
                   v-model="draftBranchFilter"
                   class="form-select"
+                  :disabled="isBranchLocked"
                 >
-                  <option value="all">
+                  <option
+                    v-if="allowAllBranches"
+                    value="all"
+                  >
                     Semua cabang
+                  </option>
+                  <option
+                    v-else-if="branches.length === 0"
+                    value=""
+                  >
+                    Belum ada cabang akses
                   </option>
                   <option
                     v-for="branch in branches"
@@ -55,6 +65,12 @@
                     {{ branch.branchName }}
                   </option>
                 </select>
+                <small
+                  v-if="isBranchLocked"
+                  class="text-secondary"
+                >
+                  Cabang user ini dikunci sesuai assignment owner.
+                </small>
               </div>
 
               <div class="col-12">
@@ -138,6 +154,8 @@ const props = defineProps<{
   branchFilter: string;
   statusFilter: 'all' | PawnContractStatusModel;
   hasActiveFilters: boolean;
+  allowAllBranches: boolean;
+  isBranchLocked: boolean;
 }>();
 
 const emit = defineEmits<{
@@ -150,7 +168,9 @@ const draftBranchFilter = ref('all');
 const draftStatusFilter = ref<'all' | PawnContractStatusModel>('all');
 
 const syncDraftFilters = (): void => {
-  draftBranchFilter.value = props.branchFilter;
+  draftBranchFilter.value = props.isBranchLocked && props.branches.length > 0
+    ? String(props.branches[0]?.id ?? '')
+    : props.branchFilter;
   draftStatusFilter.value = props.statusFilter;
 };
 

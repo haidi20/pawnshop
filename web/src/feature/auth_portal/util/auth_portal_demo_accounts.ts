@@ -6,6 +6,7 @@ export interface AuthPortalDemoUserAccountModel {
     email: string;
     phoneNumber: string | null;
     role: AuthPortalUserRoleModel;
+    assignedBranchId: number | null;
 }
 
 export interface AuthPortalDemoCompanyAccountModel {
@@ -36,7 +37,8 @@ export const authPortalDemoCompanies: AuthPortalDemoCompanyAccountModel[] = [
             username: 'owner.sgn',
             email: 'owner@sentragadai.id',
             phoneNumber: '0811-5400-101',
-            role: 'owner'
+            role: 'owner',
+            assignedBranchId: null
         },
         employees: [
             {
@@ -44,14 +46,16 @@ export const authPortalDemoCompanies: AuthPortalDemoCompanyAccountModel[] = [
                 username: 'admin.sgn',
                 email: 'admin@sentragadai.id',
                 phoneNumber: '0811-5400-102',
-                role: 'admin'
+                role: 'admin',
+                assignedBranchId: 1
             },
             {
                 fullName: 'Mita Lestari',
                 username: 'staff.sgn',
                 email: 'staff@sentragadai.id',
                 phoneNumber: '0811-5400-103',
-                role: 'staff'
+                role: 'staff',
+                assignedBranchId: 2
             }
         ]
     },
@@ -68,7 +72,8 @@ export const authPortalDemoCompanies: AuthPortalDemoCompanyAccountModel[] = [
             username: 'owner.pjs',
             email: 'owner@primajaminan.id',
             phoneNumber: '0812-5200-201',
-            role: 'owner'
+            role: 'owner',
+            assignedBranchId: null
         },
         employees: [
             {
@@ -76,14 +81,16 @@ export const authPortalDemoCompanies: AuthPortalDemoCompanyAccountModel[] = [
                 username: 'admin.pjs',
                 email: 'admin@primajaminan.id',
                 phoneNumber: '0812-5200-202',
-                role: 'admin'
+                role: 'admin',
+                assignedBranchId: 1
             },
             {
                 fullName: 'Fajar Saputra',
                 username: 'staff.pjs',
                 email: 'staff@primajaminan.id',
                 phoneNumber: '0812-5200-203',
-                role: 'staff'
+                role: 'staff',
+                assignedBranchId: 2
             }
         ]
     }

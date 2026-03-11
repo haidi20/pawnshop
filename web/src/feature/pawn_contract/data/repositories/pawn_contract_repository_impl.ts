@@ -82,6 +82,22 @@ export class PawnContractRepositoryImpl implements PawnContractRepository {
         }
     }
 
+    async getHistorySummaryById(contractId: number): Promise<Either<Error, PawnContractSummaryModel | null>> {
+        try {
+            await ensurePawnContractDemoDataSeed();
+            await seedFeatureTablesIfEmpty('PawnContractRepositoryImpl', pawnContractDataDaos);
+
+            const data = await this.localDataSource.getDataByContractId(contractId);
+            if (!data) {
+                return right(null);
+            }
+
+            return right(this.indexLocalDataSource.getContractSummaries(data)[0] ?? null);
+        } catch (error) {
+            return left(toError(error));
+        }
+    }
+
     async getFormReferenceData(): Promise<Either<Error, PawnContractFormReferenceModel>> {
         try {
             await ensurePawnContractDemoDataSeed();

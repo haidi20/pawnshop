@@ -7,6 +7,10 @@ export class PawnItemsDao extends FeatureTableDao<PawnItemsRow> {
         super(pawnItemsTable);
     }
 
+    async findByContractId(contractId: number): Promise<PawnItemsRow[]> {
+        return this.findByContractIds([contractId]);
+    }
+
     async findByContractIds(contractIds: number[]): Promise<PawnItemsRow[]> {
         if (contractIds.length === 0) {
             return [];

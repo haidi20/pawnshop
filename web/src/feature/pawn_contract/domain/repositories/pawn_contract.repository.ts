@@ -25,6 +25,7 @@ import type {
 
 export interface PawnContractRepository {
     getData(filters?: PawnContractDataFilterModel): Promise<Either<Error, PawnContractDataModel>>;
+    getHistorySummaryById(contractId: number): Promise<Either<Error, PawnContractSummaryModel | null>>;
     getFormReferenceData(): Promise<Either<Error, PawnContractFormReferenceModel>>;
     getFormValue(contractId: number): Promise<Either<Error, PawnContractFormValueModel>>;
     saveContract(payload: SavePawnContractPayloadModel): Promise<Either<Error, SavePawnContractResultModel>>;

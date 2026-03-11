@@ -265,7 +265,7 @@
               v-if="form.employees.length === 0"
               class="auth-portal__empty-users"
             >
-              Belum ada user karyawan. Anda tetap bisa lanjut dan menambahkannya nanti dengan membuat akun baru lewat halaman registrasi berikutnya.
+              Belum ada user karyawan. Anda tetap bisa lanjut dan mengatur user berikut cabang aksesnya nanti dari menu Sistem > User.
             </div>
 
             <div class="auth-portal__user-list">

@@ -33,6 +33,21 @@ export const appNavigationItems: AppNavigationItem[] = [
                 children: pawnContractIndexNavigationItems
             }
         ]
+    },
+    {
+        key: 'system',
+        label: 'Sistem',
+        icon: 'bi-gear',
+        caption: 'Kelola user dan akses cabang',
+        children: [
+            {
+                key: 'system-users',
+                label: 'User',
+                route: '/system/users',
+                icon: 'bi-people',
+                caption: 'Atur user pegawai dan cabangnya'
+            }
+        ]
     }
 ];
 

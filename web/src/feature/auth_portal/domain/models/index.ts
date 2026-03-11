@@ -5,3 +5,5 @@ export * from './auth-portal-session.model';
 export * from './auth-portal-session-snapshot.model';
 export * from './auth-portal-login-payload.model';
 export * from './auth-portal-register-payload.model';
+export * from './auth-portal-company-users.model';
+export * from './auth-portal-update-user-branch-payload.model';

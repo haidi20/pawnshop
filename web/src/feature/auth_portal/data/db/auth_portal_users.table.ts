@@ -4,6 +4,7 @@ export interface AuthPortalUsersRow {
     id: number;
     company_id: number;
     role: string;
+    assigned_branch_id: number | null;
     username: string;
     password_hash: string;
     full_name: string;
@@ -23,6 +24,7 @@ export const authPortalUsersTable = createFeatureDbTable<AuthPortalUsersRow>({
         { name: 'id', dataType: 'number', nullable: false, sqlType: 'BIGINT UNSIGNED' },
         { name: 'company_id', dataType: 'number', nullable: false, sqlType: 'BIGINT UNSIGNED' },
         { name: 'role', dataType: 'string', nullable: false, sqlType: 'ENUM(\'owner\', \'admin\', \'staff\')', enumValues: ['owner', 'admin', 'staff'] },
+        { name: 'assigned_branch_id', dataType: 'number', nullable: true, sqlType: 'BIGINT UNSIGNED' },
         { name: 'username', dataType: 'string', nullable: false, sqlType: 'VARCHAR(100)' },
         { name: 'password_hash', dataType: 'string', nullable: false, sqlType: 'VARCHAR(255)' },
         { name: 'full_name', dataType: 'string', nullable: false, sqlType: 'VARCHAR(150)' },
