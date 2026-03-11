@@ -4,13 +4,15 @@ import {
     getCurrentAuthPortalSessionUsecase,
     loginAuthPortalUsecase,
     logoutAuthPortalUsecase,
-    registerAuthPortalUsecase
+    registerAuthPortalUsecase,
+    updateAuthPortalCompanyUsecase
 } from '@feature/auth_portal/presentation/di/auth_portal.di';
 import { authPortalState } from '@feature/auth_portal/presentation/view_models/auth_portal.state';
 import type {
     AuthPortalLoginPayloadModel,
     AuthPortalRegisterPayloadModel,
-    AuthPortalSessionSnapshotModel
+    AuthPortalSessionSnapshotModel,
+    AuthPortalUpdateCompanyPayloadModel
 } from '@feature/auth_portal/domain/models';
 
 export const authPortalViewModel = defineStore('authPortalStore', () => {
@@ -72,6 +74,25 @@ export const authPortalViewModel = defineStore('authPortalStore', () => {
         }
     };
 
+    const updateCompany = async (
+        payload: AuthPortalUpdateCompanyPayloadModel
+    ): Promise<AuthPortalSessionSnapshotModel> => {
+        state.isSubmitting.value = true;
+        setError(null);
+
+        try {
+            const session = unwrapEitherOrThrow(await updateAuthPortalCompanyUsecase.execute(payload));
+            state.currentSession.value = session;
+            return session;
+        } catch (error) {
+            const message = error instanceof Error ? error.message : String(error);
+            setError(message);
+            throw error;
+        } finally {
+            state.isSubmitting.value = false;
+        }
+    };
+
     const logout = async (): Promise<void> => {
         state.isSubmitting.value = true;
         setError(null);
@@ -94,6 +115,7 @@ export const authPortalViewModel = defineStore('authPortalStore', () => {
         login,
         logout,
         register,
+        updateCompany,
         setError
     };
 });

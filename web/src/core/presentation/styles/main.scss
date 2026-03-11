@@ -764,11 +764,23 @@ body {
   background: #f9fcff;
 }
 
+.admin-profile-section-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 14px;
+}
+
 .admin-profile-section-title {
-  margin: 0 0 14px;
+  margin: 0;
   font-size: 0.9rem;
   font-weight: 700;
   color: var(--text-dark);
+}
+
+.admin-profile-section-action {
+  flex-shrink: 0;
 }
 
 .admin-profile-list {
@@ -800,6 +812,39 @@ body {
 
 .admin-profile-row--stacked dd {
   white-space: pre-wrap;
+}
+
+.admin-company-modal {
+  width: min(760px, 100%);
+}
+
+.admin-company-form-grid {
+  display: grid;
+  gap: 14px;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.admin-company-field {
+  display: grid;
+  gap: 8px;
+}
+
+.admin-company-field span {
+  color: var(--text-muted);
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+}
+
+.admin-company-field--full {
+  grid-column: 1 / -1;
+}
+
+.admin-company-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 18px;
 }
 
 .header-left {
@@ -1049,6 +1094,10 @@ body {
     grid-template-columns: 1fr;
   }
 
+  .admin-company-form-grid {
+    grid-template-columns: 1fr;
+  }
+
   .admin-content {
     padding: 12px;
   }
@@ -1093,6 +1142,12 @@ body {
 
   .admin-profile-title-wrap {
     gap: 12px;
+  }
+
+  .admin-profile-section-head,
+  .admin-company-actions {
+    align-items: stretch;
+    flex-direction: column;
   }
 
   .admin-content {

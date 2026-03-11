@@ -19,6 +19,7 @@ import type {
     AuthPortalLoginPayloadModel,
     AuthPortalRegisterPayloadModel,
     AuthPortalSessionSnapshotModel,
+    AuthPortalUpdateCompanyPayloadModel,
     AuthPortalUpdateUserBranchPayloadModel,
     AuthPortalUserRoleModel
 } from '@feature/auth_portal/domain/models';
@@ -210,6 +211,63 @@ export class AuthPortalLocalDatasource {
         await authPortalSessionsDao.replaceAll(updatedSessionRows);
 
         const snapshot = this.buildSessionSnapshot(sessionRow, ownerUserRow, companyRow);
+        writeAuthPortalStoredSession(snapshot);
+        return snapshot;
+    }
+
+    async updateCompany(payload: AuthPortalUpdateCompanyPayloadModel): Promise<AuthPortalSessionSnapshotModel> {
+        await this.ensureDemoDataSeeded();
+
+        const session = await this.getCurrentSession();
+        if (!session) {
+            throw new Error('Sesi login tidak ditemukan.');
+        }
+
+        if (session.user.role !== 'owner') {
+            throw new Error('Hanya owner yang dapat mengubah profil perusahaan.');
+        }
+
+        const normalizedName = normalizeValue(payload.name);
+        if (!normalizedName) {
+            throw new Error('Nama perusahaan wajib diisi.');
+        }
+
+        const [companyRows, userRows, sessionRows] = await Promise.all([
+            authPortalCompaniesDao.getAll(),
+            authPortalUsersDao.getAll(),
+            authPortalSessionsDao.getAll()
+        ]);
+
+        const companyRow = companyRows.find((item) => item.id === session.company.id);
+        const currentUserRow = userRows.find(
+            (item) => item.id === session.user.id && item.company_id === session.company.id
+        );
+        const currentSessionRow = sessionRows.find(
+            (item) => item.session_token === session.sessionToken && item.session_status === 'active'
+        );
+
+        if (!companyRow || !currentUserRow || !currentSessionRow) {
+            throw new Error('Data perusahaan aktif tidak ditemukan.');
+        }
+
+        const timestamp = createTimestamp();
+        const updatedCompanyRow: AuthPortalCompaniesRow = {
+            ...companyRow,
+            name: normalizedName,
+            legal_name: asOptionalValue(payload.legalName),
+            business_type: asOptionalValue(payload.businessType),
+            email: asOptionalValue(payload.email),
+            phone_number: asOptionalValue(payload.phoneNumber),
+            city: asOptionalValue(payload.city),
+            address: asOptionalValue(payload.address),
+            updated_at: timestamp
+        };
+
+        await authPortalCompaniesDao.replaceAll(
+            companyRows.map((item) => (item.id === updatedCompanyRow.id ? updatedCompanyRow : item))
+        );
+
+        const snapshot = this.buildSessionSnapshot(currentSessionRow, currentUserRow, updatedCompanyRow);
         writeAuthPortalStoredSession(snapshot);
         return snapshot;
     }

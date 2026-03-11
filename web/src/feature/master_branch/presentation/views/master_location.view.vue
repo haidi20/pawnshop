@@ -2,17 +2,17 @@
   <LocalDbFeedbackStateComponent
     v-if="isLoading && !data"
     state="loading"
-    title="Memuat master cabang"
-    description="Mengambil data cabang dari database lokal perusahaan aktif."
-    note="Tabel cabang akan siap dipakai setelah pembacaan data lokal selesai."
+    title="Memuat lokasi penyimpanan"
+    description="Mengambil data lokasi penyimpanan dari database lokal perusahaan aktif."
+    note="Tabel lokasi akan siap dipakai setelah pembacaan data lokal selesai."
   />
 
   <LocalDbFeedbackStateComponent
     v-else-if="error && !data"
     state="error"
-    title="Gagal memuat master cabang"
+    title="Gagal memuat lokasi penyimpanan"
     :description="error"
-    note="Coba muat ulang agar data cabang dari DB lokal dibaca kembali."
+    note="Coba muat ulang agar data lokasi dari DB lokal dibaca kembali."
     action-label="Muat ulang"
     @action="vm.getMasterBranchData()"
   />
@@ -25,60 +25,60 @@
       <div class="master-data-page__hero-head">
         <div>
           <div class="table-card-role">
-            Master Cabang
+            Lokasi Penyimpanan
           </div>
           <h1 class="table-card-title master-data-page__title">
-            Cabang operasional
+            Lokasi per cabang
           </h1>
           <p class="table-card-description mb-0">
-            Kelola cabang aktif perusahaan untuk operasional dan assignment user.
+            Kelola titik penyimpanan barang untuk masing-masing cabang.
           </p>
         </div>
 
         <button
           type="button"
           class="btn btn-primary master-data-page__hero-action"
-          @click="vm.openCreateBranchModal()"
+          @click="vm.openCreateLocationModal()"
         >
           <i class="bi bi-plus-circle" />
-          <span>Tambah cabang</span>
+          <span>Tambah lokasi</span>
         </button>
       </div>
 
       <div class="master-data-page__stats-grid">
         <article class="metric-card master-data-page__metric-card">
           <div class="metric-label">
-            Total Cabang
+            Total Lokasi
           </div>
           <div class="metric-value">
-            {{ totalBranchCount }}
+            {{ totalLocationCount }}
           </div>
           <div class="metric-note">
-            Seluruh cabang yang tersimpan untuk perusahaan aktif.
+            Seluruh lokasi penyimpanan yang tersimpan pada perusahaan aktif.
           </div>
         </article>
 
         <article class="metric-card master-data-page__metric-card">
           <div class="metric-label">
-            Cabang Aktif
+            Lokasi Aktif
           </div>
           <div class="metric-value">
-            {{ activeBranchCount }}
+            {{ activeLocationCount }}
           </div>
           <div class="metric-note">
-            Cabang yang siap dipakai pada operasional harian.
+            Lokasi yang siap dipakai untuk alur penyimpanan barang.
           </div>
         </article>
 
         <article class="metric-card master-data-page__metric-card">
           <div class="metric-label">
-            Belum Aktif
+            Cabang Terhubung
           </div>
           <div class="metric-value">
-            {{ inactiveBranchCount }}
+            {{ linkedBranchCount }}
           </div>
           <div class="metric-note">
-            Cabang yang masih tersimpan tetapi belum diaktifkan.
+            Cabang yang sudah memiliki minimal satu lokasi tersimpan.
           </div>
         </article>
       </div>
@@ -96,43 +96,40 @@
       <div class="feature-data-page__table-head master-data-page__table-head">
         <div class="master-data-page__table-copy">
           <div class="table-card-role">
-            Data Cabang
+            Data Lokasi
           </div>
           <h2 class="table-card-title mb-1">
-            Daftar cabang
+            Daftar lokasi penyimpanan
           </h2>
           <p class="table-card-description mb-0">
-            Gunakan tombol aksi untuk mengubah detail atau menghapus cabang yang sudah tidak dipakai.
+            Gunakan tombol aksi untuk memperbarui detail lokasi atau menghapus lokasi yang sudah tidak dipakai.
           </p>
         </div>
 
         <div class="feature-data-page__table-meta master-data-page__table-meta">
-          <span class="status-badge is-ready">{{ branchRowCount }} baris</span>
+          <span class="status-badge is-ready">{{ locationRowCount }} baris</span>
         </div>
       </div>
 
       <DataTableClientSideComponent
-        :vm="branchTableVm"
+        :vm="locationTableVm"
         class="master-data-page__datatable"
       >
         <template #extra-actions>
           <div class="master-data-page__table-tools">
             <span class="master-data-page__filter-chip">
-              {{ activeBranchCount }} aktif
+              {{ activeLocationCount }} aktif
             </span>
-            <span
-              v-if="inactiveBranchCount > 0"
-              class="master-data-page__filter-chip is-warning"
-            >
-              {{ inactiveBranchCount }} belum aktif
+            <span class="master-data-page__filter-chip is-info">
+              {{ linkedBranchCount }} cabang terhubung
             </span>
             <button
               type="button"
               class="btn btn-outline-primary master-data-page__table-action"
-              @click="vm.openCreateBranchModal()"
+              @click="vm.openCreateLocationModal()"
             >
               <i class="bi bi-plus-circle" />
-              <span>Tambah cabang</span>
+              <span>Tambah lokasi</span>
             </button>
           </div>
         </template>
@@ -144,34 +141,34 @@
                 <button
                   type="button"
                   class="btn btn-outline-primary btn-sm"
-                  @click="vm.openEditBranchModal(item.source.id)"
+                  @click="vm.openEditLocationModal(item.source.id)"
                 >
                   Ubah
                 </button>
                 <button
                   type="button"
                   class="btn btn-outline-danger btn-sm"
-                  :disabled="vm.isDeletingBranch(item.source.id)"
-                  @click="confirmDeleteBranch(item)"
+                  :disabled="vm.isDeletingLocation(item.source.id)"
+                  @click="confirmDeleteLocation(item)"
                 >
-                  {{ vm.isDeletingBranch(item.source.id) ? 'Menghapus...' : 'Hapus' }}
+                  {{ vm.isDeletingLocation(item.source.id) ? 'Menghapus...' : 'Hapus' }}
                 </button>
               </div>
             </td>
-            <td data-label="Kode Cabang">
-              <strong>{{ item.branchCode }}</strong>
-            </td>
-            <td data-label="Nomor Cabang">
-              {{ item.branchNumberLabel }}
-            </td>
-            <td data-label="Nama Cabang">
+            <td data-label="Cabang">
               <div class="master-data-page__identity-cell">
-                <strong>{{ item.branchName }}</strong>
-                <span>{{ item.addressLabel }}</span>
+                <strong>{{ item.branchLabel }}</strong>
+                <span>{{ item.branchCodeLabel }}</span>
               </div>
             </td>
-            <td data-label="Nomor Telepon">
-              {{ item.phoneNumberLabel }}
+            <td data-label="Kode Lokasi">
+              <strong>{{ item.locationCode }}</strong>
+            </td>
+            <td data-label="Nama Lokasi">
+              {{ item.locationName }}
+            </td>
+            <td data-label="Tipe Lokasi">
+              {{ item.locationType }}
             </td>
             <td data-label="Status Aktif">
               <span
@@ -187,9 +184,9 @@
         <template #empty>
           <LocalDbFeedbackStateComponent
             state="empty"
-            title="Belum ada cabang"
-            description="Tambahkan cabang pertama agar assignment user dan operasional cabang bisa dimulai."
-            note="Data tersimpan langsung ke database lokal perusahaan aktif."
+            title="Belum ada lokasi penyimpanan"
+            description="Tambahkan lokasi pertama agar penyimpanan barang per cabang bisa dikelola."
+            note="Pilih cabang yang sesuai lalu simpan lokasi ke database lokal perusahaan aktif."
             :framed="false"
             compact
           >
@@ -197,9 +194,9 @@
               <button
                 type="button"
                 class="btn btn-primary"
-                @click="vm.openCreateBranchModal()"
+                @click="vm.openCreateLocationModal()"
               >
-                Tambah cabang
+                Tambah lokasi
               </button>
             </template>
           </LocalDbFeedbackStateComponent>
@@ -207,94 +204,103 @@
       </DataTableClientSideComponent>
 
       <p
-        v-if="branchSearchKeyword"
+        v-if="locationSearchKeyword"
         class="master-data-page__search-feedback mb-0"
       >
-        Menampilkan {{ branchRowCount }} hasil untuk "{{ branchSearchKeyword }}".
+        Menampilkan {{ locationRowCount }} hasil untuk "{{ locationSearchKeyword }}".
       </p>
     </article>
   </section>
 
-  <template v-if="isBranchDialogOpen">
+  <template v-if="isLocationDialogOpen">
     <section
       class="modal fade show d-block master-data-page__modal"
       tabindex="-1"
       role="dialog"
       aria-modal="true"
-      aria-labelledby="master-branch-modal-title"
+      aria-labelledby="master-location-modal-title"
     >
       <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable master-data-page__modal-dialog">
         <div class="modal-content border-0 master-data-page__modal-content">
           <div class="modal-header master-data-page__modal-header">
             <div>
               <div class="table-card-role mb-2">
-                Master Cabang
+                Lokasi Penyimpanan
               </div>
               <h2
-                id="master-branch-modal-title"
+                id="master-location-modal-title"
                 class="h5 mb-1"
               >
-                {{ branchDialogTitle }}
+                {{ locationDialogTitle }}
               </h2>
               <p class="mb-0 text-secondary">
-                Lengkapi identitas cabang yang akan dipakai pada operasional perusahaan.
+                Hubungkan lokasi ini ke cabang yang sesuai dan tentukan status aktifnya.
               </p>
             </div>
             <button
               type="button"
               class="btn-close"
               aria-label="Tutup"
-              :disabled="isSavingBranch"
-              @click="closeBranchModal"
+              :disabled="isSavingLocation"
+              @click="closeLocationModal"
             />
           </div>
 
           <div class="modal-body master-data-page__modal-body">
             <div class="master-data-page__form-grid">
+              <label class="master-data-page__field master-data-page__field--full">
+                <span>Cabang</span>
+                <select
+                  v-model="locationForm.branchId"
+                  class="form-select"
+                >
+                  <option value="">
+                    Pilih cabang
+                  </option>
+                  <option
+                    v-for="branch in branchOptions"
+                    :key="branch.id"
+                    :value="branch.id"
+                  >
+                    {{ branch.label }}
+                  </option>
+                </select>
+              </label>
+
               <label class="master-data-page__field">
-                <span>Kode cabang</span>
+                <span>Kode lokasi</span>
                 <input
-                  v-model.trim="branchForm.branchCode"
+                  v-model.trim="locationForm.locationCode"
                   type="text"
                   class="form-control"
-                  placeholder="Contoh: BR-SMD-001"
+                  placeholder="Contoh: OFF-MKS"
                 >
               </label>
 
               <label class="master-data-page__field">
-                <span>Nomor cabang</span>
+                <span>Tipe lokasi</span>
                 <input
-                  v-model.trim="branchForm.branchNumber"
+                  v-model.trim="locationForm.locationType"
                   type="text"
                   class="form-control"
-                  placeholder="Contoh: 001"
+                  placeholder="Contoh: Kantor, Gudang"
                 >
               </label>
 
               <label class="master-data-page__field master-data-page__field--full">
-                <span>Nama cabang</span>
+                <span>Nama lokasi</span>
                 <input
-                  v-model.trim="branchForm.branchName"
+                  v-model.trim="locationForm.locationName"
                   type="text"
                   class="form-control"
-                  placeholder="Nama cabang operasional"
-                >
-              </label>
-
-              <label class="master-data-page__field">
-                <span>Nomor telepon</span>
-                <input
-                  v-model.trim="branchForm.phoneNumber"
-                  type="text"
-                  class="form-control"
-                  placeholder="No. telepon cabang"
+                  placeholder="Nama lokasi penyimpanan"
                 >
               </label>
 
               <label class="master-data-page__field">
                 <span>Status</span>
                 <select
-                  v-model="branchForm.isActive"
+                  v-model="locationForm.isActive"
                   class="form-select"
                 >
                   <option :value="true">
@@ -305,16 +311,6 @@
                   </option>
                 </select>
               </label>
-
-              <label class="master-data-page__field master-data-page__field--full">
-                <span>Alamat</span>
-                <textarea
-                  v-model.trim="branchForm.address"
-                  class="form-control"
-                  rows="3"
-                  placeholder="Alamat cabang"
-                />
-              </label>
             </div>
           </div>
 
@@ -322,19 +318,19 @@
             <button
               type="button"
               class="btn btn-outline-secondary"
-              :disabled="isSavingBranch"
-              @click="closeBranchModal"
+              :disabled="isSavingLocation"
+              @click="closeLocationModal"
             >
               Batal
             </button>
             <button
               type="button"
               class="btn btn-primary"
-              :disabled="isSavingBranch"
-              @click="handleSaveBranch"
+              :disabled="isSavingLocation"
+              @click="handleSaveLocation"
             >
               <span
-                v-if="isSavingBranch"
+                v-if="isSavingLocation"
                 class="spinner-border spinner-border-sm"
                 aria-hidden="true"
               />
@@ -342,7 +338,7 @@
                 v-else
                 class="bi bi-check2-circle"
               />
-              <span>{{ isSavingBranch ? 'Menyimpan...' : 'Simpan cabang' }}</span>
+              <span>{{ isSavingLocation ? 'Menyimpan...' : 'Simpan lokasi' }}</span>
             </button>
           </div>
         </div>
@@ -350,13 +346,13 @@
     </section>
     <div
       class="modal-backdrop fade show master-data-page__modal-backdrop"
-      @click="closeBranchModal"
+      @click="closeLocationModal"
     />
   </template>
 </template>
 
 <script setup lang="ts">
-import { computed, onBeforeUnmount, onMounted, watch } from 'vue';
+import { onBeforeUnmount, onMounted, watch } from 'vue';
 import { storeToRefs } from 'pinia';
 
 import DataTableClientSideComponent from '@core/presentation/components/datatable_clientside.component.vue';
@@ -364,41 +360,42 @@ import LocalDbFeedbackStateComponent from '@core/presentation/components/local_d
 import '@core/presentation/styles/feature_data_tables.css';
 import '@feature/master_branch/presentation/styles/master_branch.css';
 import { showErrorMessage, showSuccessMessage, showWarningMessage } from '@core/util/alert';
-import { masterBranchViewModel, type MasterBranchTableRow } from '@feature/master_branch/presentation/view_models/master_branch.vm';
+import { masterBranchViewModel, type MasterLocationTableRow } from '@feature/master_branch/presentation/view_models/master_branch.vm';
 
 const vm = masterBranchViewModel();
 const {
   data,
   error,
   isLoading,
-  branchForm,
-  branchDialogTitle,
-  isBranchDialogOpen,
-  isSavingBranch,
-  totalBranchCount,
-  activeBranchCount,
-  inactiveBranchCount,
-  branchRowCount,
-  branchSearchKeyword
+  locationForm,
+  locationDialogTitle,
+  isLocationDialogOpen,
+  isSavingLocation,
+  branchOptions,
+  totalLocationCount,
+  activeLocationCount,
+  linkedBranchCount,
+  locationRowCount,
+  locationSearchKeyword
 } = storeToRefs(vm);
-const branchTableVm = vm.branchTableVm;
+const locationTableVm = vm.locationTableVm;
 
-const closeBranchModal = (): void => {
-  if (isSavingBranch.value) {
+const closeLocationModal = (): void => {
+  if (isSavingLocation.value) {
     return;
   }
 
-  vm.closeBranchModal();
+  vm.closeLocationModal();
 };
 
-const handleSaveBranch = async (): Promise<void> => {
-  const isEditMode = vm.branchDialogMode === 'edit';
+const handleSaveLocation = async (): Promise<void> => {
+  const isEditMode = vm.locationDialogMode === 'edit';
 
   try {
-    await vm.saveBranch();
+    await vm.saveLocation();
     await showSuccessMessage(
-      isEditMode ? 'Cabang diperbarui' : 'Cabang ditambahkan',
-      isEditMode ? 'Perubahan data cabang sudah disimpan.' : 'Cabang baru sudah ditambahkan.',
+      isEditMode ? 'Lokasi diperbarui' : 'Lokasi ditambahkan',
+      isEditMode ? 'Perubahan data lokasi sudah disimpan.' : 'Lokasi baru sudah ditambahkan.',
       {
         toast: true,
         timer: 1600,
@@ -407,16 +404,16 @@ const handleSaveBranch = async (): Promise<void> => {
     );
   } catch (currentError) {
     await showErrorMessage(
-      'Simpan cabang gagal',
+      'Simpan lokasi gagal',
       currentError instanceof Error ? currentError.message : String(currentError)
     );
   }
 };
 
-const confirmDeleteBranch = async (item: MasterBranchTableRow): Promise<void> => {
+const confirmDeleteLocation = async (item: MasterLocationTableRow): Promise<void> => {
   const result = await showWarningMessage(
-    'Hapus cabang?',
-    `Cabang "${item.branchName}" akan dihapus dari database lokal.`,
+    'Hapus lokasi?',
+    `Lokasi "${item.locationName}" akan dihapus dari database lokal.`,
     {
       showCancelButton: true,
       confirmButtonText: 'Ya, hapus',
@@ -430,21 +427,21 @@ const confirmDeleteBranch = async (item: MasterBranchTableRow): Promise<void> =>
   }
 
   try {
-    await vm.deleteBranch(item.source.id);
-    await showSuccessMessage('Cabang dihapus', 'Data cabang sudah dihapus.', {
+    await vm.deleteLocation(item.source.id);
+    await showSuccessMessage('Lokasi dihapus', 'Data lokasi sudah dihapus.', {
       toast: true,
       timer: 1600,
       position: 'top-end'
     });
   } catch (currentError) {
     await showErrorMessage(
-      'Hapus cabang gagal',
+      'Hapus lokasi gagal',
       currentError instanceof Error ? currentError.message : String(currentError)
     );
   }
 };
 
-watch(isBranchDialogOpen, (value) => {
+watch(isLocationDialogOpen, (value) => {
   if (typeof document === 'undefined') {
     return;
   }

@@ -11,8 +11,25 @@ USE `pawnshop`;
 SET NAMES utf8mb4;
 SET time_zone = '+00:00';
 
+CREATE TABLE IF NOT EXISTS `auth_portal_companies` (
+  `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+  `company_id` BIGINT UNSIGNED NOT NULL,
+  `name` VARCHAR(150) NOT NULL,
+  `legal_name` VARCHAR(180) DEFAULT NULL,
+  `business_type` VARCHAR(120) DEFAULT NULL,
+  `email` VARCHAR(150) DEFAULT NULL,
+  `phone_number` VARCHAR(30) DEFAULT NULL,
+  `city` VARCHAR(120) DEFAULT NULL,
+  `address` TEXT DEFAULT NULL,
+  `created_at` TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uq_auth_portal_companies_company_id` (`company_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
 CREATE TABLE IF NOT EXISTS `branches` (
   `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+  `company_id` BIGINT UNSIGNED DEFAULT NULL,
   `branch_code` VARCHAR(50) NOT NULL,
   `branch_number` VARCHAR(50) DEFAULT NULL,
   `branch_name` VARCHAR(150) NOT NULL,
@@ -22,12 +39,14 @@ CREATE TABLE IF NOT EXISTS `branches` (
   `created_at` TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP,
   `updated_at` TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
+  KEY `idx_branches_company_id` (`company_id`),
   UNIQUE KEY `uq_branches_branch_code` (`branch_code`),
   UNIQUE KEY `uq_branches_branch_number` (`branch_number`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TABLE IF NOT EXISTS `investors` (
   `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+  `company_id` BIGINT UNSIGNED DEFAULT NULL,
   `investor_code` VARCHAR(50) NOT NULL,
   `full_name` VARCHAR(150) NOT NULL,
   `phone_number` VARCHAR(30) DEFAULT NULL,
@@ -36,11 +55,13 @@ CREATE TABLE IF NOT EXISTS `investors` (
   `created_at` TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP,
   `updated_at` TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
+  KEY `idx_investors_company_id` (`company_id`),
   UNIQUE KEY `uq_investors_investor_code` (`investor_code`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TABLE IF NOT EXISTS `branch_investors` (
   `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+  `company_id` BIGINT UNSIGNED DEFAULT NULL,
   `branch_id` BIGINT UNSIGNED NOT NULL,
   `investor_id` BIGINT UNSIGNED NOT NULL,
   `ownership_percentage` DECIMAL(5,2) DEFAULT NULL,
@@ -51,6 +72,7 @@ CREATE TABLE IF NOT EXISTS `branch_investors` (
   `created_at` TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP,
   `updated_at` TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
+  KEY `idx_branch_investors_company_id` (`company_id`),
   UNIQUE KEY `uq_branch_investors_period` (`branch_id`, `investor_id`, `start_date`),
   KEY `idx_branch_investors_branch_id` (`branch_id`),
   KEY `idx_branch_investors_investor_id` (`investor_id`),
@@ -64,16 +86,19 @@ CREATE TABLE IF NOT EXISTS `branch_investors` (
 
 CREATE TABLE IF NOT EXISTS `roles` (
   `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+  `company_id` BIGINT UNSIGNED DEFAULT NULL,
   `role_code` VARCHAR(50) NOT NULL,
   `role_name` VARCHAR(100) NOT NULL,
   `created_at` TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP,
   `updated_at` TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
+  KEY `idx_roles_company_id` (`company_id`),
   UNIQUE KEY `uq_roles_role_code` (`role_code`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TABLE IF NOT EXISTS `users` (
   `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+  `company_id` BIGINT UNSIGNED DEFAULT NULL,
   `username` VARCHAR(100) NOT NULL,
   `password_hash` VARCHAR(255) NOT NULL,
   `full_name` VARCHAR(150) DEFAULT NULL,
@@ -84,15 +109,18 @@ CREATE TABLE IF NOT EXISTS `users` (
   `created_at` TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP,
   `updated_at` TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
+  KEY `idx_users_company_id` (`company_id`),
   UNIQUE KEY `uq_users_username` (`username`),
   UNIQUE KEY `uq_users_email` (`email`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TABLE IF NOT EXISTS `user_roles` (
+  `company_id` BIGINT UNSIGNED DEFAULT NULL,
   `user_id` BIGINT UNSIGNED NOT NULL,
   `role_id` BIGINT UNSIGNED NOT NULL,
   `created_at` TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`user_id`, `role_id`),
+  KEY `idx_user_roles_company_id` (`company_id`),
   KEY `idx_user_roles_role_id` (`role_id`),
   CONSTRAINT `fk_user_roles_user`
     FOREIGN KEY (`user_id`) REFERENCES `users` (`id`)
@@ -104,6 +132,7 @@ CREATE TABLE IF NOT EXISTS `user_roles` (
 
 CREATE TABLE IF NOT EXISTS `user_branch_assignments` (
   `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+  `company_id` BIGINT UNSIGNED DEFAULT NULL,
   `user_id` BIGINT UNSIGNED NOT NULL,
   `branch_id` BIGINT UNSIGNED NOT NULL,
   `is_primary` TINYINT(1) NOT NULL DEFAULT 0,
@@ -112,6 +141,7 @@ CREATE TABLE IF NOT EXISTS `user_branch_assignments` (
   `created_at` TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP,
   `updated_at` TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
+  KEY `idx_user_branch_assignments_company_id` (`company_id`),
   UNIQUE KEY `uq_user_branch_assignments` (`user_id`, `branch_id`, `assigned_at`),
   KEY `idx_user_branch_assignments_branch_id` (`branch_id`),
   CONSTRAINT `fk_user_branch_assignments_user`
@@ -124,6 +154,7 @@ CREATE TABLE IF NOT EXISTS `user_branch_assignments` (
 
 CREATE TABLE IF NOT EXISTS `login_sessions` (
   `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+  `company_id` BIGINT UNSIGNED DEFAULT NULL,
   `user_id` BIGINT UNSIGNED DEFAULT NULL,
   `session_token` VARCHAR(255) NOT NULL,
   `ip_address` VARCHAR(45) DEFAULT NULL,
@@ -134,6 +165,7 @@ CREATE TABLE IF NOT EXISTS `login_sessions` (
   `created_at` TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP,
   `updated_at` TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
+  KEY `idx_login_sessions_company_id` (`company_id`),
   UNIQUE KEY `uq_login_sessions_session_token` (`session_token`),
   KEY `idx_login_sessions_user_id` (`user_id`),
   CONSTRAINT `fk_login_sessions_user`
@@ -141,8 +173,57 @@ CREATE TABLE IF NOT EXISTS `login_sessions` (
     ON UPDATE CASCADE ON DELETE SET NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+CREATE TABLE IF NOT EXISTS `auth_portal_users` (
+  `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+  `company_id` BIGINT UNSIGNED NOT NULL,
+  `role` ENUM('owner', 'admin', 'staff') NOT NULL,
+  `assigned_branch_id` BIGINT UNSIGNED DEFAULT NULL,
+  `username` VARCHAR(100) NOT NULL,
+  `password_hash` VARCHAR(255) NOT NULL,
+  `full_name` VARCHAR(150) NOT NULL,
+  `email` VARCHAR(150) DEFAULT NULL,
+  `phone_number` VARCHAR(30) DEFAULT NULL,
+  `is_active` TINYINT(1) NOT NULL DEFAULT 1,
+  `created_at` TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uq_auth_portal_users_username` (`username`),
+  UNIQUE KEY `uq_auth_portal_users_email` (`email`),
+  KEY `idx_auth_portal_users_company_id` (`company_id`),
+  KEY `idx_auth_portal_users_assigned_branch_id` (`assigned_branch_id`),
+  CONSTRAINT `fk_auth_portal_users_company`
+    FOREIGN KEY (`company_id`) REFERENCES `auth_portal_companies` (`company_id`)
+    ON UPDATE CASCADE ON DELETE CASCADE,
+  CONSTRAINT `fk_auth_portal_users_branch`
+    FOREIGN KEY (`assigned_branch_id`) REFERENCES `branches` (`id`)
+    ON UPDATE CASCADE ON DELETE SET NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS `auth_portal_sessions` (
+  `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+  `company_id` BIGINT UNSIGNED NOT NULL,
+  `user_id` BIGINT UNSIGNED NOT NULL,
+  `session_token` VARCHAR(255) NOT NULL,
+  `login_at` DATETIME NOT NULL,
+  `logout_at` DATETIME DEFAULT NULL,
+  `session_status` ENUM('active', 'closed') NOT NULL DEFAULT 'active',
+  `created_at` TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uq_auth_portal_sessions_session_token` (`session_token`),
+  KEY `idx_auth_portal_sessions_company_id` (`company_id`),
+  KEY `idx_auth_portal_sessions_user_id` (`user_id`),
+  CONSTRAINT `fk_auth_portal_sessions_company`
+    FOREIGN KEY (`company_id`) REFERENCES `auth_portal_companies` (`company_id`)
+    ON UPDATE CASCADE ON DELETE CASCADE,
+  CONSTRAINT `fk_auth_portal_sessions_user`
+    FOREIGN KEY (`user_id`) REFERENCES `auth_portal_users` (`id`)
+    ON UPDATE CASCADE ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
 CREATE TABLE IF NOT EXISTS `customers` (
   `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+  `company_id` BIGINT UNSIGNED DEFAULT NULL,
   `customer_code` VARCHAR(50) NOT NULL,
   `full_name` VARCHAR(150) NOT NULL,
   `gender` ENUM('male', 'female') NOT NULL,
@@ -153,11 +234,13 @@ CREATE TABLE IF NOT EXISTS `customers` (
   `created_at` TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP,
   `updated_at` TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
+  KEY `idx_customers_company_id` (`company_id`),
   UNIQUE KEY `uq_customers_customer_code` (`customer_code`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TABLE IF NOT EXISTS `customer_documents` (
   `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+  `company_id` BIGINT UNSIGNED DEFAULT NULL,
   `customer_id` BIGINT UNSIGNED NOT NULL,
   `document_type` VARCHAR(50) NOT NULL,
   `document_number` VARCHAR(100) NOT NULL,
@@ -167,6 +250,7 @@ CREATE TABLE IF NOT EXISTS `customer_documents` (
   `created_at` TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP,
   `updated_at` TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
+  KEY `idx_customer_documents_company_id` (`company_id`),
   UNIQUE KEY `uq_customer_documents_type_number` (`document_type`, `document_number`),
   KEY `idx_customer_documents_customer_id` (`customer_id`),
   CONSTRAINT `fk_customer_documents_customer`
@@ -176,6 +260,7 @@ CREATE TABLE IF NOT EXISTS `customer_documents` (
 
 CREATE TABLE IF NOT EXISTS `customer_contacts` (
   `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+  `company_id` BIGINT UNSIGNED DEFAULT NULL,
   `customer_id` BIGINT UNSIGNED NOT NULL,
   `contact_type` VARCHAR(50) NOT NULL,
   `contact_value` VARCHAR(150) NOT NULL,
@@ -183,6 +268,7 @@ CREATE TABLE IF NOT EXISTS `customer_contacts` (
   `created_at` TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP,
   `updated_at` TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
+  KEY `idx_customer_contacts_company_id` (`company_id`),
   KEY `idx_customer_contacts_customer_id` (`customer_id`),
   CONSTRAINT `fk_customer_contacts_customer`
     FOREIGN KEY (`customer_id`) REFERENCES `customers` (`id`)
@@ -191,22 +277,26 @@ CREATE TABLE IF NOT EXISTS `customer_contacts` (
 
 CREATE TABLE IF NOT EXISTS `item_categories` (
   `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+  `company_id` BIGINT UNSIGNED DEFAULT NULL,
   `category_code` VARCHAR(50) NOT NULL,
   `category_name` VARCHAR(100) NOT NULL,
   `created_at` TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP,
   `updated_at` TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
+  KEY `idx_item_categories_company_id` (`company_id`),
   UNIQUE KEY `uq_item_categories_category_code` (`category_code`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TABLE IF NOT EXISTS `item_types` (
   `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+  `company_id` BIGINT UNSIGNED DEFAULT NULL,
   `category_id` BIGINT UNSIGNED NOT NULL,
   `type_code` VARCHAR(50) NOT NULL,
   `type_name` VARCHAR(100) NOT NULL,
   `created_at` TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP,
   `updated_at` TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
+  KEY `idx_item_types_company_id` (`company_id`),
   UNIQUE KEY `uq_item_types_type_code` (`type_code`),
   KEY `idx_item_types_category_id` (`category_id`),
   CONSTRAINT `fk_item_types_category`
@@ -216,6 +306,7 @@ CREATE TABLE IF NOT EXISTS `item_types` (
 
 CREATE TABLE IF NOT EXISTS `storage_locations` (
   `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+  `company_id` BIGINT UNSIGNED DEFAULT NULL,
   `branch_id` BIGINT UNSIGNED DEFAULT NULL,
   `location_code` VARCHAR(50) NOT NULL,
   `location_name` VARCHAR(100) NOT NULL,
@@ -224,6 +315,7 @@ CREATE TABLE IF NOT EXISTS `storage_locations` (
   `created_at` TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP,
   `updated_at` TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
+  KEY `idx_storage_locations_company_id` (`company_id`),
   UNIQUE KEY `uq_storage_locations_branch_code` (`branch_id`, `location_code`),
   CONSTRAINT `fk_storage_locations_branch`
     FOREIGN KEY (`branch_id`) REFERENCES `branches` (`id`)
@@ -232,6 +324,7 @@ CREATE TABLE IF NOT EXISTS `storage_locations` (
 
 CREATE TABLE IF NOT EXISTS `pawn_contracts` (
   `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+  `company_id` BIGINT UNSIGNED DEFAULT NULL,
   `contract_number` VARCHAR(100) NOT NULL,
   `branch_id` BIGINT UNSIGNED NOT NULL,
   `customer_id` BIGINT UNSIGNED NOT NULL,
@@ -252,6 +345,7 @@ CREATE TABLE IF NOT EXISTS `pawn_contracts` (
   `created_at` TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP,
   `updated_at` TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
+  KEY `idx_pawn_contracts_company_id` (`company_id`),
   UNIQUE KEY `uq_pawn_contracts_contract_number` (`contract_number`),
   KEY `idx_pawn_contracts_branch_id` (`branch_id`),
   KEY `idx_pawn_contracts_customer_id` (`customer_id`),
@@ -269,6 +363,7 @@ CREATE TABLE IF NOT EXISTS `pawn_contracts` (
 
 CREATE TABLE IF NOT EXISTS `pawn_items` (
   `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+  `company_id` BIGINT UNSIGNED DEFAULT NULL,
   `contract_id` BIGINT UNSIGNED NOT NULL,
   `item_sequence` SMALLINT UNSIGNED NOT NULL DEFAULT 1,
   `item_name` VARCHAR(255) NOT NULL,
@@ -289,6 +384,7 @@ CREATE TABLE IF NOT EXISTS `pawn_items` (
   `created_at` TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP,
   `updated_at` TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
+  KEY `idx_pawn_items_company_id` (`company_id`),
   UNIQUE KEY `uq_pawn_items_contract_sequence` (`contract_id`, `item_sequence`),
   KEY `idx_pawn_items_category_id` (`category_id`),
   KEY `idx_pawn_items_item_type_id` (`item_type_id`),
@@ -311,6 +407,7 @@ CREATE TABLE IF NOT EXISTS `pawn_items` (
 -- kelengkapan_barang_satu, kelengkapan_barang_dua, kelengkapan_barang_tiga.
 CREATE TABLE IF NOT EXISTS `pawn_item_accessories` (
   `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+  `company_id` BIGINT UNSIGNED DEFAULT NULL,
   `pawn_item_id` BIGINT UNSIGNED NOT NULL,
   `accessory_name` VARCHAR(255) NOT NULL,
   `accessory_condition` VARCHAR(255) DEFAULT NULL,
@@ -319,6 +416,7 @@ CREATE TABLE IF NOT EXISTS `pawn_item_accessories` (
   `created_at` TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP,
   `updated_at` TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
+  KEY `idx_pawn_item_accessories_company_id` (`company_id`),
   KEY `idx_pawn_item_accessories_pawn_item_id` (`pawn_item_id`),
   CONSTRAINT `fk_pawn_item_accessories_pawn_item`
     FOREIGN KEY (`pawn_item_id`) REFERENCES `pawn_items` (`id`)
@@ -327,6 +425,7 @@ CREATE TABLE IF NOT EXISTS `pawn_item_accessories` (
 
 CREATE TABLE IF NOT EXISTS `pawn_item_issues` (
   `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+  `company_id` BIGINT UNSIGNED DEFAULT NULL,
   `pawn_item_id` BIGINT UNSIGNED NOT NULL,
   `issue_name` VARCHAR(255) NOT NULL,
   `issue_details` TEXT DEFAULT NULL,
@@ -334,6 +433,7 @@ CREATE TABLE IF NOT EXISTS `pawn_item_issues` (
   `created_at` TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP,
   `updated_at` TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
+  KEY `idx_pawn_item_issues_company_id` (`company_id`),
   KEY `idx_pawn_item_issues_pawn_item_id` (`pawn_item_id`),
   CONSTRAINT `fk_pawn_item_issues_pawn_item`
     FOREIGN KEY (`pawn_item_id`) REFERENCES `pawn_items` (`id`)
@@ -342,6 +442,7 @@ CREATE TABLE IF NOT EXISTS `pawn_item_issues` (
 
 CREATE TABLE IF NOT EXISTS `pawn_item_location_movements` (
   `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+  `company_id` BIGINT UNSIGNED DEFAULT NULL,
   `pawn_item_id` BIGINT UNSIGNED NOT NULL,
   `from_location_id` BIGINT UNSIGNED DEFAULT NULL,
   `to_location_id` BIGINT UNSIGNED DEFAULT NULL,
@@ -353,6 +454,7 @@ CREATE TABLE IF NOT EXISTS `pawn_item_location_movements` (
   `created_at` TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP,
   `updated_at` TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
+  KEY `idx_pawn_item_location_movements_company_id` (`company_id`),
   KEY `idx_pawn_item_location_movements_pawn_item_id` (`pawn_item_id`),
   KEY `idx_pawn_item_location_movements_from_location_id` (`from_location_id`),
   KEY `idx_pawn_item_location_movements_to_location_id` (`to_location_id`),
@@ -373,6 +475,7 @@ CREATE TABLE IF NOT EXISTS `pawn_item_location_movements` (
 
 CREATE TABLE IF NOT EXISTS `contract_payments` (
   `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+  `company_id` BIGINT UNSIGNED DEFAULT NULL,
   `contract_id` BIGINT UNSIGNED NOT NULL,
   `payment_type` VARCHAR(50) NOT NULL,
   `payment_reference` VARCHAR(100) DEFAULT NULL,
@@ -383,6 +486,7 @@ CREATE TABLE IF NOT EXISTS `contract_payments` (
   `created_at` TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP,
   `updated_at` TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
+  KEY `idx_contract_payments_company_id` (`company_id`),
   KEY `idx_contract_payments_contract_id` (`contract_id`),
   KEY `idx_contract_payments_created_by_user_id` (`created_by_user_id`),
   CONSTRAINT `fk_contract_payments_contract`
@@ -395,6 +499,7 @@ CREATE TABLE IF NOT EXISTS `contract_payments` (
 
 CREATE TABLE IF NOT EXISTS `contract_extensions` (
   `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+  `company_id` BIGINT UNSIGNED DEFAULT NULL,
   `contract_id` BIGINT UNSIGNED NOT NULL,
   `extension_date` DATE NOT NULL,
   `previous_maturity_date` DATE NOT NULL,
@@ -406,6 +511,7 @@ CREATE TABLE IF NOT EXISTS `contract_extensions` (
   `created_at` TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP,
   `updated_at` TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
+  KEY `idx_contract_extensions_company_id` (`company_id`),
   KEY `idx_contract_extensions_contract_id` (`contract_id`),
   KEY `idx_contract_extensions_created_by_user_id` (`created_by_user_id`),
   CONSTRAINT `fk_contract_extensions_contract`
@@ -418,6 +524,7 @@ CREATE TABLE IF NOT EXISTS `contract_extensions` (
 
 CREATE TABLE IF NOT EXISTS `auction_transactions` (
   `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+  `company_id` BIGINT UNSIGNED DEFAULT NULL,
   `contract_id` BIGINT UNSIGNED NOT NULL,
   `auction_date` DATE NOT NULL,
   `overdue_amount` DECIMAL(18,2) NOT NULL DEFAULT 0.00,
@@ -429,6 +536,7 @@ CREATE TABLE IF NOT EXISTS `auction_transactions` (
   `created_at` TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP,
   `updated_at` TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
+  KEY `idx_auction_transactions_company_id` (`company_id`),
   UNIQUE KEY `uq_auction_transactions_contract_id` (`contract_id`),
   KEY `idx_auction_transactions_created_by_user_id` (`created_by_user_id`),
   CONSTRAINT `fk_auction_transactions_contract`
@@ -441,6 +549,7 @@ CREATE TABLE IF NOT EXISTS `auction_transactions` (
 
 CREATE TABLE IF NOT EXISTS `branch_cash_accounts` (
   `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+  `company_id` BIGINT UNSIGNED DEFAULT NULL,
   `branch_id` BIGINT UNSIGNED NOT NULL,
   `account_code` VARCHAR(50) NOT NULL,
   `account_name` VARCHAR(100) NOT NULL,
@@ -450,6 +559,7 @@ CREATE TABLE IF NOT EXISTS `branch_cash_accounts` (
   `created_at` TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP,
   `updated_at` TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
+  KEY `idx_branch_cash_accounts_company_id` (`company_id`),
   UNIQUE KEY `uq_branch_cash_accounts_branch_code` (`branch_id`, `account_code`),
   CONSTRAINT `fk_branch_cash_accounts_branch`
     FOREIGN KEY (`branch_id`) REFERENCES `branches` (`id`)
@@ -459,6 +569,7 @@ CREATE TABLE IF NOT EXISTS `branch_cash_accounts` (
 -- Covers legacy tables such as administrasi, atk, refund, bku, kas_cabang, and saldo_cabang logs.
 CREATE TABLE IF NOT EXISTS `branch_cash_transactions` (
   `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+  `company_id` BIGINT UNSIGNED DEFAULT NULL,
   `branch_id` BIGINT UNSIGNED NOT NULL,
   `cash_account_id` BIGINT UNSIGNED DEFAULT NULL,
   `transaction_type_code` VARCHAR(50) NOT NULL,
@@ -472,6 +583,7 @@ CREATE TABLE IF NOT EXISTS `branch_cash_transactions` (
   `created_at` TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP,
   `updated_at` TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
+  KEY `idx_branch_cash_transactions_company_id` (`company_id`),
   KEY `idx_branch_cash_transactions_branch_id` (`branch_id`),
   KEY `idx_branch_cash_transactions_cash_account_id` (`cash_account_id`),
   KEY `idx_branch_cash_transactions_created_by_user_id` (`created_by_user_id`),
@@ -488,6 +600,7 @@ CREATE TABLE IF NOT EXISTS `branch_cash_transactions` (
 
 CREATE TABLE IF NOT EXISTS `branch_debts` (
   `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+  `company_id` BIGINT UNSIGNED DEFAULT NULL,
   `branch_id` BIGINT UNSIGNED NOT NULL,
   `creditor_branch_id` BIGINT UNSIGNED DEFAULT NULL,
   `debt_source_type` VARCHAR(50) NOT NULL,
@@ -502,6 +615,7 @@ CREATE TABLE IF NOT EXISTS `branch_debts` (
   `created_at` TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP,
   `updated_at` TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
+  KEY `idx_branch_debts_company_id` (`company_id`),
   KEY `idx_branch_debts_branch_id` (`branch_id`),
   KEY `idx_branch_debts_creditor_branch_id` (`creditor_branch_id`),
   KEY `idx_branch_debts_created_by_user_id` (`created_by_user_id`),
@@ -518,6 +632,7 @@ CREATE TABLE IF NOT EXISTS `branch_debts` (
 
 CREATE TABLE IF NOT EXISTS `branch_debt_payments` (
   `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+  `company_id` BIGINT UNSIGNED DEFAULT NULL,
   `debt_id` BIGINT UNSIGNED NOT NULL,
   `payment_date` DATETIME NOT NULL,
   `amount` DECIMAL(18,2) NOT NULL,
@@ -526,6 +641,7 @@ CREATE TABLE IF NOT EXISTS `branch_debt_payments` (
   `created_at` TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP,
   `updated_at` TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
+  KEY `idx_branch_debt_payments_company_id` (`company_id`),
   KEY `idx_branch_debt_payments_debt_id` (`debt_id`),
   KEY `idx_branch_debt_payments_created_by_user_id` (`created_by_user_id`),
   CONSTRAINT `fk_branch_debt_payments_debt`
@@ -538,6 +654,7 @@ CREATE TABLE IF NOT EXISTS `branch_debt_payments` (
 
 CREATE TABLE IF NOT EXISTS `inter_branch_transfers` (
   `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+  `company_id` BIGINT UNSIGNED DEFAULT NULL,
   `source_branch_id` BIGINT UNSIGNED NOT NULL,
   `target_branch_id` BIGINT UNSIGNED NOT NULL,
   `transfer_number` VARCHAR(100) NOT NULL,
@@ -549,6 +666,7 @@ CREATE TABLE IF NOT EXISTS `inter_branch_transfers` (
   `created_at` TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP,
   `updated_at` TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
+  KEY `idx_inter_branch_transfers_company_id` (`company_id`),
   UNIQUE KEY `uq_inter_branch_transfers_transfer_number` (`transfer_number`),
   KEY `idx_inter_branch_transfers_source_branch_id` (`source_branch_id`),
   KEY `idx_inter_branch_transfers_target_branch_id` (`target_branch_id`),
@@ -567,6 +685,7 @@ CREATE TABLE IF NOT EXISTS `inter_branch_transfers` (
 -- Covers legacy modal_investor, penambahan_modal, peralihan_modal, and related logs.
 CREATE TABLE IF NOT EXISTS `investor_capital_transactions` (
   `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+  `company_id` BIGINT UNSIGNED DEFAULT NULL,
   `investor_id` BIGINT UNSIGNED NOT NULL,
   `branch_id` BIGINT UNSIGNED NOT NULL,
   `transfer_id` BIGINT UNSIGNED DEFAULT NULL,
@@ -578,6 +697,7 @@ CREATE TABLE IF NOT EXISTS `investor_capital_transactions` (
   `created_at` TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP,
   `updated_at` TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
+  KEY `idx_investor_capital_transactions_company_id` (`company_id`),
   KEY `idx_investor_capital_transactions_investor_id` (`investor_id`),
   KEY `idx_investor_capital_transactions_branch_id` (`branch_id`),
   KEY `idx_investor_capital_transactions_transfer_id` (`transfer_id`),
@@ -598,6 +718,7 @@ CREATE TABLE IF NOT EXISTS `investor_capital_transactions` (
 
 CREATE TABLE IF NOT EXISTS `branch_item_settings` (
   `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+  `company_id` BIGINT UNSIGNED DEFAULT NULL,
   `branch_id` BIGINT UNSIGNED NOT NULL,
   `item_type_id` BIGINT UNSIGNED NOT NULL,
   `margin_rate` DECIMAL(5,2) NOT NULL DEFAULT 0.00,
@@ -607,6 +728,7 @@ CREATE TABLE IF NOT EXISTS `branch_item_settings` (
   `created_at` TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP,
   `updated_at` TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
+  KEY `idx_branch_item_settings_company_id` (`company_id`),
   UNIQUE KEY `uq_branch_item_settings_period` (`branch_id`, `item_type_id`, `effective_from`),
   KEY `idx_branch_item_settings_item_type_id` (`item_type_id`),
   CONSTRAINT `fk_branch_item_settings_branch`
@@ -619,6 +741,7 @@ CREATE TABLE IF NOT EXISTS `branch_item_settings` (
 
 CREATE TABLE IF NOT EXISTS `notifications` (
   `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+  `company_id` BIGINT UNSIGNED DEFAULT NULL,
   `branch_id` BIGINT UNSIGNED DEFAULT NULL,
   `customer_id` BIGINT UNSIGNED DEFAULT NULL,
   `contract_id` BIGINT UNSIGNED DEFAULT NULL,
@@ -630,6 +753,7 @@ CREATE TABLE IF NOT EXISTS `notifications` (
   `created_at` TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP,
   `updated_at` TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
+  KEY `idx_notifications_company_id` (`company_id`),
   KEY `idx_notifications_branch_id` (`branch_id`),
   KEY `idx_notifications_customer_id` (`customer_id`),
   KEY `idx_notifications_contract_id` (`contract_id`),
@@ -650,6 +774,7 @@ CREATE TABLE IF NOT EXISTS `notifications` (
 
 CREATE TABLE IF NOT EXISTS `audit_logs` (
   `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+  `company_id` BIGINT UNSIGNED DEFAULT NULL,
   `user_id` BIGINT UNSIGNED DEFAULT NULL,
   `entity_type` VARCHAR(100) NOT NULL,
   `entity_id` BIGINT UNSIGNED DEFAULT NULL,
@@ -660,6 +785,7 @@ CREATE TABLE IF NOT EXISTS `audit_logs` (
   `metadata_json` JSON DEFAULT NULL,
   `created_at` TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
+  KEY `idx_audit_logs_company_id` (`company_id`),
   KEY `idx_audit_logs_user_id` (`user_id`),
   KEY `idx_audit_logs_entity` (`entity_type`, `entity_id`),
   CONSTRAINT `fk_audit_logs_user`

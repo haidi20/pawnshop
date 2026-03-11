@@ -6,7 +6,15 @@ const masterBranchRoutes: Array<RouteRecordRaw> = [
         name: 'MasterBranch',
         component: () => import('@feature/master_branch/presentation/views/master_branch.view.vue'),
         meta: {
-            title: 'Master Cabang'
+            title: 'Data Cabang'
+        }
+    },
+    {
+        path: '/locations',
+        name: 'MasterLocation',
+        component: () => import('@feature/master_branch/presentation/views/master_location.view.vue'),
+        meta: {
+            title: 'Lokasi Penyimpanan'
         }
     }
 ];

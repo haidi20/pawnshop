@@ -1,0 +1,108 @@
+.pawn-contract-form-loading-state {
+  display: grid;
+  gap: 18px;
+  border: 1px solid rgba(0, 94, 170, 0.1);
+  overflow: hidden;
+  background:
+    radial-gradient(circle at top right, rgba(0, 94, 170, 0.08), transparent 28%),
+    #ffffff;
+}
+
+.pawn-contract-form-loading-state__head {
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+}
+
+.pawn-contract-form-loading-state__copy {
+  display: grid;
+  gap: 4px;
+}
+
+.pawn-contract-form-loading-state__icon {
+  width: 56px;
+  height: 56px;
+  flex-shrink: 0;
+  display: grid;
+  place-items: center;
+  border-radius: 18px;
+  background: rgba(0, 94, 170, 0.1);
+  color: var(--primary-blue);
+}
+
+.pawn-contract-form-loading-state__icon-symbol {
+  font-size: 1.4rem;
+}
+
+.pawn-contract-form-loading-state__preview {
+  display: grid;
+  gap: 16px;
+}
+
+.pawn-contract-form-loading-state__grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.pawn-contract-form-loading-state__chip,
+.pawn-contract-form-loading-state__card,
+.pawn-contract-form-loading-state__line {
+  position: relative;
+  overflow: hidden;
+  background: #eef3f7;
+}
+
+.pawn-contract-form-loading-state__chip::after,
+.pawn-contract-form-loading-state__card::after,
+.pawn-contract-form-loading-state__line::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  transform: translateX(-100%);
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.75), transparent);
+  animation: pawn-contract-form-loading-state__shimmer 1.4s infinite;
+}
+
+.pawn-contract-form-loading-state__chip {
+  height: 72px;
+  border-radius: 18px;
+}
+
+.pawn-contract-form-loading-state__card {
+  display: grid;
+  gap: 12px;
+  padding: 18px;
+  border-radius: 22px;
+}
+
+.pawn-contract-form-loading-state__line {
+  height: 14px;
+  border-radius: 999px;
+}
+
+.pawn-contract-form-loading-state__line.is-short {
+  width: 36%;
+}
+
+.pawn-contract-form-loading-state__line.is-medium {
+  width: 68%;
+}
+
+@keyframes pawn-contract-form-loading-state__shimmer {
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+@media (max-width: 991.98px) {
+  .pawn-contract-form-loading-state__grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 575.98px) {
+  .pawn-contract-form-loading-state__head {
+    flex-direction: column;
+  }
+}

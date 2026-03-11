@@ -50,14 +50,14 @@ export const appNavigationItems: AppNavigationItem[] = [
             {
                 key: 'system-branches',
                 label: 'Cabang',
-                route: '/branches#data-cabang',
+                route: '/branches',
                 icon: 'bi-diagram-3',
                 caption: 'Kelola master cabang operasional'
             },
             {
                 key: 'system-locations',
                 label: 'Lokasi',
-                route: '/branches#lokasi-penyimpanan',
+                route: '/locations',
                 icon: 'bi-pin-map',
                 caption: 'Kelola lokasi penyimpanan per cabang'
             }
@@ -118,8 +118,8 @@ export const appModules: AppModuleSummary[] = [
             }
         ],
         nextSteps: [
-            'Bangun CRUD cabang.',
-            'Hubungkan lokasi penyimpanan sebagai child resource di detail cabang.',
+            'Rapikan validasi CRUD cabang dan lokasi.',
+            'Tambahkan relasi pemakaian cabang ke modul operasional lain.',
             'Siapkan dipakai oleh modul pawn contract dan branch finance.'
         ]
     },

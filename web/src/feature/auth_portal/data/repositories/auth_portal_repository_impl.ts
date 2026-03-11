@@ -6,6 +6,7 @@ import type {
     AuthPortalLoginPayloadModel,
     AuthPortalRegisterPayloadModel,
     AuthPortalSessionSnapshotModel,
+    AuthPortalUpdateCompanyPayloadModel,
     AuthPortalUpdateUserBranchPayloadModel
 } from '@feature/auth_portal/domain/models';
 import type { AuthPortalRepository } from '@feature/auth_portal/domain/repositories/auth_portal.repository';
@@ -40,6 +41,16 @@ export class AuthPortalRepositoryImpl implements AuthPortalRepository {
     async register(payload: AuthPortalRegisterPayloadModel): Promise<Either<Error, AuthPortalSessionSnapshotModel>> {
         try {
             return right(await this.localDatasource.register(payload));
+        } catch (error) {
+            return left(toError(error));
+        }
+    }
+
+    async updateCompany(
+        payload: AuthPortalUpdateCompanyPayloadModel
+    ): Promise<Either<Error, AuthPortalSessionSnapshotModel>> {
+        try {
+            return right(await this.localDatasource.updateCompany(payload));
         } catch (error) {
             return left(toError(error));
         }
