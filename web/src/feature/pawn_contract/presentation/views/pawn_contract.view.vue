@@ -1,43 +1,51 @@
 <template>
-  <section
+  <LocalDbFeedbackStateComponent
     v-if="isLoading"
-    class="card p-3"
-  >
-    <div class="d-flex align-items-center gap-3">
-      <div
-        class="spinner-border text-primary"
-        role="status"
-        aria-hidden="true"
-      />
-      <div>
-        <div class="fw-bold">
-          Memuat Index Gadai
-        </div>
-        <div class="text-secondary">
-          Mengambil data kontrak operasional dari DB lokal.
-        </div>
-      </div>
-    </div>
-  </section>
+    state="loading"
+    title="Memuat index gadai"
+    description="Mengambil data kontrak operasional dari database lokal sesuai perusahaan dan akses cabang user aktif."
+    note="Ringkasan, tabel, dan filter akan aktif setelah pembacaan kontrak lokal selesai."
+  />
 
-  <section
+  <LocalDbFeedbackStateComponent
     v-else-if="error"
-    class="card p-3"
+    state="error"
+    title="Gagal memuat index gadai"
+    :description="error"
+    note="Coba muat ulang agar kontrak pada DB lokal perusahaan aktif dibaca kembali."
+    action-label="Muat ulang"
+    @action="vm.getPawnContractData()"
+  />
+
+  <LocalDbFeedbackStateComponent
+    v-else-if="data && indexTabs.every((tab) => tab.count === 0)"
+    state="empty"
+    :title="canAccessAllBranches ? 'Belum ada data gadai' : 'Belum ada data gadai pada cabang user ini'"
+    :description="canAccessAllBranches
+      ? 'Database lokal perusahaan aktif belum memiliki kontrak gadai yang bisa ditampilkan.'
+      : 'Belum ada kontrak gadai pada cabang assignment user aktif, atau cabang user belum diatur.'"
+    :note="canAccessAllBranches
+      ? 'Mulai input data pertama agar seluruh tab index dan ringkasan terisi.'
+      : 'Jika user ini karyawan, owner perlu memastikan assignment cabangnya sudah benar di menu Sistem > User.'"
   >
-    <div class="fw-bold text-danger mb-2">
-      Feature load failed
-    </div>
-    <p class="mb-3 text-secondary">
-      {{ error }}
-    </p>
-    <button
-      class="btn btn-primary"
-      type="button"
-      @click="vm.getPawnContractData()"
-    >
-      Muat ulang
-    </button>
-  </section>
+    <template #actions>
+      <RouterLink
+        v-if="canAccessAllBranches || sortedBranches.length > 0"
+        class="btn btn-primary"
+        :to="{ name: 'PawnContractForm' }"
+      >
+        <i class="bi bi-plus-lg" />
+        <span>Buat gadai baru</span>
+      </RouterLink>
+      <button
+        class="btn btn-outline-secondary"
+        type="button"
+        @click="vm.getPawnContractData()"
+      >
+        Muat ulang
+      </button>
+    </template>
+  </LocalDbFeedbackStateComponent>
 
   <section
     v-else-if="data"
@@ -201,6 +209,7 @@ import { onMounted, ref, watch } from 'vue';
 import { storeToRefs } from 'pinia';
 import { RouterLink, useRoute, useRouter } from 'vue-router';
 
+import LocalDbFeedbackStateComponent from '@core/presentation/components/local_db_feedback_state.component.vue';
 import type { PawnContractStatusModel } from '@core/util/helpers';
 import {
   PawnContractIndexTabKeyEnum,

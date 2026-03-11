@@ -95,9 +95,14 @@
               </tr>
             </template>
             <template #empty>
-              <div class="pawn-contract-page__empty-state">
-                Belum ada data pada kategori ini hari ini.
-              </div>
+              <LocalDbFeedbackStateComponent
+                state="empty"
+                title="Belum ada aktivitas hari ini"
+                description="Kategori ringkasan ini belum memiliki kontrak yang cocok pada database lokal hari ini."
+                note="Data akan muncul saat transaksi atau kontrak baru masuk sesuai kategori tersebut."
+                :framed="false"
+                compact
+              />
             </template>
           </DataTableClientSideComponent>
         </article>
@@ -127,9 +132,14 @@
           </button>
         </template>
         <template #empty>
-          <div class="pawn-contract-page__empty-state mt-3">
-            Belum ada pendapatan yang tercatat hari ini.
-          </div>
+          <LocalDbFeedbackStateComponent
+            state="empty"
+            title="Belum ada pendapatan hari ini"
+            description="Pendapatan biaya titip dan administrasi belum tercatat pada database lokal hari ini."
+            note="Tabel ini akan terisi otomatis saat data kontrak dan transaksi yang relevan tersedia."
+            :framed="false"
+            compact
+          />
         </template>
       </DataTableClientSideComponent>
     </section>
@@ -138,6 +148,7 @@
 
 <script setup lang="ts">
 import DataTableClientSideComponent from '@core/presentation/components/datatable_clientside.component.vue';
+import LocalDbFeedbackStateComponent from '@core/presentation/components/local_db_feedback_state.component.vue';
 import type { PawnContractStatusModel } from '@core/util/helpers';
 import type { PawnContractRingkasanMetricModel } from '@feature/pawn_contract/domain/models';
 import type {

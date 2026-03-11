@@ -63,9 +63,14 @@
         </tr>
       </template>
       <template #empty>
-        <div class="pawn-contract-page__empty-state mt-3">
-          Belum ada gadai yang masuk window maintenance.
-        </div>
+        <LocalDbFeedbackStateComponent
+          state="empty"
+          title="Belum ada data maintenance"
+          description="Belum ada barang atau kontrak yang membutuhkan maintenance pada database lokal saat ini."
+          note="Tabel ini akan terisi saat kontrak aktif memiliki kebutuhan inspeksi atau tindak lanjut."
+          :framed="false"
+          compact
+        />
       </template>
     </DataTableClientSideComponent>
   </section>
@@ -73,6 +78,7 @@
 
 <script setup lang="ts">
 import DataTableClientSideComponent from '@core/presentation/components/datatable_clientside.component.vue';
+import LocalDbFeedbackStateComponent from '@core/presentation/components/local_db_feedback_state.component.vue';
 import type { DataTableClientSideVM } from '@core/presentation/view_models/datatable_clientside.vm';
 import type { PawnContractMaintenanceTableRow } from '@feature/pawn_contract/presentation/view_models/pawn_contract.vm';
 

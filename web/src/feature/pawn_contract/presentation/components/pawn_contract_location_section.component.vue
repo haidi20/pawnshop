@@ -97,9 +97,14 @@
         </tr>
       </template>
       <template #empty>
-        <div class="pawn-contract-page__empty-state mt-3">
-          Tidak ada barang untuk kategori lokasi ini.
-        </div>
+        <LocalDbFeedbackStateComponent
+          state="empty"
+          title="Belum ada data distribusi barang"
+          description="Tidak ada barang jaminan yang cocok dengan kategori lokasi ini pada database lokal."
+          note="Mutasi lokasi akan muncul setelah kontrak dan perpindahan barang tercatat."
+          :framed="false"
+          compact
+        />
       </template>
     </DataTableClientSideComponent>
   </section>
@@ -107,6 +112,7 @@
 
 <script setup lang="ts">
 import DataTableClientSideComponent from '@core/presentation/components/datatable_clientside.component.vue';
+import LocalDbFeedbackStateComponent from '@core/presentation/components/local_db_feedback_state.component.vue';
 import type { DataTableClientSideVM } from '@core/presentation/view_models/datatable_clientside.vm';
 import type { PawnItemLocationStatusModel } from '@feature/pawn_contract/domain/models/pawn-item.model';
 import type {

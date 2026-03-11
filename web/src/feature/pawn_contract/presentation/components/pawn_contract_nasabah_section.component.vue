@@ -156,9 +156,14 @@
             </tr>
           </template>
           <template #empty>
-            <div class="pawn-contract-page__empty-state">
-              No contracts are available in this section.
-            </div>
+            <LocalDbFeedbackStateComponent
+              state="empty"
+              title="Belum ada kontrak pada bagian ini"
+              description="Belum ada kontrak gadai yang cocok untuk seksi nasabah ini pada database lokal."
+              note="Coba ubah tab atau filter agar data kontrak yang relevan ditampilkan."
+              :framed="false"
+              compact
+            />
           </template>
         </DataTableClientSideComponent>
 
@@ -183,6 +188,7 @@
 
 <script setup lang="ts">
 import DataTableClientSideComponent from '@core/presentation/components/datatable_clientside.component.vue';
+import LocalDbFeedbackStateComponent from '@core/presentation/components/local_db_feedback_state.component.vue';
 import type { PawnContractDueStateModel } from '@core/util/helpers';
 import type {
   PawnContractNasabahSectionModel,

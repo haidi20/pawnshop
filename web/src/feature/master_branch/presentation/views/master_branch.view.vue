@@ -1,43 +1,29 @@
 <template>
-  <section
+  <LocalDbFeedbackStateComponent
     v-if="isLoading"
-    class="card p-4"
-  >
-    <div class="d-flex align-items-center gap-3">
-      <div
-        class="spinner-border text-primary"
-        role="status"
-        aria-hidden="true"
-      />
-      <div>
-        <div class="fw-bold">
-          Loading Master Branch
-        </div>
-        <div class="text-secondary">
-          Mengambil data lokal dari DAO feature.
-        </div>
-      </div>
-    </div>
-  </section>
+    state="loading"
+    title="Memuat master cabang"
+    description="Mengambil data cabang dan lokasi penyimpanan dari database lokal."
+    note="Daftar cabang aktif akan muncul setelah pembacaan tabel lokal selesai."
+  />
 
-  <section
+  <LocalDbFeedbackStateComponent
     v-else-if="error"
-    class="card p-4"
-  >
-    <div class="fw-bold text-danger mb-2">
-      Feature load failed
-    </div>
-    <p class="mb-3 text-secondary">
-      {{ error }}
-    </p>
-    <button
-      class="btn btn-primary"
-      type="button"
-      @click="vm.getMasterBranchData()"
-    >
-      Muat ulang
-    </button>
-  </section>
+    state="error"
+    title="Gagal memuat master cabang"
+    :description="error"
+    note="Coba muat ulang agar data cabang dari DB lokal dibaca kembali."
+    action-label="Muat ulang"
+    @action="vm.getMasterBranchData()"
+  />
+
+  <LocalDbFeedbackStateComponent
+    v-else-if="data && data.totalRows === 0"
+    state="empty"
+    title="Belum ada master cabang"
+    description="Database lokal perusahaan aktif belum memiliki data cabang untuk digunakan."
+    note="Pemilihan cabang user dan filter operasional baru tersedia setelah data ini ada."
+  />
 
   <section
     v-else-if="data"
@@ -109,6 +95,7 @@ import { onMounted } from 'vue';
 import { storeToRefs } from 'pinia';
 
 import DataTableClientSideComponent from '@core/presentation/components/datatable_clientside.component.vue';
+import LocalDbFeedbackStateComponent from '@core/presentation/components/local_db_feedback_state.component.vue';
 import { useFeatureTableSections } from '@core/presentation/composables/use_feature_table_sections';
 import '@core/presentation/styles/feature_data_tables.css';
 import { masterBranchViewModel } from '@feature/master_branch/presentation/view_models/master_branch.vm';

@@ -1,43 +1,29 @@
 <template>
-  <section
+  <LocalDbFeedbackStateComponent
     v-if="isLoading"
-    class="card p-4"
-  >
-    <div class="d-flex align-items-center gap-3">
-      <div
-        class="spinner-border text-primary"
-        role="status"
-        aria-hidden="true"
-      />
-      <div>
-        <div class="fw-bold">
-          Loading Customer
-        </div>
-        <div class="text-secondary">
-          Mengambil data lokal dari DAO feature.
-        </div>
-      </div>
-    </div>
-  </section>
+    state="loading"
+    title="Memuat data customer"
+    description="Mengambil data customer perusahaan aktif dari database lokal."
+    note="Tampilan akan diisi setelah VM menerima hasil pembacaan DAO lokal."
+  />
 
-  <section
+  <LocalDbFeedbackStateComponent
     v-else-if="error"
-    class="card p-4"
-  >
-    <div class="fw-bold text-danger mb-2">
-      Feature load failed
-    </div>
-    <p class="mb-3 text-secondary">
-      {{ error }}
-    </p>
-    <button
-      class="btn btn-primary"
-      type="button"
-      @click="vm.getCustomerData()"
-    >
-      Muat ulang
-    </button>
-  </section>
+    state="error"
+    title="Gagal memuat data customer"
+    :description="error"
+    note="Coba muat ulang pembacaan DB lokal agar daftar customer diperbarui."
+    action-label="Muat ulang"
+    @action="vm.getCustomerData()"
+  />
+
+  <LocalDbFeedbackStateComponent
+    v-else-if="data && data.totalRows === 0"
+    state="empty"
+    title="Belum ada data customer"
+    description="Database lokal perusahaan aktif belum memiliki baris customer untuk ditampilkan."
+    note="Kondisi ini normal untuk perusahaan baru atau setelah data lokal dibersihkan."
+  />
 
   <section
     v-else-if="data"
@@ -109,6 +95,7 @@ import { onMounted } from 'vue';
 import { storeToRefs } from 'pinia';
 
 import DataTableClientSideComponent from '@core/presentation/components/datatable_clientside.component.vue';
+import LocalDbFeedbackStateComponent from '@core/presentation/components/local_db_feedback_state.component.vue';
 import { useFeatureTableSections } from '@core/presentation/composables/use_feature_table_sections';
 import '@core/presentation/styles/feature_data_tables.css';
 import { customerViewModel } from '@feature/customer/presentation/view_models/customer.vm';

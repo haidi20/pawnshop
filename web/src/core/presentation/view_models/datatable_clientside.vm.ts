@@ -27,6 +27,8 @@ export interface DataTableClientSideVM<T extends Record<string, any>> {
   searchData: () => void;
 }
 
+const DEFAULT_TABLE_LIMIT = 5;
+
 export function createDataTableClientSideVM<T extends Record<string, any>>(
   fields: any[] = [],
   initialItems: T[] = []
@@ -36,7 +38,7 @@ export function createDataTableClientSideVM<T extends Record<string, any>>(
   const loading = ref(false);
   const search = ref('');
   const offset = ref(0);
-  const limit = ref(10);
+  const limit = ref(DEFAULT_TABLE_LIMIT);
   const totalItems = ref(0);
 
   // Internal helper to apply filter and pagination
@@ -87,14 +89,15 @@ export function createDataTableClientSideVM<T extends Record<string, any>>(
     options.add(limit.value);
 
     if (options.size === 0) {
-      options.add(10);
+      options.add(DEFAULT_TABLE_LIMIT);
     }
 
     return Array.from(options).sort((a, b) => a - b);
   });
 
   const setLimit = (value: number) => {
-    const nextLimit = Number.isFinite(value) && value > 0 ? Math.trunc(value) : 10;
+    const nextLimit =
+      Number.isFinite(value) && value > 0 ? Math.trunc(value) : DEFAULT_TABLE_LIMIT;
     limit.value = nextLimit;
   };
 

@@ -28,6 +28,8 @@ export interface FetchResult<T> {
   total: number;
 }
 
+const DEFAULT_TABLE_LIMIT = 5;
+
 export function createDataTableServerSideVM<T extends Record<string, any>>(
   onFetch: (params: { search: string; offset: number; limit: number }) => Promise<FetchResult<T>>,
   fields: any[] = []
@@ -36,7 +38,7 @@ export function createDataTableServerSideVM<T extends Record<string, any>>(
   const loading = ref(false);
   const search = ref('');
   const offset = ref(0);
-  const limit = ref(10);
+  const limit = ref(DEFAULT_TABLE_LIMIT);
   const totalItems = ref(0);
 
   const fetchData = async () => {
@@ -64,12 +66,13 @@ export function createDataTableServerSideVM<T extends Record<string, any>>(
     });
     if (totalItems.value > 0) options.add(totalItems.value);
     options.add(limit.value);
-    if (options.size === 0) options.add(10);
+    if (options.size === 0) options.add(DEFAULT_TABLE_LIMIT);
     return Array.from(options).sort((a, b) => a - b);
   });
 
   const setLimit = (value: number) => {
-    const nextLimit = Number.isFinite(value) && value > 0 ? Math.trunc(value) : 10;
+    const nextLimit =
+      Number.isFinite(value) && value > 0 ? Math.trunc(value) : DEFAULT_TABLE_LIMIT;
     limit.value = nextLimit;
   };
 

@@ -1,43 +1,29 @@
 <template>
-  <section
+  <LocalDbFeedbackStateComponent
     v-if="isLoading"
-    class="card p-4"
-  >
-    <div class="d-flex align-items-center gap-3">
-      <div
-        class="spinner-border text-primary"
-        role="status"
-        aria-hidden="true"
-      />
-      <div>
-        <div class="fw-bold">
-          Loading Branch Finance
-        </div>
-        <div class="text-secondary">
-          Mengambil data lokal dari DAO feature.
-        </div>
-      </div>
-    </div>
-  </section>
+    state="loading"
+    title="Memuat keuangan cabang"
+    description="Mengambil kas, utang, pembayaran, dan transfer cabang dari database lokal."
+    note="Tampilan akan diperbarui setelah seluruh tabel keuangan lokal selesai dibaca."
+  />
 
-  <section
+  <LocalDbFeedbackStateComponent
     v-else-if="error"
-    class="card p-4"
-  >
-    <div class="fw-bold text-danger mb-2">
-      Feature load failed
-    </div>
-    <p class="mb-3 text-secondary">
-      {{ error }}
-    </p>
-    <button
-      class="btn btn-primary"
-      type="button"
-      @click="vm.getBranchFinanceData()"
-    >
-      Muat ulang
-    </button>
-  </section>
+    state="error"
+    title="Gagal memuat keuangan cabang"
+    :description="error"
+    note="Coba muat ulang untuk membaca ulang tabel keuangan dari DB lokal."
+    action-label="Muat ulang"
+    @action="vm.getBranchFinanceData()"
+  />
+
+  <LocalDbFeedbackStateComponent
+    v-else-if="data && data.totalRows === 0"
+    state="empty"
+    title="Belum ada data keuangan cabang"
+    description="Belum ada baris kas atau transaksi cabang di database lokal perusahaan aktif."
+    note="Kondisi ini umum pada workspace baru atau setelah data lokal dihapus."
+  />
 
   <section
     v-else-if="data"
@@ -109,6 +95,7 @@ import { onMounted } from 'vue';
 import { storeToRefs } from 'pinia';
 
 import DataTableClientSideComponent from '@core/presentation/components/datatable_clientside.component.vue';
+import LocalDbFeedbackStateComponent from '@core/presentation/components/local_db_feedback_state.component.vue';
 import { useFeatureTableSections } from '@core/presentation/composables/use_feature_table_sections';
 import '@core/presentation/styles/feature_data_tables.css';
 import { branchFinanceViewModel } from '@feature/branch_finance/presentation/view_models/branch_finance.vm';

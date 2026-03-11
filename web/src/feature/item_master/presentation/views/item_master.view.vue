@@ -1,43 +1,29 @@
 <template>
-  <section
+  <LocalDbFeedbackStateComponent
     v-if="isLoading"
-    class="card p-4"
-  >
-    <div class="d-flex align-items-center gap-3">
-      <div
-        class="spinner-border text-primary"
-        role="status"
-        aria-hidden="true"
-      />
-      <div>
-        <div class="fw-bold">
-          Loading Item Master
-        </div>
-        <div class="text-secondary">
-          Mengambil data lokal dari DAO feature.
-        </div>
-      </div>
-    </div>
-  </section>
+    state="loading"
+    title="Memuat item master"
+    description="Mengambil kategori, tipe, dan pengaturan item dari database lokal."
+    note="Data akan tampil otomatis setelah pembacaan tabel lokal selesai."
+  />
 
-  <section
+  <LocalDbFeedbackStateComponent
     v-else-if="error"
-    class="card p-4"
-  >
-    <div class="fw-bold text-danger mb-2">
-      Feature load failed
-    </div>
-    <p class="mb-3 text-secondary">
-      {{ error }}
-    </p>
-    <button
-      class="btn btn-primary"
-      type="button"
-      @click="vm.getItemMasterData()"
-    >
-      Muat ulang
-    </button>
-  </section>
+    state="error"
+    title="Gagal memuat item master"
+    :description="error"
+    note="Coba muat ulang agar pembacaan data master dari DB lokal diulang."
+    action-label="Muat ulang"
+    @action="vm.getItemMasterData()"
+  />
+
+  <LocalDbFeedbackStateComponent
+    v-else-if="data && data.totalRows === 0"
+    state="empty"
+    title="Belum ada item master"
+    description="Database lokal perusahaan aktif belum memiliki data kategori atau tipe item."
+    note="Isi tabel item master akan muncul setelah data referensi lokal tersedia."
+  />
 
   <section
     v-else-if="data"
@@ -109,6 +95,7 @@ import { onMounted } from 'vue';
 import { storeToRefs } from 'pinia';
 
 import DataTableClientSideComponent from '@core/presentation/components/datatable_clientside.component.vue';
+import LocalDbFeedbackStateComponent from '@core/presentation/components/local_db_feedback_state.component.vue';
 import { useFeatureTableSections } from '@core/presentation/composables/use_feature_table_sections';
 import '@core/presentation/styles/feature_data_tables.css';
 import { itemMasterViewModel } from '@feature/item_master/presentation/view_models/item_master.vm';

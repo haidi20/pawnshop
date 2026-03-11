@@ -92,9 +92,14 @@
         </tr>
       </template>
       <template #empty>
-        <div class="pawn-contract-page__empty-state mt-3">
-          Tidak ada Gadai untuk kategori jatuh tempo ini.
-        </div>
+        <LocalDbFeedbackStateComponent
+          state="empty"
+          title="Belum ada data jatuh tempo"
+          description="Tidak ada kontrak gadai untuk kategori jatuh tempo ini pada database lokal yang sedang diakses."
+          note="Ubah filter atau tunggu data kontrak dari cabang terkait tersedia."
+          :framed="false"
+          compact
+        />
       </template>
     </DataTableClientSideComponent>
   </section>
@@ -104,6 +109,7 @@
 import { RouterLink } from 'vue-router';
 
 import DataTableClientSideComponent from '@core/presentation/components/datatable_clientside.component.vue';
+import LocalDbFeedbackStateComponent from '@core/presentation/components/local_db_feedback_state.component.vue';
 import type { DataTableClientSideVM } from '@core/presentation/view_models/datatable_clientside.vm';
 import type {
   PawnContractDueStateModel,

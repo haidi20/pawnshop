@@ -75,9 +75,14 @@
         </tr>
       </template>
       <template #empty>
-        <div class="pawn-contract-page__empty-state mt-3">
-          Belum ada kontrak pada kategori ini.
-        </div>
+        <LocalDbFeedbackStateComponent
+          state="empty"
+          title="Belum ada data pelunasan atau lelang"
+          description="Tidak ada kontrak pada kategori penyelesaian ini di database lokal yang sedang dibuka."
+          note="Periksa kategori yang dipilih atau tunggu transaksi penyelesaian tercatat."
+          :framed="false"
+          compact
+        />
       </template>
     </DataTableClientSideComponent>
   </section>
@@ -85,6 +90,7 @@
 
 <script setup lang="ts">
 import DataTableClientSideComponent from '@core/presentation/components/datatable_clientside.component.vue';
+import LocalDbFeedbackStateComponent from '@core/presentation/components/local_db_feedback_state.component.vue';
 import type { DataTableClientSideVM } from '@core/presentation/view_models/datatable_clientside.vm';
 import type { PawnContractStatusModel } from '@core/util/helpers';
 import type {

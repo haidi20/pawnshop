@@ -1,43 +1,29 @@
 <template>
-  <section
+  <LocalDbFeedbackStateComponent
     v-if="isLoading"
-    class="card p-4"
-  >
-    <div class="d-flex align-items-center gap-3">
-      <div
-        class="spinner-border text-primary"
-        role="status"
-        aria-hidden="true"
-      />
-      <div>
-        <div class="fw-bold">
-          Loading Dashboard
-        </div>
-        <div class="text-secondary">
-          Mengambil data transaksi gadai dari database lokal.
-        </div>
-      </div>
-    </div>
-  </section>
+    state="loading"
+    title="Memuat dashboard"
+    description="Mengambil data transaksi gadai dari database lokal perusahaan aktif."
+    note="Grafik, ringkasan, dan tabel terbaru akan tampil setelah pembacaan lokal selesai."
+  />
 
-  <section
+  <LocalDbFeedbackStateComponent
     v-else-if="error"
-    class="card p-4"
-  >
-    <div class="fw-bold text-danger mb-2">
-      Dashboard load failed
-    </div>
-    <p class="mb-3 text-secondary">
-      {{ error }}
-    </p>
-    <button
-      class="btn btn-primary"
-      type="button"
-      @click="vm.getDashboardData()"
-    >
-      Muat ulang
-    </button>
-  </section>
+    state="error"
+    title="Gagal memuat dashboard"
+    :description="error"
+    note="Coba muat ulang agar pembacaan transaksi dari DB lokal diulang."
+    action-label="Muat ulang"
+    @action="vm.getDashboardData()"
+  />
+
+  <LocalDbFeedbackStateComponent
+    v-else-if="data && totalTransactionCount === 0"
+    state="empty"
+    title="Belum ada transaksi untuk dashboard"
+    description="Database lokal pada scope perusahaan dan cabang user aktif belum memiliki transaksi yang bisa diringkas."
+    note="Jika user ini karyawan, data hanya tampil dari cabang yang sudah diatur pada assignment user."
+  />
 
   <section
     v-else-if="data"
@@ -225,12 +211,15 @@
             </div>
           </div>
 
-          <div
+          <LocalDbFeedbackStateComponent
             v-else
-            class="dashboard-empty-state"
-          >
-            Belum ada data transaksi gadai untuk ditampilkan.
-          </div>
+            state="empty"
+            title="Belum ada titik transaksi"
+            description="Grafik line akan muncul setelah transaksi lokal tersedia."
+            note="Tambahkan transaksi gadai atau pilih user dengan akses cabang yang memiliki data."
+            :framed="false"
+            compact
+          />
         </article>
       </div>
 
@@ -434,12 +423,15 @@
         </table>
       </div>
 
-      <div
+      <LocalDbFeedbackStateComponent
         v-else
-        class="dashboard-empty-state"
-      >
-        Belum ada transaksi terbaru untuk ditampilkan.
-      </div>
+        state="empty"
+        title="Belum ada transaksi terbaru"
+        description="Tabel ini akan menampilkan lima transaksi terakhir dari database lokal."
+        note="Data akan terisi setelah pembayaran, perpanjangan, atau lelang mulai tercatat."
+        :framed="false"
+        compact
+      />
     </section>
   </section>
 </template>
@@ -448,6 +440,7 @@
 import { computed, onMounted } from 'vue';
 import { storeToRefs } from 'pinia';
 
+import LocalDbFeedbackStateComponent from '@core/presentation/components/local_db_feedback_state.component.vue';
 import type {
   DashboardLinePointModel,
   DashboardRecentTransactionModel

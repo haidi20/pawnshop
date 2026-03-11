@@ -191,6 +191,9 @@ import { computed, ref, watch } from 'vue';
 import { RouterLink } from 'vue-router';
 
 import type { AppNavigationItem } from '@core/domain/interfaces/app_module.interface';
+import router from '@core/util/router';
+import { showErrorMessage, showSuccessMessage } from '@core/util/alert';
+import { authPortalViewModel } from '@feature/auth_portal/presentation/view_models/auth_portal.vm';
 
 const localDbPrefix = 'pawnshop.localdb.';
 
@@ -209,6 +212,7 @@ const isResetting = ref(false);
 const expandedGroupKey = ref<string | null>(null);
 const activePath = computed<string>(() => props.activePath);
 const isCollapsed = computed<boolean>(() => props.isCollapsed);
+const authVm = authPortalViewModel();
 
 const isItemActive = (route?: string): boolean =>
   route !== undefined && (activePath.value === route || activePath.value.startsWith(`${route}/`));
@@ -240,26 +244,41 @@ watch(
   { immediate: true }
 );
 
-const resetLocalData = (): void => {
+const resetLocalData = async (): Promise<void> => {
   if (typeof window === 'undefined') {
     return;
   }
 
-  const confirmed = window.confirm('Hapus seluruh data lokal dan reload aplikasi?');
+  const confirmed = window.confirm('Hapus seluruh data lokal lalu logout dari aplikasi?');
   if (!confirmed) {
     return;
   }
 
   isResetting.value = true;
 
-  if (typeof localStorage !== 'undefined') {
-    Object.keys(localStorage)
-      .filter((key) => key.startsWith(localDbPrefix))
-      .forEach((key) => {
-        localStorage.removeItem(key);
-      });
-  }
+  try {
+    if (typeof localStorage !== 'undefined') {
+      Object.keys(localStorage)
+        .filter((key) => key.startsWith(localDbPrefix))
+        .forEach((key) => {
+          localStorage.removeItem(key);
+        });
+    }
 
-  window.location.reload();
+    await authVm.logout();
+    await showSuccessMessage('Data lokal berhasil dihapus', 'Sesi Anda sudah ditutup.', {
+      toast: true,
+      timer: 1800,
+      position: 'top-end'
+    });
+    await router.replace('/login');
+  } catch (error) {
+    await showErrorMessage(
+      'Gagal menghapus data lokal',
+      error instanceof Error ? error.message : String(error)
+    );
+  } finally {
+    isResetting.value = false;
+  }
 };
 </script>

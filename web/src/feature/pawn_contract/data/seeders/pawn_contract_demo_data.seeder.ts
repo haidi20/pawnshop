@@ -46,7 +46,7 @@ import {
     readAuthPortalStoredSession
 } from '@feature/auth_portal/util/auth_portal_session';
 
-export const PAWN_CONTRACT_DEMO_DATASET_VERSION = 'pawn-contract-demo-500-v1';
+export const PAWN_CONTRACT_DEMO_DATASET_VERSION = 'pawn-contract-demo-500-v2';
 export const PAWN_CONTRACT_DEMO_MIN_CONTRACT_COUNT = 500;
 
 const DEMO_SEED_STORAGE_KEY = 'pawnshop.demo_seed.pawn_contract.version';
@@ -58,6 +58,18 @@ type DemoBranchSeed = Pick<
     BranchesRow,
     'branch_code' | 'branch_number' | 'branch_name' | 'phone_number' | 'address'
 >;
+
+type DemoCompanySeedProfile = {
+    companyId: number;
+    companyCode: string;
+    referenceDateOffsetDays: number;
+    customerNameOffset: number;
+    customerPhonePrefix: string;
+    identityAreaCode: string;
+    templateOffset: number;
+    branchPattern: readonly number[];
+    branches: DemoBranchSeed[];
+};
 
 type DemoItemCatalog = {
     itemKind: PawnContractItemKindEnum;
@@ -179,6 +191,104 @@ const DEMO_BRANCHES: DemoBranchSeed[] = [
         branch_name: 'Pawnshop Loa Janan Ilir',
         phone_number: '0541-810010',
         address: 'Jl. Cipto Mangunkusumo No. 14, Loa Janan Ilir, Samarinda'
+    }
+];
+
+const DEMO_BRANCHES_BALIKPAPAN: DemoBranchSeed[] = [
+    {
+        branch_code: 'BR-BPN-001',
+        branch_number: '001',
+        branch_name: 'Pawnshop Balikpapan Kota',
+        phone_number: '0542-820001',
+        address: 'Jl. Jenderal Sudirman No. 5, Balikpapan Kota, Balikpapan'
+    },
+    {
+        branch_code: 'BR-BPN-002',
+        branch_number: '002',
+        branch_name: 'Pawnshop Balikpapan Selatan',
+        phone_number: '0542-820002',
+        address: 'Jl. MT Haryono No. 17, Balikpapan Selatan, Balikpapan'
+    },
+    {
+        branch_code: 'BR-BPN-003',
+        branch_number: '003',
+        branch_name: 'Pawnshop Balikpapan Tengah',
+        phone_number: '0542-820003',
+        address: 'Jl. Ahmad Yani No. 21, Balikpapan Tengah, Balikpapan'
+    },
+    {
+        branch_code: 'BR-BPN-004',
+        branch_number: '004',
+        branch_name: 'Pawnshop Balikpapan Utara',
+        phone_number: '0542-820004',
+        address: 'Jl. Soekarno Hatta Km. 6, Balikpapan Utara, Balikpapan'
+    },
+    {
+        branch_code: 'BR-BPN-005',
+        branch_number: '005',
+        branch_name: 'Pawnshop Balikpapan Timur',
+        phone_number: '0542-820005',
+        address: 'Jl. Mulawarman No. 14, Balikpapan Timur, Balikpapan'
+    },
+    {
+        branch_code: 'BR-BPN-006',
+        branch_number: '006',
+        branch_name: 'Pawnshop Balikpapan Barat',
+        phone_number: '0542-820006',
+        address: 'Jl. Letjen Suprapto No. 9, Balikpapan Barat, Balikpapan'
+    },
+    {
+        branch_code: 'BR-BPN-007',
+        branch_number: '007',
+        branch_name: 'Pawnshop Damai',
+        phone_number: '0542-820007',
+        address: 'Jl. Damai Bahagia No. 12, Balikpapan Selatan, Balikpapan'
+    },
+    {
+        branch_code: 'BR-BPN-008',
+        branch_number: '008',
+        branch_name: 'Pawnshop Gunung Bahagia',
+        phone_number: '0542-820008',
+        address: 'Jl. Ruhui Rahayu No. 11, Gunung Bahagia, Balikpapan'
+    },
+    {
+        branch_code: 'BR-BPN-009',
+        branch_number: '009',
+        branch_name: 'Pawnshop Lamaru',
+        phone_number: '0542-820009',
+        address: 'Jl. Mulawarman No. 66, Lamaru, Balikpapan Timur'
+    },
+    {
+        branch_code: 'BR-BPN-010',
+        branch_number: '010',
+        branch_name: 'Pawnshop Kariangau',
+        phone_number: '0542-820010',
+        address: 'Jl. Kariangau Km. 5, Balikpapan Barat, Balikpapan'
+    }
+];
+
+const DEMO_COMPANY_SEED_PROFILES: DemoCompanySeedProfile[] = [
+    {
+        companyId: 1,
+        companyCode: 'SGN',
+        referenceDateOffsetDays: 0,
+        customerNameOffset: 0,
+        customerPhonePrefix: '0812987',
+        identityAreaCode: '6471',
+        templateOffset: 0,
+        branchPattern: [0, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9],
+        branches: DEMO_BRANCHES
+    },
+    {
+        companyId: 2,
+        companyCode: 'PJS',
+        referenceDateOffsetDays: -21,
+        customerNameOffset: 7,
+        customerPhonePrefix: '0813520',
+        identityAreaCode: '6472',
+        templateOffset: 5,
+        branchPattern: [0, 1, 1, 1, 2, 3, 4, 5, 6, 7, 8, 9],
+        branches: DEMO_BRANCHES_BALIKPAPAN
     }
 ];
 
@@ -691,20 +801,40 @@ const resolveItemCatalog = (
     return targetCollection[(contractIndex + itemSequence) % targetCollection.length];
 };
 
-const buildCustomerName = (customerId: number): string => {
-    const firstName = FIRST_NAMES[(customerId - 1) % FIRST_NAMES.length];
-    const lastName = LAST_NAMES[Math.floor((customerId - 1) / FIRST_NAMES.length) % LAST_NAMES.length];
-    return `${firstName} ${lastName} ${padNumber(customerId, 3)}`;
+const resolveDemoCompanySeedProfile = (companyId: number | null = null): DemoCompanySeedProfile => {
+    const currentCompanyId = companyId ?? readAuthPortalStoredSession()?.company.id ?? 1;
+    return DEMO_COMPANY_SEED_PROFILES.find((profile) => profile.companyId === currentCompanyId) ??
+        DEMO_COMPANY_SEED_PROFILES[0];
 };
 
-const buildIdentityNumber = (identityType: PawnContractIdentityTypeEnum, customerId: number): string => {
+const resolveDemoBranch = (
+    branches: BranchesRow[],
+    contractIndex: number,
+    profile: DemoCompanySeedProfile
+): BranchesRow => {
+    const patternIndex = profile.branchPattern[contractIndex % profile.branchPattern.length];
+    return branches[patternIndex] ?? branches[contractIndex % branches.length] ?? branches[0];
+};
+
+const buildCustomerName = (customerId: number, profile: DemoCompanySeedProfile): string => {
+    const nameIndex = customerId - 1 + profile.customerNameOffset;
+    const firstName = FIRST_NAMES[nameIndex % FIRST_NAMES.length];
+    const lastName = LAST_NAMES[Math.floor(nameIndex / FIRST_NAMES.length) % LAST_NAMES.length];
+    return `${firstName} ${lastName} ${profile.companyCode}-${padNumber(customerId, 3)}`;
+};
+
+const buildIdentityNumber = (
+    identityType: PawnContractIdentityTypeEnum,
+    customerId: number,
+    profile: DemoCompanySeedProfile
+): string => {
     switch (identityType) {
         case PawnContractIdentityTypeEnum.Sim:
-            return `SIM-${padNumber(customerId, 6)}`;
+            return `SIM-${profile.companyCode}-${padNumber(customerId, 6)}`;
         case PawnContractIdentityTypeEnum.Kk:
-            return `KK-${padNumber(customerId, 6)}`;
+            return `KK-${profile.companyCode}-${padNumber(customerId, 6)}`;
         default:
-            return `7371${padNumber(customerId, 8)}`;
+            return `${profile.identityAreaCode}${padNumber(customerId, 8)}`;
     }
 };
 
@@ -811,14 +941,17 @@ const buildContractNotes = (params: {
 };
 
 export const createPawnContractDemoSeedDataset = (
-    referenceDate = getTodayDateValue()
+    referenceDate = getTodayDateValue(),
+    companyId: number | null = null
 ): PawnContractDemoSeedDataset => {
-    const branches: BranchesRow[] = DEMO_BRANCHES.map((branch, index) => ({
+    const profile = resolveDemoCompanySeedProfile(companyId);
+    const effectiveReferenceDate = addDays(referenceDate, profile.referenceDateOffsetDays);
+    const branches: BranchesRow[] = profile.branches.map((branch, index) => ({
         id: index + 1,
         ...branch,
         is_active: 1,
-        created_at: buildTimestamp(addDays(referenceDate, -30), index, 9),
-        updated_at: buildTimestamp(addDays(referenceDate, -30), index, 9)
+        created_at: buildTimestamp(addDays(effectiveReferenceDate, -30), index, 9),
+        updated_at: buildTimestamp(addDays(effectiveReferenceDate, -30), index, 9)
     }));
 
     const customers: CustomersRow[] = [];
@@ -840,13 +973,15 @@ export const createPawnContractDemoSeedDataset = (
     for (let contractIndex = 0; contractIndex < PAWN_CONTRACT_DEMO_MIN_CONTRACT_COUNT; contractIndex += 1) {
         const contractId = contractIndex + 1;
         const customerId = contractId;
-        const branch = branches[contractIndex % branches.length];
-        const template = DEMO_CONTRACT_TEMPLATES[contractIndex % DEMO_CONTRACT_TEMPLATES.length];
-        const cycleIndex = Math.floor(contractIndex / DEMO_CONTRACT_TEMPLATES.length);
-        const contractDate = resolveContractDate(template, referenceDate, cycleIndex);
-        const maturityDate = addDays(referenceDate, template.daysToMaturity);
+        const branch = resolveDemoBranch(branches, contractIndex, profile);
+        const templateIndex =
+            (contractIndex + profile.templateOffset + (branch.id - 1)) % DEMO_CONTRACT_TEMPLATES.length;
+        const template = DEMO_CONTRACT_TEMPLATES[templateIndex];
+        const cycleIndex = Math.floor((contractIndex + profile.templateOffset) / DEMO_CONTRACT_TEMPLATES.length);
+        const contractDate = resolveContractDate(template, effectiveReferenceDate, cycleIndex);
+        const maturityDate = addDays(effectiveReferenceDate, template.daysToMaturity);
         const createdAt = buildTimestamp(contractDate, contractIndex, 8);
-        const updatedAt = resolveUpdatedAt(template, contractDate, referenceDate, contractIndex);
+        const updatedAt = resolveUpdatedAt(template, contractDate, effectiveReferenceDate, contractIndex);
         const itemBlueprints = buildItemBlueprints(contractIndex, template);
         const appraisedValue = itemBlueprints.reduce((total, item) => total + item.appraisedValue, 0);
         const disbursedValue = itemBlueprints.reduce((total, item) => total + item.disbursedValue, 0);
@@ -879,13 +1014,13 @@ export const createPawnContractDemoSeedDataset = (
             PawnContractIdentityTypeEnum.Kk
         ];
         const identityType = identityTypeValues[contractIndex % identityTypeValues.length];
-        const customerBirthDate = addDays(referenceDate, -(9_000 + contractIndex));
+        const customerBirthDate = addDays(effectiveReferenceDate, -(9_000 + contractIndex));
         const customerCreatedAt = buildTimestamp(addDays(contractDate, -2), contractIndex, 9);
 
         customers.push({
             id: customerId,
-            customer_code: `CUST-${padNumber(customerId, 4)}`,
-            full_name: buildCustomerName(customerId),
+            customer_code: `CUST-${profile.companyCode}-${padNumber(customerId, 4)}`,
+            full_name: buildCustomerName(customerId, profile),
             gender: customerGender,
             birth_date: customerBirthDate,
             city: branch.branch_name.replace('Pawnshop ', ''),
@@ -899,7 +1034,7 @@ export const createPawnContractDemoSeedDataset = (
             id: customerId,
             customer_id: customerId,
             contact_type: 'phone',
-            contact_value: `0812987${padNumber(customerId, 6)}`,
+            contact_value: `${profile.customerPhonePrefix}${padNumber(customerId, 6)}`,
             is_primary: 1,
             created_at: customerCreatedAt,
             updated_at: updatedAt
@@ -909,7 +1044,7 @@ export const createPawnContractDemoSeedDataset = (
             id: customerId,
             customer_id: customerId,
             document_type: identityType,
-            document_number: buildIdentityNumber(identityType, customerId),
+            document_number: buildIdentityNumber(identityType, customerId, profile),
             is_primary: 1,
             issued_date: addYears(customerBirthDate, 18),
             expired_date:
@@ -967,7 +1102,7 @@ export const createPawnContractDemoSeedDataset = (
             entry_direction: 'credit',
             amount: disbursedValue,
             transaction_date: createdAt,
-            description: `Pencairan demo ${contractId} untuk ${buildCustomerName(customerId)}.`,
+            description: `Pencairan demo ${contractId} untuk ${buildCustomerName(customerId, profile)}.`,
             created_by_user_id: 1 + (branch.id % 3),
             created_at: createdAt,
             updated_at: updatedAt
@@ -1085,8 +1220,8 @@ export const createPawnContractDemoSeedDataset = (
         current_balance:
             BRANCH_STARTING_BALANCE + (totalDisbursedByBranch.get(branch.id) ?? 0) + index * 2_500_000,
         is_active: 1,
-        created_at: buildTimestamp(addDays(referenceDate, -45), index, 8),
-        updated_at: buildTimestamp(addDays(referenceDate, -1), index, 9)
+        created_at: buildTimestamp(addDays(effectiveReferenceDate, -45), index, 8),
+        updated_at: buildTimestamp(addDays(effectiveReferenceDate, -1), index, 9)
     }));
 
     const branchCashTransactions: BranchCashTransactionsRow[] = [
@@ -1099,11 +1234,11 @@ export const createPawnContractDemoSeedDataset = (
             reference_id: account.branch_id,
             entry_direction: 'debit',
             amount: account.current_balance + (totalDisbursedByBranch.get(account.branch_id) ?? 0),
-            transaction_date: buildTimestamp(addDays(referenceDate, -60), index, 8),
+            transaction_date: buildTimestamp(addDays(effectiveReferenceDate, -60), index, 8),
             description: `Modal awal demo untuk ${branches[index]?.branch_name ?? 'cabang'}.`,
             created_by_user_id: 1,
-            created_at: buildTimestamp(addDays(referenceDate, -60), index, 8),
-            updated_at: buildTimestamp(addDays(referenceDate, -60), index, 8)
+            created_at: buildTimestamp(addDays(effectiveReferenceDate, -60), index, 8),
+            updated_at: buildTimestamp(addDays(effectiveReferenceDate, -60), index, 8)
         })),
         ...pendingCashTransactions.map((transaction, index) => ({
             id: branchCashAccounts.length + index + 1,
@@ -1154,15 +1289,11 @@ export const ensurePawnContractDemoDataSeed = async (): Promise<void> => {
     const contractRows = await pawnContractsDao.getAll();
     const storedSeedVersion = readStoredSeedVersion();
 
-    if (
-        contractRows.length >= PAWN_CONTRACT_DEMO_MIN_CONTRACT_COUNT &&
-        storedSeedVersion === PAWN_CONTRACT_DEMO_DATASET_VERSION
-    ) {
-        return;
-    }
+    const shouldReseed =
+        contractRows.length < PAWN_CONTRACT_DEMO_MIN_CONTRACT_COUNT ||
+        storedSeedVersion !== PAWN_CONTRACT_DEMO_DATASET_VERSION;
 
-    if (contractRows.length >= PAWN_CONTRACT_DEMO_MIN_CONTRACT_COUNT) {
-        writeStoredSeedVersion();
+    if (!shouldReseed) {
         return;
     }
 

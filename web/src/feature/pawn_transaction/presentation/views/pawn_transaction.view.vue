@@ -1,43 +1,29 @@
 <template>
-  <section
+  <LocalDbFeedbackStateComponent
     v-if="isLoading"
-    class="card p-4"
-  >
-    <div class="d-flex align-items-center gap-3">
-      <div
-        class="spinner-border text-primary"
-        role="status"
-        aria-hidden="true"
-      />
-      <div>
-        <div class="fw-bold">
-          Memuat Transaksi Gadai
-        </div>
-        <div class="text-secondary">
-          Mengambil data lokal dari DAO feature.
-        </div>
-      </div>
-    </div>
-  </section>
+    state="loading"
+    title="Memuat transaksi gadai"
+    description="Mengambil pembayaran, perpanjangan, dan lelang dari database lokal."
+    note="Tampilan akan diperbarui setelah seluruh transaksi lokal selesai dibaca."
+  />
 
-  <section
+  <LocalDbFeedbackStateComponent
     v-else-if="error"
-    class="card p-4"
-  >
-    <div class="fw-bold text-danger mb-2">
-      Feature load failed
-    </div>
-    <p class="mb-3 text-secondary">
-      {{ error }}
-    </p>
-    <button
-      class="btn btn-primary"
-      type="button"
-      @click="vm.getPawnTransactionData()"
-    >
-      Muat ulang
-    </button>
-  </section>
+    state="error"
+    title="Gagal memuat transaksi gadai"
+    :description="error"
+    note="Coba muat ulang agar tabel transaksi dari DB lokal diproses kembali."
+    action-label="Muat ulang"
+    @action="vm.getPawnTransactionData()"
+  />
+
+  <LocalDbFeedbackStateComponent
+    v-else-if="data && data.totalRows === 0"
+    state="empty"
+    title="Belum ada transaksi gadai"
+    description="Database lokal perusahaan aktif belum memiliki pembayaran, perpanjangan, atau lelang."
+    note="Halaman ini akan terisi setelah transaksi lokal mulai tercatat."
+  />
 
   <section
     v-else-if="data"
@@ -109,6 +95,7 @@ import { onMounted } from 'vue';
 import { storeToRefs } from 'pinia';
 
 import DataTableClientSideComponent from '@core/presentation/components/datatable_clientside.component.vue';
+import LocalDbFeedbackStateComponent from '@core/presentation/components/local_db_feedback_state.component.vue';
 import { useFeatureTableSections } from '@core/presentation/composables/use_feature_table_sections';
 import '@core/presentation/styles/feature_data_tables.css';
 import { pawnTransactionViewModel } from '@feature/pawn_transaction/presentation/view_models/pawn_transaction.vm';

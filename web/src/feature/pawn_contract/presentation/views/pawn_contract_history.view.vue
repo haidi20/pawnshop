@@ -1,36 +1,20 @@
 <template>
-  <section
+  <LocalDbFeedbackStateComponent
     v-if="isLoading"
-    class="card p-3"
-  >
-    <div class="d-flex align-items-center gap-3">
-      <div
-        class="spinner-border text-primary"
-        role="status"
-        aria-hidden="true"
-      />
-      <div>
-        <div class="fw-bold">
-          Memuat history gadai
-        </div>
-        <div class="text-secondary">
-          Mengambil riwayat kontrak dan perpindahan barang dari DB lokal.
-        </div>
-      </div>
-    </div>
-  </section>
+    state="loading"
+    title="Memuat history gadai"
+    description="Mengambil riwayat kontrak dan perpindahan barang dari database lokal."
+    note="Timeline akan dirangkai setelah VM menerima data dari usecase dan repository lokal."
+  />
 
-  <section
+  <LocalDbFeedbackStateComponent
     v-else-if="error"
-    class="card p-3"
+    state="error"
+    title="Gagal memuat history gadai"
+    :description="error"
+    note="Coba muat ulang agar data kontrak dan mutasi barang dari DB lokal dibaca kembali."
   >
-    <div class="fw-bold text-danger mb-2">
-      Gagal memuat history
-    </div>
-    <p class="mb-3 text-secondary">
-      {{ error }}
-    </p>
-    <div class="d-flex flex-wrap gap-2">
+    <template #actions>
       <button
         class="btn btn-primary"
         type="button"
@@ -44,8 +28,8 @@
       >
         Kembali ke data gadai
       </RouterLink>
-    </div>
-  </section>
+    </template>
+  </LocalDbFeedbackStateComponent>
 
   <section
     v-else-if="summary"
@@ -157,12 +141,15 @@
           </article>
         </div>
 
-        <div
+        <LocalDbFeedbackStateComponent
           v-else
-          class="pawn-contract-page__empty-state"
-        >
-          Belum ada riwayat tambahan untuk kontrak ini.
-        </div>
+          state="empty"
+          title="Belum ada riwayat tambahan"
+          description="Timeline tambahan akan muncul saat ada perubahan kontrak atau mutasi barang berikutnya."
+          note="Data history tetap dibatasi oleh perusahaan aktif dan cabang user yang berhak mengakses."
+          :framed="false"
+          compact
+        />
       </div>
     </section>
 
@@ -223,29 +210,29 @@
     </section>
   </section>
 
-  <section
+  <LocalDbFeedbackStateComponent
     v-else
-    class="card p-3"
+    state="empty"
+    title="Kontrak tidak ditemukan"
+    description="Data kontrak yang diminta tidak tersedia pada perusahaan aktif atau berada di luar akses cabang user."
+    note="Pastikan nomor kontrak benar dan user ini memang berhak melihat cabang tersebut."
   >
-    <div class="fw-bold mb-2">
-      Kontrak tidak ditemukan
-    </div>
-    <p class="mb-3 text-secondary">
-      Data kontrak yang diminta tidak tersedia di perusahaan aktif.
-    </p>
-    <RouterLink
-      class="btn btn-primary"
-      :to="{ name: 'PawnContract' }"
-    >
-      Kembali ke data gadai
-    </RouterLink>
-  </section>
+    <template #actions>
+      <RouterLink
+        class="btn btn-primary"
+        :to="{ name: 'PawnContract' }"
+      >
+        Kembali ke data gadai
+      </RouterLink>
+    </template>
+  </LocalDbFeedbackStateComponent>
 </template>
 
 <script setup lang="ts">
 import { onBeforeUnmount, watch } from 'vue';
 import { storeToRefs } from 'pinia';
 import { RouterLink, useRoute } from 'vue-router';
+import LocalDbFeedbackStateComponent from '@core/presentation/components/local_db_feedback_state.component.vue';
 import '@feature/pawn_contract/presentation/styles/pawn_contract.css';
 import { pawnContractHistoryViewModel } from '@feature/pawn_contract/presentation/view_models/pawn_contract_history.vm';
 

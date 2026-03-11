@@ -21,7 +21,7 @@ describe('pawn contract demo data seeder', () => {
     });
 
     test('builds 500 demo contracts and covers all pawn contract index views', () => {
-        const dataset = createPawnContractDemoSeedDataset('2026-03-11');
+        const dataset = createPawnContractDemoSeedDataset('2026-03-11', 1);
         const data = createPawnContractDataFromRows({
             module: getAppModuleByKey('pawn-contract'),
             contractRows: dataset.contracts,
@@ -118,5 +118,26 @@ describe('pawn contract demo data seeder', () => {
                 dataset.contracts.some((contract) => contract.branch_id === branch.id)
             )
         ).toBe(true);
+    });
+
+    test('builds distinct demo datasets for each demo company and branch scope', () => {
+        const sentraDataset = createPawnContractDemoSeedDataset('2026-03-11', 1);
+        const primaDataset = createPawnContractDemoSeedDataset('2026-03-11', 2);
+        const sentraBranchOneCount = sentraDataset.contracts.filter((contract) => contract.branch_id === 1).length;
+        const sentraBranchTwoCount = sentraDataset.contracts.filter((contract) => contract.branch_id === 2).length;
+        const primaBranchOneCount = primaDataset.contracts.filter((contract) => contract.branch_id === 1).length;
+        const primaBranchTwoCount = primaDataset.contracts.filter((contract) => contract.branch_id === 2).length;
+
+        expect(sentraDataset.branches[0]?.branch_name).toContain('Samarinda');
+        expect(primaDataset.branches[0]?.branch_name).toContain('Balikpapan');
+        expect(sentraDataset.customers[0]?.full_name).not.toBe(primaDataset.customers[0]?.full_name);
+        expect(sentraDataset.customerContacts[0]?.contact_value).not.toBe(
+            primaDataset.customerContacts[0]?.contact_value
+        );
+        expect(sentraDataset.customerDocuments[0]?.document_number).not.toBe(
+            primaDataset.customerDocuments[0]?.document_number
+        );
+        expect(sentraBranchOneCount).not.toBe(sentraBranchTwoCount);
+        expect(primaBranchOneCount).not.toBe(primaBranchTwoCount);
     });
 });
