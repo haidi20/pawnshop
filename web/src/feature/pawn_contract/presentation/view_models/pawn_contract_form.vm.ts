@@ -6,6 +6,7 @@ import {
     PawnContractFormModeEnum,
     PawnContractItemKindEnum
 } from '@core/domain/models/pawn-contract-form-enum.model';
+import { unwrapEitherOrThrow } from '@core/util/either';
 import { showErrorMessage, showSuccessMessage } from '@core/util/alert';
 import {
     buildPawnContractPrepaidStorageLabel,
@@ -501,11 +502,13 @@ export const pawnContractFormViewModel = defineStore('pawnContractFormStore', ()
         setError(null);
 
         try {
-            const referenceData = await pawnContractRepository.getFormReferenceData();
+            const referenceData = unwrapEitherOrThrow(await pawnContractRepository.getFormReferenceData());
             state.referenceData.value = referenceData;
 
             if (isEditMode.value && state.currentContractId.value !== null) {
-                const formValue = await pawnContractRepository.getFormValue(state.currentContractId.value);
+                const formValue = unwrapEitherOrThrow(
+                    await pawnContractRepository.getFormValue(state.currentContractId.value)
+                );
                 applyLoadedFormValue(formValue);
                 return;
             }
@@ -565,7 +568,7 @@ export const pawnContractFormViewModel = defineStore('pawnContractFormStore', ()
 
         try {
             const savePayload = createSavePayload();
-            const result = await pawnContractRepository.saveContract(savePayload);
+            const result = unwrapEitherOrThrow(await pawnContractRepository.saveContract(savePayload));
             state.lastSavedResult.value = result;
 
             const successMessage = buildSaveSuccessMessage({

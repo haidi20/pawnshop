@@ -1,5 +1,6 @@
 import { defineStore } from 'pinia';
 
+import { unwrapEitherOrThrow } from '@core/util/either';
 import { getPawnTransactionDataUsecase } from '@feature/pawn_transaction/presentation/di/pawn_transaction.di';
 import { pawnTransactionState } from '@feature/pawn_transaction/presentation/view_models/pawn_transaction.state';
 
@@ -15,7 +16,7 @@ export const pawnTransactionViewModel = defineStore('pawnTransactionStore', () =
         setError(null);
 
         try {
-            state.data.value = await getPawnTransactionDataUsecase.execute();
+            state.data.value = unwrapEitherOrThrow(await getPawnTransactionDataUsecase.execute());
         } catch (error) {
             setError(error instanceof Error ? error.message : String(error));
         } finally {

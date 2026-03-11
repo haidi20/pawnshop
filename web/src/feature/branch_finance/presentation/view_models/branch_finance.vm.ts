@@ -1,5 +1,6 @@
 import { defineStore } from 'pinia';
 
+import { unwrapEitherOrThrow } from '@core/util/either';
 import { getBranchFinanceDataUsecase } from '@feature/branch_finance/presentation/di/branch_finance.di';
 import { branchFinanceState } from '@feature/branch_finance/presentation/view_models/branch_finance.state';
 
@@ -15,7 +16,7 @@ export const branchFinanceViewModel = defineStore('branchFinanceStore', () => {
         setError(null);
 
         try {
-            state.data.value = await getBranchFinanceDataUsecase.execute();
+            state.data.value = unwrapEitherOrThrow(await getBranchFinanceDataUsecase.execute());
         } catch (error) {
             setError(error instanceof Error ? error.message : String(error));
         } finally {

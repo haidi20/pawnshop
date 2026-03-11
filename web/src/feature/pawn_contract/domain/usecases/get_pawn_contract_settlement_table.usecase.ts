@@ -1,3 +1,5 @@
+import { left, type Either } from 'fp-ts/Either';
+import { toError } from '@core/util/either';
 import type {
     GetPawnContractSettlementTableParamsModel,
     PawnContractSettlementTableModel
@@ -7,7 +9,13 @@ import type { PawnContractRepository } from '@feature/pawn_contract/domain/repos
 export class GetPawnContractSettlementTableUsecase {
     constructor(private readonly repository: PawnContractRepository) {}
 
-    execute(params: GetPawnContractSettlementTableParamsModel): PawnContractSettlementTableModel {
-        return this.repository.getSettlementTable(params);
+    execute(
+        params: GetPawnContractSettlementTableParamsModel
+    ): Either<Error, PawnContractSettlementTableModel> {
+        try {
+            return this.repository.getSettlementTable(params);
+        } catch (error) {
+            return left(toError(error));
+        }
     }
 }

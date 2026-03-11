@@ -5,19 +5,25 @@ import type {
 import type { PawnContractDetailModel } from '@feature/pawn_contract/domain/models/pawn-contract-detail.model';
 import type { PawnItemLocationStatusModel } from '@feature/pawn_contract/domain/models/pawn-item.model';
 
-export type PawnContractIndexTabKeyModel =
-    | 'nasabah_akad'
-    | 'ringkasan_harian'
-    | 'akad_jatuh_tempo'
-    | 'pelunasan_lelang'
-    | 'lokasi_distribusi'
-    | 'maintenance';
+export enum PawnContractIndexTabKeyEnum {
+    CustomerContracts = 'customer_contracts',
+    DailySummary = 'daily_summary',
+    DueContracts = 'due_contracts',
+    SettlementAuction = 'settlement_auction',
+    LocationDistribution = 'location_distribution',
+    Maintenance = 'maintenance'
+}
 
-export type PawnContractNasabahTabKeyModel =
-    | 'seluruh_data'
-    | 'harian'
-    | 'tujuh_hari'
-    | 'lima_belas_hari';
+export type PawnContractIndexTabKeyModel = PawnContractIndexTabKeyEnum;
+
+export enum PawnContractNasabahTabKeyEnum {
+    AllData = 'all_data',
+    Daily = 'daily',
+    SevenDays = 'seven_days',
+    FifteenDays = 'fifteen_days'
+}
+
+export type PawnContractNasabahTabKeyModel = PawnContractNasabahTabKeyEnum;
 
 export type PawnContractAjtTypeModel =
     | '7'

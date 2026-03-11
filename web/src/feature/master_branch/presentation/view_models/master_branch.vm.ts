@@ -1,5 +1,6 @@
 import { defineStore } from 'pinia';
 
+import { unwrapEitherOrThrow } from '@core/util/either';
 import { getMasterBranchDataUsecase } from '@feature/master_branch/presentation/di/master_branch.di';
 import { masterBranchState } from '@feature/master_branch/presentation/view_models/master_branch.state';
 
@@ -15,7 +16,7 @@ export const masterBranchViewModel = defineStore('masterBranchStore', () => {
         setError(null);
 
         try {
-            state.data.value = await getMasterBranchDataUsecase.execute();
+            state.data.value = unwrapEitherOrThrow(await getMasterBranchDataUsecase.execute());
         } catch (error) {
             setError(error instanceof Error ? error.message : String(error));
         } finally {

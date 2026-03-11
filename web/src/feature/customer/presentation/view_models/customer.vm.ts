@@ -1,5 +1,6 @@
 import { defineStore } from 'pinia';
 
+import { unwrapEitherOrThrow } from '@core/util/either';
 import { getCustomerDataUsecase } from '@feature/customer/presentation/di/customer.di';
 import { customerState } from '@feature/customer/presentation/view_models/customer.state';
 
@@ -15,7 +16,7 @@ export const customerViewModel = defineStore('customerStore', () => {
         setError(null);
 
         try {
-            state.data.value = await getCustomerDataUsecase.execute();
+            state.data.value = unwrapEitherOrThrow(await getCustomerDataUsecase.execute());
         } catch (error) {
             setError(error instanceof Error ? error.message : String(error));
         } finally {

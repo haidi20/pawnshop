@@ -1,3 +1,5 @@
+import { left, right, type Either } from 'fp-ts/Either';
+import { toError } from '@core/util/either';
 import { PawnContractIndexLocalDatasource } from '@feature/pawn_contract/data/datasources/pawn_contract_index_local_datasource';
 import type { PawnContractRepository } from '@feature/pawn_contract/domain/repositories/pawn_contract.repository';
 import { seedFeatureTablesIfEmpty } from '@core/data/datasources/db/feature_table_seeder';
@@ -13,6 +15,7 @@ import {
     pawnItemsDao
 } from '@feature/pawn_contract/data/db';
 import { PawnContractLocalDatasource } from '@feature/pawn_contract/data/datasources/pawn_contract_local_datasource';
+import { ensurePawnContractDemoDataSeed } from '@feature/pawn_contract/data/seeders/pawn_contract_demo_data.seeder';
 import type {
     GetPawnContractAjtTableParamsModel,
     PawnContractDataFilterModel,
@@ -68,56 +71,120 @@ export class PawnContractRepositoryImpl implements PawnContractRepository {
         private readonly indexLocalDataSource: PawnContractIndexLocalDatasource
     ) {}
 
-    async getData(filters?: PawnContractDataFilterModel): Promise<PawnContractDataModel> {
-        await seedFeatureTablesIfEmpty('PawnContractRepositoryImpl', pawnContractDataDaos);
+    async getData(filters?: PawnContractDataFilterModel): Promise<Either<Error, PawnContractDataModel>> {
+        try {
+            await ensurePawnContractDemoDataSeed();
+            await seedFeatureTablesIfEmpty('PawnContractRepositoryImpl', pawnContractDataDaos);
 
-        return this.localDataSource.getData(filters);
+            return right(await this.localDataSource.getData(filters));
+        } catch (error) {
+            return left(toError(error));
+        }
     }
 
-    async getFormReferenceData(): Promise<PawnContractFormReferenceModel> {
-        await seedFeatureTablesIfEmpty('PawnContractRepositoryImpl', pawnContractFormDaos);
-        return this.localDataSource.getFormReferenceData();
+    async getFormReferenceData(): Promise<Either<Error, PawnContractFormReferenceModel>> {
+        try {
+            await ensurePawnContractDemoDataSeed();
+            await seedFeatureTablesIfEmpty('PawnContractRepositoryImpl', pawnContractFormDaos);
+            return right(await this.localDataSource.getFormReferenceData());
+        } catch (error) {
+            return left(toError(error));
+        }
     }
 
-    async getFormValue(contractId: number): Promise<PawnContractFormValueModel> {
-        await seedFeatureTablesIfEmpty('PawnContractRepositoryImpl', pawnContractFormDaos);
-        return this.localDataSource.getFormValue(contractId);
+    async getFormValue(contractId: number): Promise<Either<Error, PawnContractFormValueModel>> {
+        try {
+            await ensurePawnContractDemoDataSeed();
+            await seedFeatureTablesIfEmpty('PawnContractRepositoryImpl', pawnContractFormDaos);
+            return right(await this.localDataSource.getFormValue(contractId));
+        } catch (error) {
+            return left(toError(error));
+        }
     }
 
-    async saveContract(payload: SavePawnContractPayloadModel): Promise<SavePawnContractResultModel> {
-        await seedFeatureTablesIfEmpty('PawnContractRepositoryImpl', pawnContractFormDaos);
-        return this.localDataSource.saveContract(payload);
+    async saveContract(
+        payload: SavePawnContractPayloadModel
+    ): Promise<Either<Error, SavePawnContractResultModel>> {
+        try {
+            await ensurePawnContractDemoDataSeed();
+            await seedFeatureTablesIfEmpty('PawnContractRepositoryImpl', pawnContractFormDaos);
+            return right(await this.localDataSource.saveContract(payload));
+        } catch (error) {
+            return left(toError(error));
+        }
     }
 
-    getContractSummaries(data: PawnContractDataModel | null): PawnContractSummaryModel[] {
-        return this.indexLocalDataSource.getContractSummaries(data);
+    getContractSummaries(data: PawnContractDataModel | null): Either<Error, PawnContractSummaryModel[]> {
+        try {
+            return right(this.indexLocalDataSource.getContractSummaries(data));
+        } catch (error) {
+            return left(toError(error));
+        }
     }
 
-    getNasabahTable(params: GetPawnContractNasabahTableParamsModel): PawnContractNasabahTableModel {
-        return this.indexLocalDataSource.getNasabahTable(params);
+    getNasabahTable(
+        params: GetPawnContractNasabahTableParamsModel
+    ): Either<Error, PawnContractNasabahTableModel> {
+        try {
+            return right(this.indexLocalDataSource.getNasabahTable(params));
+        } catch (error) {
+            return left(toError(error));
+        }
     }
 
-    getRingkasanTable(params: GetPawnContractRingkasanTableParamsModel): PawnContractRingkasanTableModel {
-        return this.indexLocalDataSource.getRingkasanTable(params);
+    getRingkasanTable(
+        params: GetPawnContractRingkasanTableParamsModel
+    ): Either<Error, PawnContractRingkasanTableModel> {
+        try {
+            return right(this.indexLocalDataSource.getRingkasanTable(params));
+        } catch (error) {
+            return left(toError(error));
+        }
     }
 
-    getAjtTable(params: GetPawnContractAjtTableParamsModel): PawnContractAjtTableModel {
-        return this.indexLocalDataSource.getAjtTable(params);
+    getAjtTable(params: GetPawnContractAjtTableParamsModel): Either<Error, PawnContractAjtTableModel> {
+        try {
+            return right(this.indexLocalDataSource.getAjtTable(params));
+        } catch (error) {
+            return left(toError(error));
+        }
     }
 
-    getSettlementTable(params: GetPawnContractSettlementTableParamsModel): PawnContractSettlementTableModel {
-        return this.indexLocalDataSource.getSettlementTable(params);
+    getSettlementTable(
+        params: GetPawnContractSettlementTableParamsModel
+    ): Either<Error, PawnContractSettlementTableModel> {
+        try {
+            return right(this.indexLocalDataSource.getSettlementTable(params));
+        } catch (error) {
+            return left(toError(error));
+        }
     }
 
-    getLocationTable(params: GetPawnContractLocationTableParamsModel): PawnContractLocationTableModel {
-        return this.indexLocalDataSource.getLocationTable(params);
+    getLocationTable(
+        params: GetPawnContractLocationTableParamsModel
+    ): Either<Error, PawnContractLocationTableModel> {
+        try {
+            return right(this.indexLocalDataSource.getLocationTable(params));
+        } catch (error) {
+            return left(toError(error));
+        }
     }
 
-    getMaintenanceTable(params: GetPawnContractMaintenanceTableParamsModel): PawnContractMaintenanceTableModel {
-        return this.indexLocalDataSource.getMaintenanceTable(params);
+    getMaintenanceTable(
+        params: GetPawnContractMaintenanceTableParamsModel
+    ): Either<Error, PawnContractMaintenanceTableModel> {
+        try {
+            return right(this.indexLocalDataSource.getMaintenanceTable(params));
+        } catch (error) {
+            return left(toError(error));
+        }
     }
 
-    getIndexTabs(params: GetPawnContractIndexTabsParamsModel): PawnContractIndexTabModel[] {
-        return this.indexLocalDataSource.getIndexTabs(params);
+    getIndexTabs(params: GetPawnContractIndexTabsParamsModel): Either<Error, PawnContractIndexTabModel[]> {
+        try {
+            return right(this.indexLocalDataSource.getIndexTabs(params));
+        } catch (error) {
+            return left(toError(error));
+        }
     }
 }

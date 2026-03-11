@@ -1,5 +1,6 @@
 import { defineStore } from 'pinia';
 
+import { unwrapEitherOrThrow } from '@core/util/either';
 import { getSupportDataUsecase } from '@feature/support/presentation/di/support.di';
 import { supportState } from '@feature/support/presentation/view_models/support.state';
 
@@ -15,7 +16,7 @@ export const supportViewModel = defineStore('supportStore', () => {
         setError(null);
 
         try {
-            state.data.value = await getSupportDataUsecase.execute();
+            state.data.value = unwrapEitherOrThrow(await getSupportDataUsecase.execute());
         } catch (error) {
             setError(error instanceof Error ? error.message : String(error));
         } finally {

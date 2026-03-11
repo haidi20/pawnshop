@@ -1,5 +1,6 @@
 import { defineStore } from 'pinia';
 
+import { unwrapEitherOrThrow } from '@core/util/either';
 import { getDashboardDataUsecase } from '@feature/dashboard/presentation/di/dashboard.di';
 import { dashboardState } from '@feature/dashboard/presentation/view_models/dashboard.state';
 
@@ -15,7 +16,7 @@ export const dashboardViewModel = defineStore('dashboardStore', () => {
         setError(null);
 
         try {
-            state.data.value = await getDashboardDataUsecase.execute();
+            state.data.value = unwrapEitherOrThrow(await getDashboardDataUsecase.execute());
         } catch (error) {
             setError(error instanceof Error ? error.message : String(error));
         } finally {

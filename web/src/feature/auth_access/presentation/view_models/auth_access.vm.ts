@@ -1,5 +1,6 @@
 import { defineStore } from 'pinia';
 
+import { unwrapEitherOrThrow } from '@core/util/either';
 import { getAuthAccessDataUsecase } from '@feature/auth_access/presentation/di/auth_access.di';
 import { authAccessState } from '@feature/auth_access/presentation/view_models/auth_access.state';
 
@@ -15,7 +16,7 @@ export const authAccessViewModel = defineStore('authAccessStore', () => {
         setError(null);
 
         try {
-            state.data.value = await getAuthAccessDataUsecase.execute();
+            state.data.value = unwrapEitherOrThrow(await getAuthAccessDataUsecase.execute());
         } catch (error) {
             setError(error instanceof Error ? error.message : String(error));
         } finally {

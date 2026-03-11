@@ -3,6 +3,7 @@ import { defineStore } from 'pinia';
 
 import { DataTableClientSideService } from '@core/presentation/services/datatable_clientside.service';
 import type { DataTableClientSideVM } from '@core/presentation/view_models/datatable_clientside.vm';
+import { unwrapEitherOrThrow } from '@core/util/either';
 import {
     formatCountForHumans,
     formatCurrencyValueForHumans,
@@ -53,16 +54,31 @@ import {
     type PawnContractTableField
 } from '@feature/pawn_contract/presentation/view_models/pawn_contract.state';
 
-type PawnContractClientTableRow<TSource = unknown> = Record<string, unknown> & {
+export type PawnContractClientTableRow<TSource = unknown> = Record<string, unknown> & {
     id: number | string;
     source: TSource;
 };
 
 type PawnContractRowsSource<TSource> = ComputedRef<TSource[]> | Ref<TSource[]>;
 
-type PawnContractSectionTableModel<TSection, TRow extends Record<string, unknown>> = TSection & {
+export type PawnContractSectionTableModel<TSection, TRow extends Record<string, unknown>> = TSection & {
     vm: DataTableClientSideVM<TRow>;
 };
+
+export type PawnContractSummaryTableRow = PawnContractClientTableRow<PawnContractSummaryModel>;
+export type PawnContractRingkasanPendapatanTableRow =
+    PawnContractClientTableRow<PawnContractRingkasanPendapatanRowModel>;
+export type PawnContractLocationTableRow = PawnContractClientTableRow<PawnContractLocationRowModel>;
+export type PawnContractMaintenanceTableRow =
+    PawnContractClientTableRow<PawnContractMaintenanceRowModel>;
+export type PawnContractNasabahSectionTableModel = PawnContractSectionTableModel<
+    PawnContractNasabahSectionModel,
+    PawnContractSummaryTableRow
+>;
+export type PawnContractRingkasanSectionTableModel = PawnContractSectionTableModel<
+    PawnContractRingkasanSectionModel,
+    PawnContractSummaryTableRow
+>;
 
 const createClientTableVm = <TSource, TRow extends Record<string, unknown>>(
     sourceRows: PawnContractRowsSource<TSource>,
@@ -154,68 +170,82 @@ export const pawnContractViewModel = defineStore('pawnContractStore', () => {
         )
     );
     const contractSummaries = computed(() =>
-        getPawnContractSummariesUsecase.execute(activeData.value)
+        unwrapEitherOrThrow(getPawnContractSummariesUsecase.execute(activeData.value))
     );
     const openContractSummaries = computed(() =>
         contractSummaries.value.filter((item) => item.isOpenContract)
     );
 
     const nasabahTable = computed(() =>
-        getPawnContractNasabahTableUsecase.execute({
-            summaries: openContractSummaries.value,
-            activeTab: state.activeNasabahTab.value
-        })
+        unwrapEitherOrThrow(
+            getPawnContractNasabahTableUsecase.execute({
+                summaries: openContractSummaries.value,
+                activeTab: state.activeNasabahTab.value
+            })
+        )
     );
     const ringkasanTable = computed(() =>
-        getPawnContractRingkasanTableUsecase.execute({
-            summaries: contractSummaries.value
-        })
+        unwrapEitherOrThrow(
+            getPawnContractRingkasanTableUsecase.execute({
+                summaries: contractSummaries.value
+            })
+        )
     );
     const ajtTable = computed(() =>
-        getPawnContractAjtTableUsecase.execute({
-            summaries: openContractSummaries.value,
-            activeType: state.activeAjtType.value
-        })
+        unwrapEitherOrThrow(
+            getPawnContractAjtTableUsecase.execute({
+                summaries: openContractSummaries.value,
+                activeType: state.activeAjtType.value
+            })
+        )
     );
     const settlementTable = computed(() =>
-        getPawnContractSettlementTableUsecase.execute({
-            summaries: contractSummaries.value,
-            activeType: state.activeSettlementType.value
-        })
+        unwrapEitherOrThrow(
+            getPawnContractSettlementTableUsecase.execute({
+                summaries: contractSummaries.value,
+                activeType: state.activeSettlementType.value
+            })
+        )
     );
     const locationTable = computed(() =>
-        getPawnContractLocationTableUsecase.execute({
-            summaries: contractSummaries.value,
-            activeTab: state.activeLocationTab.value
-        })
+        unwrapEitherOrThrow(
+            getPawnContractLocationTableUsecase.execute({
+                summaries: contractSummaries.value,
+                activeTab: state.activeLocationTab.value
+            })
+        )
     );
     const maintenanceTable = computed(() =>
-        getPawnContractMaintenanceTableUsecase.execute({
-            summaries: contractSummaries.value
-        })
+        unwrapEitherOrThrow(
+            getPawnContractMaintenanceTableUsecase.execute({
+                summaries: contractSummaries.value
+            })
+        )
     );
 
     const indexTabs = computed(() =>
-        getPawnContractIndexTabsUsecase.execute({
-            openContractCount: openContractSummaries.value.length,
-            ringkasanRowCount: ringkasanTable.value.sections.reduce(
-                (total, section) => total + section.rows.length,
-                0
-            ),
-            ajtRowCount: ajtTable.value.rows.length,
-            settlementRowCount: settlementTable.value.rows.length,
-            locationRowCount: locationTable.value.rows.length,
-            maintenanceRowCount: maintenanceTable.value.rows.length
-        })
+        unwrapEitherOrThrow(
+            getPawnContractIndexTabsUsecase.execute({
+                openContractCount: openContractSummaries.value.length,
+                ringkasanRowCount: ringkasanTable.value.sections.reduce(
+                    (total, section) => total + section.rows.length,
+                    0
+                ),
+                ajtRowCount: ajtTable.value.rows.length,
+                settlementRowCount: settlementTable.value.rows.length,
+                locationRowCount: locationTable.value.rows.length,
+                maintenanceRowCount: maintenanceTable.value.rows.length
+            })
+        )
     );
     const activeIndexTabMeta = computed(() => {
         const currentTab = indexTabs.value.find((tab) => tab.key === state.activeIndexTab.value);
 
         return {
-            label: currentTab?.label ?? 'Index Akad',
+            label: currentTab?.label ?? 'Index Gadai',
             description:
                 currentTab?.description ??
-                'Pantau data akad gadai secara terpusat dengan filter cabang dan status kontrak.'
+                'Pantau data gadai secara terpusat dengan filter cabang dan status kontrak.'
         };
     });
 
@@ -402,7 +432,7 @@ export const pawnContractViewModel = defineStore('pawnContractStore', () => {
             setters.setError(null);
 
             try {
-                state.data.value = await getPawnContractDataUsecase.execute();
+                state.data.value = unwrapEitherOrThrow(await getPawnContractDataUsecase.execute());
                 const dataFilter = buildDataFilter({
                     branchFilter: state.branchFilter.value,
                     statusFilter: state.statusFilter.value
@@ -410,7 +440,7 @@ export const pawnContractViewModel = defineStore('pawnContractStore', () => {
 
                 state.filteredData.value = isDefaultDataFilter(dataFilter)
                     ? state.data.value
-                    : await getPawnContractDataUsecase.execute(dataFilter);
+                    : unwrapEitherOrThrow(await getPawnContractDataUsecase.execute(dataFilter));
             } catch (error) {
                 setters.setError(error instanceof Error ? error.message : String(error));
             } finally {
@@ -435,7 +465,9 @@ export const pawnContractViewModel = defineStore('pawnContractStore', () => {
             setters.setError(null);
 
             try {
-                state.filteredData.value = await getPawnContractDataUsecase.execute(dataFilter);
+                state.filteredData.value = unwrapEitherOrThrow(
+                    await getPawnContractDataUsecase.execute(dataFilter)
+                );
             } catch (error) {
                 setters.setError(error instanceof Error ? error.message : String(error));
             }

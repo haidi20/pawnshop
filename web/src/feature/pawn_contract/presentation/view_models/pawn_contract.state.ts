@@ -8,11 +8,16 @@ import type {
     PawnContractNasabahTabKeyModel,
     PawnContractSettlementTypeModel
 } from '@feature/pawn_contract/domain/models';
+import {
+    PawnContractIndexTabKeyEnum,
+    PawnContractNasabahTabKeyEnum
+} from '@feature/pawn_contract/domain/models';
 import type { PawnContractStatusModel } from '@core/util/helpers';
 export type {
     PawnContractAjtTypeModel,
     PawnContractIndexTabKeyModel,
     PawnContractLocationTabModel,
+    PawnContractNasabahTabKeyEnum,
     PawnContractNasabahTabKeyModel,
     PawnContractSettlementTypeModel
 } from '@feature/pawn_contract/domain/models';
@@ -45,14 +50,14 @@ export const nasabahTableFields = [
     { key: 'itemNames', label: 'Jaminan' },
     { key: 'principalAmount', label: 'Pinjaman' },
     { key: 'arrearsAmount', label: 'Tunggakan' },
-    { key: 'contractDate', label: 'Tanggal Akad' },
+    { key: 'contractDate', label: 'Tanggal Gadai' },
     { key: 'maturityDate', label: 'Jatuh Tempo' },
     { key: 'processStatusLabel', label: 'Status Proses' },
     { key: 'actions', label: 'Aksi', thClass: 'text-end', tdClass: 'text-end' }
 ] satisfies PawnContractTableField[];
 
 export const ringkasanTableFields = [
-    { key: 'contractNumber', label: 'No. Akad' },
+    { key: 'contractNumber', label: 'No. Gadai' },
     { key: 'customerName', label: 'Nasabah' },
     { key: 'itemNames', label: 'Jaminan' },
     { key: 'principalAmount', label: 'Pinjaman' },
@@ -60,7 +65,7 @@ export const ringkasanTableFields = [
 ] satisfies PawnContractTableField[];
 
 export const ringkasanPendapatanTableFields = [
-    { key: 'contractNumber', label: 'No. Akad' },
+    { key: 'contractNumber', label: 'No. Gadai' },
     { key: 'customerName', label: 'Nasabah' },
     { key: 'branchName', label: 'Cabang' },
     { key: 'storageFeeAmount', label: 'B. Titip' },
@@ -69,7 +74,7 @@ export const ringkasanPendapatanTableFields = [
 ] satisfies PawnContractTableField[];
 
 export const ajtTableFields = [
-    { key: 'contractNumber', label: 'No. Akad' },
+    { key: 'contractNumber', label: 'No. Gadai' },
     { key: 'customerName', label: 'Nasabah' },
     { key: 'itemNames', label: 'Jaminan' },
     { key: 'maturityDate', label: 'Jatuh Tempo' },
@@ -79,7 +84,7 @@ export const ajtTableFields = [
 ] satisfies PawnContractTableField[];
 
 export const settlementTableFields = [
-    { key: 'contractNumber', label: 'No. Akad' },
+    { key: 'contractNumber', label: 'No. Gadai' },
     { key: 'customerName', label: 'Nasabah' },
     { key: 'itemNames', label: 'Jaminan' },
     { key: 'settlementDate', label: 'Tanggal' },
@@ -101,7 +106,7 @@ export const maintenanceTableFields = [
     { key: 'contractId', label: 'ID' },
     { key: 'customerName', label: 'Nama Nasabah' },
     { key: 'itemNames', label: 'Nama Barang' },
-    { key: 'contractDate', label: 'Tanggal Akad' },
+    { key: 'contractDate', label: 'Tanggal Gadai' },
     { key: 'checklistLabel', label: 'Ceklis' },
     { key: 'print', label: 'Print' }
 ] satisfies PawnContractTableField[];
@@ -111,8 +116,8 @@ export const createPawnContractState = (): IPawnContractState => ({
     filteredData: ref(null),
     isLoading: ref(false),
     error: ref(null),
-    activeIndexTab: ref('nasabah_akad'),
-    activeNasabahTab: ref('seluruh_data'),
+    activeIndexTab: ref(PawnContractIndexTabKeyEnum.CustomerContracts),
+    activeNasabahTab: ref(PawnContractNasabahTabKeyEnum.AllData),
     activeAjtType: ref('30'),
     activeSettlementType: ref('lunas'),
     activeLocationTab: ref('kantor'),

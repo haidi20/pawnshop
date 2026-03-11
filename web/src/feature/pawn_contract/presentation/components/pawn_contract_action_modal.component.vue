@@ -5,14 +5,14 @@
       tabindex="-1"
       role="dialog"
       aria-modal="true"
-      aria-label="Aksi akad"
+      aria-label="Aksi gadai"
     >
       <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable pawn-contract-page__action-dialog">
         <div class="modal-content border-0 pawn-contract-page__action-content">
           <div class="modal-header pawn-contract-page__action-header">
             <div>
               <div class="pawn-contract-page__section-eyebrow mb-2">
-                Aksi Akad
+                Aksi Gadai
               </div>
               <h2 class="h5 mb-1">
                 {{ row.customerName }}
@@ -181,9 +181,9 @@ const selectedActionHistoryEntries = computed(() => {
   }
 
   return [
-    { key: 'created-at', label: 'Akad dibuat', value: formatDateTime(props.row.contract.createdAt) },
+    { key: 'created-at', label: 'Gadai dibuat', value: formatDateTime(props.row.contract.createdAt) },
     { key: 'updated-at', label: 'Terakhir diperbarui', value: formatDateTime(props.row.contract.updatedAt) },
-    { key: 'contract-date', label: 'Tanggal akad', value: formatDate(props.row.contract.contractDate) },
+    { key: 'contract-date', label: 'Tanggal gadai', value: formatDate(props.row.contract.contractDate) },
     { key: 'maturity-date', label: 'Jatuh tempo', value: formatDate(props.row.contract.maturityDate) },
     {
       key: 'contract-status',

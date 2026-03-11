@@ -12,6 +12,10 @@ import {
     type PawnContractStatusModel
 } from '@core/util/helpers';
 import { getTodayDateValue } from '@core/util/pawn-contract-form';
+import {
+    PawnContractIndexTabKeyEnum,
+    PawnContractNasabahTabKeyEnum
+} from '@feature/pawn_contract/domain/models';
 import type {
     PawnContractActionOptionModel,
     GetPawnContractAjtTableParamsModel,
@@ -44,32 +48,32 @@ const RUNNING_CONTRACT_STATUSES = new Set<PawnContractStatusModel>(['active', 'e
 
 const PAWN_CONTRACT_INDEX_TABS: Array<Omit<PawnContractIndexTabModel, 'count'>> = [
     {
-        key: 'nasabah_akad',
-        label: 'Nasabah Akad',
+        key: PawnContractIndexTabKeyEnum.CustomerContracts,
+        label: 'Nasabah Gadai',
         description: 'Pantau daftar nasabah aktif, jatuh tempo, dan tindak lanjut utama berdasarkan filter cabang dan status.'
     },
     {
-        key: 'ringkasan_harian',
+        key: PawnContractIndexTabKeyEnum.DailySummary,
         label: 'Ringkasan Harian',
-        description: 'Ringkas pergerakan akad dan pendapatan harian untuk membantu monitoring operasional yang lebih cepat.'
+        description: 'Ringkas pergerakan gadai dan pendapatan harian untuk membantu monitoring operasional yang lebih cepat.'
     },
     {
-        key: 'akad_jatuh_tempo',
-        label: 'Akad Jatuh Tempo',
-        description: 'Kelompokkan akad yang mendekati atau melewati jatuh tempo agar tindak lanjut tidak tertinggal.'
+        key: PawnContractIndexTabKeyEnum.DueContracts,
+        label: 'Gadai Jatuh Tempo',
+        description: 'Kelompokkan gadai yang mendekati atau melewati jatuh tempo agar tindak lanjut tidak tertinggal.'
     },
     {
-        key: 'pelunasan_lelang',
+        key: PawnContractIndexTabKeyEnum.SettlementAuction,
         label: 'Pelunasan & Lelang',
         description: 'Tinjau kontrak yang sudah lunas, masuk proses lelang, atau memerlukan refund dalam satu alur kerja.'
     },
     {
-        key: 'lokasi_distribusi',
+        key: PawnContractIndexTabKeyEnum.LocationDistribution,
         label: 'Lokasi / Distribusi',
         description: 'Lihat perpindahan dan lokasi barang jaminan per cabang tanpa pindah halaman.'
     },
     {
-        key: 'maintenance',
+        key: PawnContractIndexTabKeyEnum.Maintenance,
         label: 'Maintenance',
         description: 'Awasi kontrak yang masuk window maintenance dan ceklis operasional yang perlu ditangani.'
     }
@@ -79,49 +83,49 @@ const PAWN_CONTRACT_NASABAH_TABS: Array<
     Omit<PawnContractTableOptionModel<PawnContractNasabahTabKeyModel>, 'count'>
 > = [
     {
-        key: 'seluruh_data',
-        label: 'Seluruh Data',
-        description: 'Ringkasan kontrak aktif berdasarkan rentang bulan.'
+        key: PawnContractNasabahTabKeyEnum.AllData,
+        label: 'All Data',
+        description: 'Review active contracts grouped by contract month.'
     },
     {
-        key: 'harian',
-        label: 'Harian',
-        description: 'Kontrak aktif dengan opsi pembayaran harian.'
+        key: PawnContractNasabahTabKeyEnum.Daily,
+        label: 'Daily',
+        description: 'Active contracts with a daily payment schedule.'
     },
     {
-        key: 'tujuh_hari',
-        label: '7 Hari',
-        description: 'Kontrak aktif dengan opsi pembayaran per 7 hari.'
+        key: PawnContractNasabahTabKeyEnum.SevenDays,
+        label: '7 Days',
+        description: 'Active contracts with a 7-day payment schedule.'
     },
     {
-        key: 'lima_belas_hari',
-        label: '15 Hari',
-        description: 'Kontrak aktif dengan opsi pembayaran per 15 hari.'
+        key: PawnContractNasabahTabKeyEnum.FifteenDays,
+        label: '15 Days',
+        description: 'Active contracts with a 15-day payment schedule.'
     }
 ];
 
 const PAWN_CONTRACT_AJT_OPTIONS: Array<
     Omit<PawnContractTableOptionModel<PawnContractAjtTypeModel>, 'count'>
 > = [
-    { key: '7', label: '7 Hari', description: 'Akad tenor 7 hari yang masih aktif dan mendekati jatuh tempo.' },
-    { key: '15', label: '15 Hari', description: 'Akad tenor 15 hari yang perlu dipantau menjelang jatuh tempo.' },
-    { key: '30', label: '30 Hari', description: 'Akad tenor 30 hari yang jatuh tempo dalam waktu dekat.' },
-    { key: '60', label: '60 Hari', description: 'Akad tenor 60 hari yang mendekati tenggat kontrak.' },
-    { key: 'tertunggak', label: 'Tertunggak', description: 'Akad aktif yang sudah melewati jatuh tempo.' },
+    { key: '7', label: '7 Hari', description: 'Gadai tenor 7 hari yang masih aktif dan mendekati jatuh tempo.' },
+    { key: '15', label: '15 Hari', description: 'Gadai tenor 15 hari yang perlu dipantau menjelang jatuh tempo.' },
+    { key: '30', label: '30 Hari', description: 'Gadai tenor 30 hari yang jatuh tempo dalam waktu dekat.' },
+    { key: '60', label: '60 Hari', description: 'Gadai tenor 60 hari yang mendekati tenggat kontrak.' },
+    { key: 'tertunggak', label: 'Tertunggak', description: 'Gadai aktif yang sudah melewati jatuh tempo.' },
     {
         key: 'mendekati_tempo_lelang',
         label: 'Mendekati Lelang',
-        description: 'Akad overdue awal yang masih punya ruang tindak lanjut sebelum lelang.'
+        description: 'Gadai overdue awal yang masih punya ruang tindak lanjut sebelum lelang.'
     },
     {
         key: 'tempo_lelang',
         label: 'Tempo Lelang',
-        description: 'Akad overdue lebih lanjut yang mulai masuk window lelang.'
+        description: 'Gadai overdue lebih lanjut yang mulai masuk window lelang.'
     },
     {
         key: 'tunda_lelang',
         label: 'Tunda Lelang',
-        description: 'Akad perpanjangan yang tetap overdue dan perlu keputusan lanjutan.'
+        description: 'Gadai perpanjangan yang tetap overdue dan perlu keputusan lanjutan.'
     }
 ];
 
@@ -192,26 +196,27 @@ export class PawnContractIndexLocalDatasource {
     }
 
     getNasabahTable(params: GetPawnContractNasabahTableParamsModel): PawnContractNasabahTableModel {
+        const tabRows = this.getNasabahTabRows(params.summaries, params.activeTab);
         const tabs = PAWN_CONTRACT_NASABAH_TABS.map((tab) => ({
             ...tab,
             count: this.getNasabahTabRows(params.summaries, tab.key).length
         }));
-        const sections = this.createNasabahMonthlySections(params.summaries);
+        const sections = this.createNasabahMonthlySections(tabRows);
         const activeTabMeta = tabs.find((tab) => tab.key === params.activeTab) ?? tabs[0];
         const activeSection = this.createNasabahSection(
             params.activeTab,
             activeTabMeta.label,
             activeTabMeta.description,
-            this.getNasabahTabRows(params.summaries, params.activeTab)
+            tabRows
         );
 
         return {
-            title: 'Daftar akad aktif',
-            description: 'Kelompokkan akad aktif per rentang pembayaran dan umur kontrak agar tindak lanjut lebih cepat.',
+            title: 'Active Contract List',
+            description: 'Group active contracts by payment schedule and contract age for faster follow-up.',
             tabs,
             sections,
             activeSection,
-            displayedSections: params.activeTab === 'seluruh_data' ? sections : [activeSection]
+            displayedSections: sections
         };
     }
 
@@ -241,17 +246,17 @@ export class PawnContractIndexLocalDatasource {
 
         return {
             title: 'Aktivitas hari ini',
-            description: 'Lihat realisasi akad baru, akad ulang, dan pendapatan harian dari data lokal.',
+            description: 'Lihat realisasi gadai baru, gadai ulang, dan pendapatan harian dari data lokal.',
             sections: [
                 {
                     key: 'akad_baru',
-                    label: 'Data Akad Baru',
+                    label: 'Data Gadai Baru',
                     description: 'Kontrak yang tercatat pada hari ini dari data lokal.',
                     rows: akadBaruRows
                 },
                 {
                     key: 'akad_ulang',
-                    label: 'Data Akad Ulang',
+                    label: 'Data Gadai Ulang',
                     description: 'Kontrak berstatus perpanjangan yang diperbarui hari ini.',
                     rows: akadUlangRows
                 }
@@ -270,7 +275,7 @@ export class PawnContractIndexLocalDatasource {
     getAjtTable(params: GetPawnContractAjtTableParamsModel): PawnContractAjtTableModel {
         return {
             title: 'Pilihan jenis jatuh tempo',
-            description: 'Fokuskan pemantauan akad aktif berdasarkan tenor dan tingkat keterlambatan.',
+            description: 'Fokuskan pemantauan gadai aktif berdasarkan tenor dan tingkat keterlambatan.',
             options: PAWN_CONTRACT_AJT_OPTIONS.map((item) => ({
                 ...item,
                 count: this.getAjtRows(params.summaries, item.key).length
@@ -306,7 +311,7 @@ export class PawnContractIndexLocalDatasource {
     getMaintenanceTable(params: GetPawnContractMaintenanceTableParamsModel): PawnContractMaintenanceTableModel {
         return {
             title: 'Window maintenance operasional',
-            description: 'Tampilkan akad yang perlu inspeksi atau checklist maintenance dalam window kontrol.',
+            description: 'Tampilkan gadai yang perlu inspeksi atau checklist maintenance dalam window kontrol.',
             rows: this.getMaintenanceRows(params.summaries)
         };
     }
@@ -348,26 +353,26 @@ export class PawnContractIndexLocalDatasource {
         return [
             this.createNasabahSection(
                 'bulan_berjalan',
-                'Bulan Berjalan',
-                'Kontrak aktif dengan tanggal akad pada bulan berjalan.',
+                'Current Month',
+                'Active contracts created in the current month.',
                 currentMonthRows
             ),
             this.createNasabahSection(
                 'satu_bulan_lalu',
-                '1 Bulan Kemarin',
-                'Kontrak aktif yang tercatat pada bulan sebelumnya.',
+                '1 Month Ago',
+                'Active contracts created in the previous month.',
                 oneMonthAgoRows
             ),
             this.createNasabahSection(
                 'dua_bulan_lalu',
-                '2 Bulan Kemarin',
-                'Kontrak aktif yang berasal dari dua bulan sebelumnya.',
+                '2 Months Ago',
+                'Active contracts created two months ago.',
                 twoMonthAgoRows
             ),
             this.createNasabahSection(
                 'tiga_bulan_atau_lebih',
-                '3 Bulan Kemarin dan Seterusnya',
-                'Kontrak aktif yang lebih lama dan masih perlu dipantau.',
+                '3+ Months Ago',
+                'Older active contracts that still need follow-up.',
                 threeMonthAgoRows
             )
         ];
@@ -378,11 +383,11 @@ export class PawnContractIndexLocalDatasource {
         tab: PawnContractNasabahTabKeyModel
     ): PawnContractSummaryModel[] {
         switch (tab) {
-            case 'harian':
+            case PawnContractNasabahTabKeyEnum.Daily:
                 return rows.filter((item) => item.contract.paymentOptionDays === 1);
-            case 'tujuh_hari':
+            case PawnContractNasabahTabKeyEnum.SevenDays:
                 return rows.filter((item) => item.contract.paymentOptionDays === 7);
-            case 'lima_belas_hari':
+            case PawnContractNasabahTabKeyEnum.FifteenDays:
                 return rows.filter((item) => item.contract.paymentOptionDays === 15);
             default:
                 return rows;
@@ -497,17 +502,17 @@ export class PawnContractIndexLocalDatasource {
         params: GetPawnContractIndexTabsParamsModel
     ): number {
         switch (key) {
-            case 'nasabah_akad':
+            case PawnContractIndexTabKeyEnum.CustomerContracts:
                 return params.openContractCount;
-            case 'ringkasan_harian':
+            case PawnContractIndexTabKeyEnum.DailySummary:
                 return params.ringkasanRowCount;
-            case 'akad_jatuh_tempo':
+            case PawnContractIndexTabKeyEnum.DueContracts:
                 return params.ajtRowCount;
-            case 'pelunasan_lelang':
+            case PawnContractIndexTabKeyEnum.SettlementAuction:
                 return params.settlementRowCount;
-            case 'lokasi_distribusi':
+            case PawnContractIndexTabKeyEnum.LocationDistribution:
                 return params.locationRowCount;
-            case 'maintenance':
+            case PawnContractIndexTabKeyEnum.Maintenance:
                 return params.maintenanceRowCount;
             default:
                 return 0;
@@ -545,7 +550,7 @@ export class PawnContractIndexLocalDatasource {
             return 'Bayar B. Titip';
         }
 
-        return 'Akad Aktif';
+        return 'Gadai Aktif';
     }
 
     private getAvailableActions(params: {
@@ -556,12 +561,12 @@ export class PawnContractIndexLocalDatasource {
             {
                 key: 'edit',
                 label: 'Ubah Data',
-                description: 'Buka form akad untuk memperbarui data kontrak dan jaminan.'
+                description: 'Buka form gadai untuk memperbarui data kontrak dan jaminan.'
             },
             {
                 key: 'history',
                 label: 'History',
-                description: 'Lihat ringkasan riwayat perubahan, jatuh tempo, dan aktivitas penting akad.'
+                description: 'Lihat ringkasan riwayat perubahan, jatuh tempo, dan aktivitas penting gadai.'
             }
         ];
 
@@ -569,12 +574,12 @@ export class PawnContractIndexLocalDatasource {
             actions.push({
                 key: 'storage_fee',
                 label: 'Bayar B. Titip',
-                description: 'Tandai tindak lanjut pembayaran biaya titip untuk akad yang masih berjalan.'
+                description: 'Tandai tindak lanjut pembayaran biaya titip untuk gadai yang masih berjalan.'
             });
             actions.push({
                 key: 'settlement',
                 label: 'Pelunasan',
-                description: 'Siapkan proses pelunasan jika nasabah ingin menutup akad.'
+                description: 'Siapkan proses pelunasan jika nasabah ingin menutup gadai.'
             });
         }
 
@@ -582,7 +587,7 @@ export class PawnContractIndexLocalDatasource {
             actions.push({
                 key: 'extension',
                 label: 'Perpanjangan',
-                description: 'Lanjutkan akad dengan proses perpanjangan atau akad ulang.'
+                description: 'Lanjutkan gadai dengan proses perpanjangan atau gadai ulang.'
             });
         }
 
@@ -590,7 +595,7 @@ export class PawnContractIndexLocalDatasource {
             actions.push({
                 key: 'auction',
                 label: 'Lelang',
-                description: 'Tindak lanjuti akad yang sudah lewat jatuh tempo atau masuk proses lelang.'
+                description: 'Tindak lanjuti gadai yang sudah lewat jatuh tempo atau masuk proses lelang.'
             });
         }
 

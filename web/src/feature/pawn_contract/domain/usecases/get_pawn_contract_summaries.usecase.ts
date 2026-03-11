@@ -1,3 +1,5 @@
+import { left, type Either } from 'fp-ts/Either';
+import { toError } from '@core/util/either';
 import type {
     PawnContractDataModel,
     PawnContractSummaryModel
@@ -7,7 +9,11 @@ import type { PawnContractRepository } from '@feature/pawn_contract/domain/repos
 export class GetPawnContractSummariesUsecase {
     constructor(private readonly repository: PawnContractRepository) {}
 
-    execute(data: PawnContractDataModel | null): PawnContractSummaryModel[] {
-        return this.repository.getContractSummaries(data);
+    execute(data: PawnContractDataModel | null): Either<Error, PawnContractSummaryModel[]> {
+        try {
+            return this.repository.getContractSummaries(data);
+        } catch (error) {
+            return left(toError(error));
+        }
     }
 }

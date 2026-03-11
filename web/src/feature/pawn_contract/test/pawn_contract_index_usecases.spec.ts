@@ -1,11 +1,17 @@
 import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest';
+import { right } from 'fp-ts/Either';
 
+import { unwrapEitherOrThrow } from '@core/util/either';
 import {
     PawnContractCustomerGenderEnum,
     PawnContractIdentityTypeEnum,
     PawnContractPaymentOptionDaysEnum,
     PawnContractTermDaysEnum
 } from '../domain/models/pawn-contract-form.model';
+import {
+    PawnContractIndexTabKeyEnum,
+    PawnContractNasabahTabKeyEnum
+} from '../domain/models/pawn-contract-index.model';
 import {
     createPawnContractDataModel,
     type PawnContractDataModel
@@ -32,7 +38,9 @@ describe('pawn_contract index usecases', () => {
     });
 
     test('builds enriched contract summaries for downstream tables', () => {
-        const summaries = new GetPawnContractSummariesUsecase(createRepository()).execute(createFixtureData());
+        const summaries = unwrapEitherOrThrow(
+            new GetPawnContractSummariesUsecase(createRepository()).execute(createFixtureData())
+        );
         const todaySummary = summaries.find((item) => item.contract.id === 1);
         const overdueExtendedSummary = summaries.find((item) => item.contract.id === 2);
 
@@ -108,7 +116,9 @@ describe('pawn_contract index usecases', () => {
             ]
         });
 
-        const summaries = new GetPawnContractSummariesUsecase(createRepository()).execute(dataWithDraft);
+        const summaries = unwrapEitherOrThrow(
+            new GetPawnContractSummariesUsecase(createRepository()).execute(dataWithDraft)
+        );
         const draftSummary = summaries.find((item) => item.contract.id === 7);
 
         expect(draftSummary?.isOpenContract).toBe(false);
@@ -119,35 +129,43 @@ describe('pawn_contract index usecases', () => {
         const summaries = getOpenSummaries();
         const usecase = new GetPawnContractNasabahTableUsecase(createRepository());
 
-        const seluruhDataTable = usecase.execute({
-            summaries,
-            activeTab: 'seluruh_data'
-        });
-        const harianTable = usecase.execute({
-            summaries,
-            activeTab: 'harian'
-        });
+        const seluruhDataTable = unwrapEitherOrThrow(
+            usecase.execute({
+                summaries,
+                activeTab: PawnContractNasabahTabKeyEnum.AllData
+            })
+        );
+        const harianTable = unwrapEitherOrThrow(
+            usecase.execute({
+                summaries,
+                activeTab: PawnContractNasabahTabKeyEnum.Daily
+            })
+        );
 
-        expect(seluruhDataTable.title).toBe('Daftar akad aktif');
+        expect(seluruhDataTable.title).toBe('Active Contract List');
         expect(seluruhDataTable.tabs).toEqual([
-            expect.objectContaining({ key: 'seluruh_data', count: 3 }),
-            expect.objectContaining({ key: 'harian', count: 1 }),
-            expect.objectContaining({ key: 'tujuh_hari', count: 1 }),
-            expect.objectContaining({ key: 'lima_belas_hari', count: 1 })
+            expect.objectContaining({ key: PawnContractNasabahTabKeyEnum.AllData, count: 3 }),
+            expect.objectContaining({ key: PawnContractNasabahTabKeyEnum.Daily, count: 1 }),
+            expect.objectContaining({ key: PawnContractNasabahTabKeyEnum.SevenDays, count: 1 }),
+            expect.objectContaining({ key: PawnContractNasabahTabKeyEnum.FifteenDays, count: 1 })
         ]);
         expect(seluruhDataTable.sections.find((item) => item.key === 'bulan_berjalan')?.rows).toHaveLength(1);
         expect(seluruhDataTable.sections.find((item) => item.key === 'satu_bulan_lalu')?.rows).toHaveLength(1);
         expect(seluruhDataTable.sections.find((item) => item.key === 'dua_bulan_lalu')?.rows).toHaveLength(1);
         expect(seluruhDataTable.activeSection.totals.principalAmount).toBe(4100000);
-        expect(harianTable.displayedSections).toHaveLength(1);
+        expect(harianTable.displayedSections).toHaveLength(4);
+        expect(harianTable.displayedSections.find((item) => item.key === 'bulan_berjalan')?.rows).toHaveLength(1);
+        expect(harianTable.displayedSections.find((item) => item.key === 'satu_bulan_lalu')?.rows).toHaveLength(0);
         expect(harianTable.activeSection.rows.map((item) => item.contract.id)).toEqual([1]);
-        expect(harianTable.activeSection.description).toContain('pembayaran harian');
+        expect(harianTable.activeSection.description).toContain('daily payment schedule');
     });
 
     test('builds ringkasan harian table metrics and income rows', () => {
-        const table = new GetPawnContractRingkasanTableUsecase(createRepository()).execute({
-            summaries: getSummaries()
-        });
+        const table = unwrapEitherOrThrow(
+            new GetPawnContractRingkasanTableUsecase(createRepository()).execute({
+                summaries: getSummaries()
+            })
+        );
 
         expect(table.title).toBe('Aktivitas hari ini');
         expect(table.sections[0].rows.map((item) => item.contract.id)).toEqual([1]);
@@ -170,10 +188,12 @@ describe('pawn_contract index usecases', () => {
     });
 
     test('builds jatuh tempo table options from open contracts', () => {
-        const table = new GetPawnContractAjtTableUsecase(createRepository()).execute({
-            summaries: getOpenSummaries(),
-            activeType: '30'
-        });
+        const table = unwrapEitherOrThrow(
+            new GetPawnContractAjtTableUsecase(createRepository()).execute({
+                summaries: getOpenSummaries(),
+                activeType: '30'
+            })
+        );
 
         expect(table.rows.map((item) => item.contract.id)).toEqual([1]);
         expect(table.options.find((item) => item.key === 'tertunggak')?.count).toBe(1);
@@ -186,48 +206,64 @@ describe('pawn_contract index usecases', () => {
         const openSummaries = summaries.filter((item) => item.isOpenContract);
         const repository = createRepository();
 
-        const settlementTable = new GetPawnContractSettlementTableUsecase(repository).execute({
-            summaries,
-            activeType: 'lelang'
-        });
-        const locationTable = new GetPawnContractLocationTableUsecase(repository).execute({
-            summaries,
-            activeTab: 'proses'
-        });
-        const maintenanceTable = new GetPawnContractMaintenanceTableUsecase(repository).execute({
-            summaries
-        });
-        const ringkasanTable = new GetPawnContractRingkasanTableUsecase(repository).execute({
-            summaries
-        });
-        const ajtTable = new GetPawnContractAjtTableUsecase(repository).execute({
-            summaries: openSummaries,
-            activeType: '30'
-        });
-        const indexTabs = new GetPawnContractIndexTabsUsecase(repository).execute({
-            openContractCount: openSummaries.length,
-            ringkasanRowCount: ringkasanTable.sections.reduce(
-                (total, section) => total + section.rows.length,
-                0
-            ),
-            ajtRowCount: ajtTable.rows.length,
-            settlementRowCount: settlementTable.rows.length,
-            locationRowCount: locationTable.rows.length,
-            maintenanceRowCount: maintenanceTable.rows.length
-        });
+        const settlementTable = unwrapEitherOrThrow(
+            new GetPawnContractSettlementTableUsecase(repository).execute({
+                summaries,
+                activeType: 'lelang'
+            })
+        );
+        const locationTable = unwrapEitherOrThrow(
+            new GetPawnContractLocationTableUsecase(repository).execute({
+                summaries,
+                activeTab: 'proses'
+            })
+        );
+        const maintenanceTable = unwrapEitherOrThrow(
+            new GetPawnContractMaintenanceTableUsecase(repository).execute({
+                summaries
+            })
+        );
+        const ringkasanTable = unwrapEitherOrThrow(
+            new GetPawnContractRingkasanTableUsecase(repository).execute({
+                summaries
+            })
+        );
+        const ajtTable = unwrapEitherOrThrow(
+            new GetPawnContractAjtTableUsecase(repository).execute({
+                summaries: openSummaries,
+                activeType: '30'
+            })
+        );
+        const indexTabs = unwrapEitherOrThrow(
+            new GetPawnContractIndexTabsUsecase(repository).execute({
+                openContractCount: openSummaries.length,
+                ringkasanRowCount: ringkasanTable.sections.reduce(
+                    (total, section) => total + section.rows.length,
+                    0
+                ),
+                ajtRowCount: ajtTable.rows.length,
+                settlementRowCount: settlementTable.rows.length,
+                locationRowCount: locationTable.rows.length,
+                maintenanceRowCount: maintenanceTable.rows.length
+            })
+        );
 
         expect(settlementTable.rows.map((item) => item.contract.id)).toEqual([4]);
         expect(
-            new GetPawnContractSettlementTableUsecase(repository).execute({
-                summaries,
-                activeType: 'lunas'
-            }).rows.map((item) => item.contract.id)
+            unwrapEitherOrThrow(
+                new GetPawnContractSettlementTableUsecase(repository).execute({
+                    summaries,
+                    activeType: 'lunas'
+                })
+            ).rows.map((item) => item.contract.id)
         ).toEqual([3]);
         expect(
-            new GetPawnContractSettlementTableUsecase(repository).execute({
-                summaries,
-                activeType: 'refund'
-            }).rows.map((item) => item.contract.id)
+            unwrapEitherOrThrow(
+                new GetPawnContractSettlementTableUsecase(repository).execute({
+                    summaries,
+                    activeType: 'refund'
+                })
+            ).rows.map((item) => item.contract.id)
         ).toEqual([5]);
 
         expect(locationTable.rows.map((item) => item.contractId)).toEqual([5, 3, 6, 4]);
@@ -246,19 +282,21 @@ describe('pawn_contract index usecases', () => {
         ]);
 
         expect(indexTabs).toEqual([
-            expect.objectContaining({ key: 'nasabah_akad', count: 3 }),
-            expect.objectContaining({ key: 'ringkasan_harian', count: 2 }),
-            expect.objectContaining({ key: 'akad_jatuh_tempo', count: 1 }),
-            expect.objectContaining({ key: 'pelunasan_lelang', count: 1 }),
-            expect.objectContaining({ key: 'lokasi_distribusi', count: 4 }),
-            expect.objectContaining({ key: 'maintenance', count: 1 })
+            expect.objectContaining({ key: PawnContractIndexTabKeyEnum.CustomerContracts, count: 3 }),
+            expect.objectContaining({ key: PawnContractIndexTabKeyEnum.DailySummary, count: 2 }),
+            expect.objectContaining({ key: PawnContractIndexTabKeyEnum.DueContracts, count: 1 }),
+            expect.objectContaining({ key: PawnContractIndexTabKeyEnum.SettlementAuction, count: 1 }),
+            expect.objectContaining({ key: PawnContractIndexTabKeyEnum.LocationDistribution, count: 4 }),
+            expect.objectContaining({ key: PawnContractIndexTabKeyEnum.Maintenance, count: 1 })
         ]);
         expect(indexTabs[0].description).toContain('nasabah aktif');
     });
 });
 
 function getSummaries() {
-    return new GetPawnContractSummariesUsecase(createRepository()).execute(createFixtureData());
+    return unwrapEitherOrThrow(
+        new GetPawnContractSummariesUsecase(createRepository()).execute(createFixtureData())
+    );
 }
 
 function getOpenSummaries() {
@@ -514,13 +552,13 @@ function createRepository(): PawnContractRepository {
         saveContract: async (_payload) => {
             throw new Error('not implemented for unit test');
         },
-        getContractSummaries: (data) => indexLocalDatasource.getContractSummaries(data),
-        getNasabahTable: (params) => indexLocalDatasource.getNasabahTable(params),
-        getRingkasanTable: (params) => indexLocalDatasource.getRingkasanTable(params),
-        getAjtTable: (params) => indexLocalDatasource.getAjtTable(params),
-        getSettlementTable: (params) => indexLocalDatasource.getSettlementTable(params),
-        getLocationTable: (params) => indexLocalDatasource.getLocationTable(params),
-        getMaintenanceTable: (params) => indexLocalDatasource.getMaintenanceTable(params),
-        getIndexTabs: (params) => indexLocalDatasource.getIndexTabs(params)
+        getContractSummaries: (data) => right(indexLocalDatasource.getContractSummaries(data)),
+        getNasabahTable: (params) => right(indexLocalDatasource.getNasabahTable(params)),
+        getRingkasanTable: (params) => right(indexLocalDatasource.getRingkasanTable(params)),
+        getAjtTable: (params) => right(indexLocalDatasource.getAjtTable(params)),
+        getSettlementTable: (params) => right(indexLocalDatasource.getSettlementTable(params)),
+        getLocationTable: (params) => right(indexLocalDatasource.getLocationTable(params)),
+        getMaintenanceTable: (params) => right(indexLocalDatasource.getMaintenanceTable(params)),
+        getIndexTabs: (params) => right(indexLocalDatasource.getIndexTabs(params))
     };
 }

@@ -1,3 +1,5 @@
+import { left, type Either } from 'fp-ts/Either';
+import { toError } from '@core/util/either';
 import type {
     GetPawnContractLocationTableParamsModel,
     PawnContractLocationTableModel
@@ -7,7 +9,11 @@ import type { PawnContractRepository } from '@feature/pawn_contract/domain/repos
 export class GetPawnContractLocationTableUsecase {
     constructor(private readonly repository: PawnContractRepository) {}
 
-    execute(params: GetPawnContractLocationTableParamsModel): PawnContractLocationTableModel {
-        return this.repository.getLocationTable(params);
+    execute(params: GetPawnContractLocationTableParamsModel): Either<Error, PawnContractLocationTableModel> {
+        try {
+            return this.repository.getLocationTable(params);
+        } catch (error) {
+            return left(toError(error));
+        }
     }
 }
