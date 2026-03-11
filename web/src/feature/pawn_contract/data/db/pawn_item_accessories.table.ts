@@ -2,6 +2,7 @@ import { createFeatureDbTable } from '@core/data/datasources/db/feature_db.types
 
 export interface PawnItemAccessoriesRow {
     id: number;
+    company_id?: number | null;
     pawn_item_id: number;
     accessory_name: string;
     accessory_condition: string | null;
@@ -19,6 +20,7 @@ export const pawnItemAccessoriesTable = createFeatureDbTable<PawnItemAccessories
     seedPath: '/dummies/pawn_item_accessories.dummy.json',
     columns: [
         { name: 'id', dataType: 'number', nullable: false, sqlType: 'BIGINT UNSIGNED' },
+        { name: 'company_id', dataType: 'number', nullable: true, sqlType: 'BIGINT UNSIGNED' },
         { name: 'pawn_item_id', dataType: 'number', nullable: false, sqlType: 'BIGINT UNSIGNED' },
         { name: 'accessory_name', dataType: 'string', nullable: false, sqlType: 'VARCHAR(255)' },
         { name: 'accessory_condition', dataType: 'string', nullable: true, sqlType: 'VARCHAR(255)' },

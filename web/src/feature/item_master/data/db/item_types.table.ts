@@ -2,6 +2,7 @@ import { createFeatureDbTable } from '@core/data/datasources/db/feature_db.types
 
 export interface ItemTypesRow {
     id: number;
+    company_id?: number | null;
     category_id: number;
     type_code: string;
     type_name: string;
@@ -17,6 +18,7 @@ export const itemTypesTable = createFeatureDbTable<ItemTypesRow>({
     seedPath: '/dummies/item_types.dummy.json',
     columns: [
         { name: 'id', dataType: 'number', nullable: false, sqlType: 'BIGINT UNSIGNED' },
+        { name: 'company_id', dataType: 'number', nullable: true, sqlType: 'BIGINT UNSIGNED' },
         { name: 'category_id', dataType: 'number', nullable: false, sqlType: 'BIGINT UNSIGNED' },
         { name: 'type_code', dataType: 'string', nullable: false, sqlType: 'VARCHAR(50)' },
         { name: 'type_name', dataType: 'string', nullable: false, sqlType: 'VARCHAR(100)' },

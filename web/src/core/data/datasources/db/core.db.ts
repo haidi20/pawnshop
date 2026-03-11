@@ -9,9 +9,11 @@ import { createRxDatabase } from 'rxdb/plugins/core';
 import { getRxStorageDexie } from 'rxdb/plugins/storage-dexie';
 import { getRxStorageLocalstorage } from 'rxdb/plugins/storage-localstorage';
 
+export const CORE_DB_SCHEMA_VERSION = 1;
+
 const itemSchemaLiteral = {
     title: 'pawnshop item schema',
-    version: 1,
+    version: CORE_DB_SCHEMA_VERSION,
     primaryKey: 'id',
     type: 'object',
     properties: {

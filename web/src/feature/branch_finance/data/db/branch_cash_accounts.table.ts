@@ -2,6 +2,7 @@ import { createFeatureDbTable } from '@core/data/datasources/db/feature_db.types
 
 export interface BranchCashAccountsRow {
     id: number;
+    company_id?: number | null;
     branch_id: number;
     account_code: string;
     account_name: string;
@@ -20,6 +21,7 @@ export const branchCashAccountsTable = createFeatureDbTable<BranchCashAccountsRo
     seedPath: '/dummies/branch_cash_accounts.dummy.json',
     columns: [
         { name: 'id', dataType: 'number', nullable: false, sqlType: 'BIGINT UNSIGNED' },
+        { name: 'company_id', dataType: 'number', nullable: true, sqlType: 'BIGINT UNSIGNED' },
         { name: 'branch_id', dataType: 'number', nullable: false, sqlType: 'BIGINT UNSIGNED' },
         { name: 'account_code', dataType: 'string', nullable: false, sqlType: 'VARCHAR(50)' },
         { name: 'account_name', dataType: 'string', nullable: false, sqlType: 'VARCHAR(100)' },

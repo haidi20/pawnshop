@@ -2,6 +2,7 @@ import { createFeatureDbTable } from '@core/data/datasources/db/feature_db.types
 
 export interface UserBranchAssignmentsRow {
     id: number;
+    company_id?: number | null;
     user_id: number;
     branch_id: number;
     is_primary: number;
@@ -19,6 +20,7 @@ export const userBranchAssignmentsTable = createFeatureDbTable<UserBranchAssignm
     seedPath: '/dummies/user_branch_assignments.dummy.json',
     columns: [
         { name: 'id', dataType: 'number', nullable: false, sqlType: 'BIGINT UNSIGNED' },
+        { name: 'company_id', dataType: 'number', nullable: true, sqlType: 'BIGINT UNSIGNED' },
         { name: 'user_id', dataType: 'number', nullable: false, sqlType: 'BIGINT UNSIGNED' },
         { name: 'branch_id', dataType: 'number', nullable: false, sqlType: 'BIGINT UNSIGNED' },
         { name: 'is_primary', dataType: 'number', nullable: false, sqlType: 'TINYINT(1)' },

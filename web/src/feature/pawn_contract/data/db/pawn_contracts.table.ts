@@ -7,6 +7,7 @@ import type { PawnContractStatusModel } from '@core/util/helpers';
 
 export interface PawnContractsRow {
     id: number;
+    company_id?: number | null;
     contract_number: string;
     branch_id: number;
     customer_id: number;
@@ -36,6 +37,7 @@ export const pawnContractsTable = createFeatureDbTable<PawnContractsRow>({
     seedPath: '/dummies/pawn_contracts.dummy.json',
     columns: [
         { name: 'id', dataType: 'number', nullable: false, sqlType: 'BIGINT UNSIGNED' },
+        { name: 'company_id', dataType: 'number', nullable: true, sqlType: 'BIGINT UNSIGNED' },
         { name: 'contract_number', dataType: 'string', nullable: false, sqlType: 'VARCHAR(100)' },
         { name: 'branch_id', dataType: 'number', nullable: false, sqlType: 'BIGINT UNSIGNED' },
         { name: 'customer_id', dataType: 'number', nullable: false, sqlType: 'BIGINT UNSIGNED' },

@@ -7,26 +7,48 @@
       Pilihan jenis jatuh tempo
     </h2>
     <div class="pawn-contract-page__tabs mt-3">
-      <button v-for="option in options" :key="option.key" class="pawn-contract-page__tab"
-        :class="{ 'is-active': activeType === option.key }" type="button" @click="emit('select-type', option.key)">
+      <button
+        v-for="option in options"
+        :key="option.key"
+        class="pawn-contract-page__tab"
+        :class="{ 'is-active': activeType === option.key }"
+        type="button"
+        @click="emit('select-type', option.key)"
+      >
         {{ option.label }} <strong>{{ formatCount(option.count) }}</strong>
       </button>
     </div>
-    <DataTableClientSideComponent :vm="dataTableVm" class="mt-3 pawn-contract-page__datatable">
+    <DataTableClientSideComponent
+      :vm="dataTableVm"
+      class="mt-3 pawn-contract-page__datatable"
+    >
       <template #extra-actions>
-        <button class="btn btn-outline-secondary pawn-contract-page__table-filter-button"
-          :class="{ 'is-active': hasActiveFilters }" type="button" @click="emit('open-filter')">
-          <i class="bi bi-sliders" aria-hidden="true" />
+        <button
+          class="btn btn-outline-secondary pawn-contract-page__table-filter-button"
+          :class="{ 'is-active': hasActiveFilters }"
+          type="button"
+          @click="emit('open-filter')"
+        >
+          <i
+            class="bi bi-sliders"
+            aria-hidden="true"
+          />
           <span>Filter Gadai</span>
         </button>
       </template>
       <template #body="{ item }">
         <tr>
-          <td class="pawn-contract-page__cell-action" data-label="Aksi">
-            <RouterLink class="btn btn-sm pawn-contract-page__action-button" :to="{
-              name: 'PawnContractFormEdit',
-              params: { contractId: item.source.contract.id },
-            }">
+          <td
+            class="pawn-contract-page__cell-action"
+            data-label="Aksi"
+          >
+            <RouterLink
+              class="btn btn-sm pawn-contract-page__action-button"
+              :to="{
+                name: 'PawnContractFormEdit',
+                params: { contractId: item.source.contract.id },
+              }"
+            >
               Ubah
             </RouterLink>
           </td>
@@ -39,21 +61,31 @@
           <td data-label="Jaminan">
             {{ item.source.itemNames }}
           </td>
-          <td class="pawn-contract-page__cell-date" data-label="Jatuh Tempo">
+          <td
+            class="pawn-contract-page__cell-date"
+            data-label="Jatuh Tempo"
+          >
             <div class="pawn-contract-page__date-text">
               {{ formatDate(item.source.contract.maturityDate) }}
             </div>
-            <span class="status-badge pawn-contract-page__status-badge pawn-contract-page__status-badge--due mt-1"
-              :class="getDueStateClass(item.source.dueState)">
+            <span
+              class="status-badge pawn-contract-page__status-badge pawn-contract-page__status-badge--due mt-1"
+              :class="getDueStateClass(item.source.dueState)"
+            >
               {{ item.source.dueLabel }}
             </span>
           </td>
           <td data-label="Tenor">
             {{ getTermLabel(item.source.contract.termDays) }}
           </td>
-          <td class="pawn-contract-page__cell-status" data-label="Status">
-            <span class="status-badge pawn-contract-page__status-badge"
-              :class="getContractStatusClass(item.source.contract.contractStatus)">
+          <td
+            class="pawn-contract-page__cell-status"
+            data-label="Status"
+          >
+            <span
+              class="status-badge pawn-contract-page__status-badge"
+              :class="getContractStatusClass(item.source.contract.contractStatus)"
+            >
               {{ getContractStatusLabel(item.source.contract.contractStatus) }}
             </span>
           </td>

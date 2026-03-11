@@ -2,6 +2,7 @@ import { createFeatureDbTable } from '@core/data/datasources/db/feature_db.types
 
 export interface CustomersRow {
     id: number;
+    company_id?: number | null;
     customer_code: string;
     full_name: string;
     gender: string;
@@ -21,6 +22,7 @@ export const customersTable = createFeatureDbTable<CustomersRow>({
     seedPath: '/dummies/customers.dummy.json',
     columns: [
         { name: 'id', dataType: 'number', nullable: false, sqlType: 'BIGINT UNSIGNED' },
+        { name: 'company_id', dataType: 'number', nullable: true, sqlType: 'BIGINT UNSIGNED' },
         { name: 'customer_code', dataType: 'string', nullable: false, sqlType: 'VARCHAR(50)' },
         { name: 'full_name', dataType: 'string', nullable: false, sqlType: 'VARCHAR(150)' },
         { name: 'gender', dataType: 'string', nullable: false, sqlType: 'ENUM(\'male\', \'female\')', enumValues: ['male', 'female'] },

@@ -40,6 +40,11 @@ import {
     type PawnItemLocationMovementsRow,
     type PawnItemsRow
 } from '@feature/pawn_contract/data/db';
+import {
+    getFeatureStorageScope,
+    isCurrentAuthPortalDemoCompany,
+    readAuthPortalStoredSession
+} from '@feature/auth_portal/util/auth_portal_session';
 
 export const PAWN_CONTRACT_DEMO_DATASET_VERSION = 'pawn-contract-demo-500-v1';
 export const PAWN_CONTRACT_DEMO_MIN_CONTRACT_COUNT = 500;
@@ -1126,7 +1131,7 @@ const readStoredSeedVersion = (): string | null => {
         return null;
     }
 
-    return localStorage.getItem(DEMO_SEED_STORAGE_KEY);
+    return localStorage.getItem(`${DEMO_SEED_STORAGE_KEY}.${getFeatureStorageScope('pawn-contract')}`);
 };
 
 const writeStoredSeedVersion = (): void => {
@@ -1134,10 +1139,18 @@ const writeStoredSeedVersion = (): void => {
         return;
     }
 
-    localStorage.setItem(DEMO_SEED_STORAGE_KEY, PAWN_CONTRACT_DEMO_DATASET_VERSION);
+    localStorage.setItem(
+        `${DEMO_SEED_STORAGE_KEY}.${getFeatureStorageScope('pawn-contract')}`,
+        PAWN_CONTRACT_DEMO_DATASET_VERSION
+    );
 };
 
 export const ensurePawnContractDemoDataSeed = async (): Promise<void> => {
+    const currentSession = readAuthPortalStoredSession();
+    if (currentSession && !isCurrentAuthPortalDemoCompany()) {
+        return;
+    }
+
     const contractRows = await pawnContractsDao.getAll();
     const storedSeedVersion = readStoredSeedVersion();
 

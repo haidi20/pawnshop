@@ -3,6 +3,7 @@ import type { PawnItemLocationStatusModel } from '@core/util/helpers';
 
 export interface PawnItemLocationMovementsRow {
     id: number;
+    company_id?: number | null;
     pawn_item_id: number;
     from_location_id: number | null;
     to_location_id: number | null;
@@ -23,6 +24,7 @@ export const pawnItemLocationMovementsTable = createFeatureDbTable<PawnItemLocat
     seedPath: '/dummies/pawn_item_location_movements.dummy.json',
     columns: [
         { name: 'id', dataType: 'number', nullable: false, sqlType: 'BIGINT UNSIGNED' },
+        { name: 'company_id', dataType: 'number', nullable: true, sqlType: 'BIGINT UNSIGNED' },
         { name: 'pawn_item_id', dataType: 'number', nullable: false, sqlType: 'BIGINT UNSIGNED' },
         { name: 'from_location_id', dataType: 'number', nullable: true, sqlType: 'BIGINT UNSIGNED' },
         { name: 'to_location_id', dataType: 'number', nullable: true, sqlType: 'BIGINT UNSIGNED' },

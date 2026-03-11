@@ -2,6 +2,7 @@ import { createFeatureDbTable } from '@core/data/datasources/db/feature_db.types
 
 export interface LoginSessionsRow {
     id: number;
+    company_id?: number | null;
     user_id: number | null;
     session_token: string;
     ip_address: string | null;
@@ -21,6 +22,7 @@ export const loginSessionsTable = createFeatureDbTable<LoginSessionsRow>({
     seedPath: '/dummies/login_sessions.dummy.json',
     columns: [
         { name: 'id', dataType: 'number', nullable: false, sqlType: 'BIGINT UNSIGNED' },
+        { name: 'company_id', dataType: 'number', nullable: true, sqlType: 'BIGINT UNSIGNED' },
         { name: 'user_id', dataType: 'number', nullable: true, sqlType: 'BIGINT UNSIGNED' },
         { name: 'session_token', dataType: 'string', nullable: false, sqlType: 'VARCHAR(255)' },
         { name: 'ip_address', dataType: 'string', nullable: true, sqlType: 'VARCHAR(45)' },

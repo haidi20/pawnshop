@@ -2,6 +2,7 @@ import { createFeatureDbTable } from '@core/data/datasources/db/feature_db.types
 
 export interface AuditLogsRow {
     id: number;
+    company_id?: number | null;
     user_id: number | null;
     entity_type: string;
     entity_id: number | null;
@@ -21,6 +22,7 @@ export const auditLogsTable = createFeatureDbTable<AuditLogsRow>({
     seedPath: '/dummies/audit_logs.dummy.json',
     columns: [
         { name: 'id', dataType: 'number', nullable: false, sqlType: 'BIGINT UNSIGNED' },
+        { name: 'company_id', dataType: 'number', nullable: true, sqlType: 'BIGINT UNSIGNED' },
         { name: 'user_id', dataType: 'number', nullable: true, sqlType: 'BIGINT UNSIGNED' },
         { name: 'entity_type', dataType: 'string', nullable: false, sqlType: 'VARCHAR(100)' },
         { name: 'entity_id', dataType: 'number', nullable: true, sqlType: 'BIGINT UNSIGNED' },

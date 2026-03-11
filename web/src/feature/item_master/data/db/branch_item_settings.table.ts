@@ -2,6 +2,7 @@ import { createFeatureDbTable } from '@core/data/datasources/db/feature_db.types
 
 export interface BranchItemSettingsRow {
     id: number;
+    company_id?: number | null;
     branch_id: number;
     item_type_id: number;
     margin_rate: number;
@@ -20,6 +21,7 @@ export const branchItemSettingsTable = createFeatureDbTable<BranchItemSettingsRo
     seedPath: '/dummies/branch_item_settings.dummy.json',
     columns: [
         { name: 'id', dataType: 'number', nullable: false, sqlType: 'BIGINT UNSIGNED' },
+        { name: 'company_id', dataType: 'number', nullable: true, sqlType: 'BIGINT UNSIGNED' },
         { name: 'branch_id', dataType: 'number', nullable: false, sqlType: 'BIGINT UNSIGNED' },
         { name: 'item_type_id', dataType: 'number', nullable: false, sqlType: 'BIGINT UNSIGNED' },
         { name: 'margin_rate', dataType: 'number', nullable: false, sqlType: 'DECIMAL(5,2)' },

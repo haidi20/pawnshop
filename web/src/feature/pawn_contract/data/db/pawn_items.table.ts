@@ -4,6 +4,7 @@ import type { PawnItemSpecificationModel } from '@feature/pawn_contract/domain/m
 
 export interface PawnItemsRow {
     id: number;
+    company_id?: number | null;
     contract_id: number;
     item_sequence: number;
     item_name: string;
@@ -33,6 +34,7 @@ export const pawnItemsTable = createFeatureDbTable<PawnItemsRow>({
     seedPath: '/dummies/pawn_items.dummy.json',
     columns: [
         { name: 'id', dataType: 'number', nullable: false, sqlType: 'BIGINT UNSIGNED' },
+        { name: 'company_id', dataType: 'number', nullable: true, sqlType: 'BIGINT UNSIGNED' },
         { name: 'contract_id', dataType: 'number', nullable: false, sqlType: 'BIGINT UNSIGNED' },
         { name: 'item_sequence', dataType: 'number', nullable: false, sqlType: 'SMALLINT UNSIGNED' },
         { name: 'item_name', dataType: 'string', nullable: false, sqlType: 'VARCHAR(255)' },

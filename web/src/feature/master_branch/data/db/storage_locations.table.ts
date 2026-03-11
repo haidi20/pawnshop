@@ -2,6 +2,7 @@ import { createFeatureDbTable } from '@core/data/datasources/db/feature_db.types
 
 export interface StorageLocationsRow {
     id: number;
+    company_id?: number | null;
     branch_id: number | null;
     location_code: string;
     location_name: string;
@@ -19,6 +20,7 @@ export const storageLocationsTable = createFeatureDbTable<StorageLocationsRow>({
     seedPath: '/dummies/storage_locations.dummy.json',
     columns: [
         { name: 'id', dataType: 'number', nullable: false, sqlType: 'BIGINT UNSIGNED' },
+        { name: 'company_id', dataType: 'number', nullable: true, sqlType: 'BIGINT UNSIGNED' },
         { name: 'branch_id', dataType: 'number', nullable: true, sqlType: 'BIGINT UNSIGNED' },
         { name: 'location_code', dataType: 'string', nullable: false, sqlType: 'VARCHAR(50)' },
         { name: 'location_name', dataType: 'string', nullable: false, sqlType: 'VARCHAR(100)' },

@@ -2,6 +2,7 @@ import { createFeatureDbTable } from '@core/data/datasources/db/feature_db.types
 
 export interface InvestorsRow {
     id: number;
+    company_id?: number | null;
     investor_code: string;
     full_name: string;
     phone_number: string | null;
@@ -19,6 +20,7 @@ export const investorsTable = createFeatureDbTable<InvestorsRow>({
     seedPath: '/dummies/investors.dummy.json',
     columns: [
         { name: 'id', dataType: 'number', nullable: false, sqlType: 'BIGINT UNSIGNED' },
+        { name: 'company_id', dataType: 'number', nullable: true, sqlType: 'BIGINT UNSIGNED' },
         { name: 'investor_code', dataType: 'string', nullable: false, sqlType: 'VARCHAR(50)' },
         { name: 'full_name', dataType: 'string', nullable: false, sqlType: 'VARCHAR(150)' },
         { name: 'phone_number', dataType: 'string', nullable: true, sqlType: 'VARCHAR(30)' },

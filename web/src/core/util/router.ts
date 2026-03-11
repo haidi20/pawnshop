@@ -8,7 +8,9 @@ import pawnTransactionRoutes from '@feature/pawn_transaction/util/pawn_transacti
 import branchFinanceRoutes from '@feature/branch_finance/util/branch_finance_router';
 import masterInvestorRoutes from '@feature/master_investor/util/master_investor_router';
 import authAccessRoutes from '@feature/auth_access/util/auth_access_router';
+import authPortalRoutes from '@feature/auth_portal/util/auth_portal_router';
 import supportRoutes from '@feature/support/util/support_router';
+import { hasAuthPortalStoredSession } from '@feature/auth_portal/util/auth_portal_session';
 
 // Kumpulkan semua rute fitur ke dalam satu array
 const featureRoutes: RouteRecordRaw[] = [
@@ -21,6 +23,7 @@ const featureRoutes: RouteRecordRaw[] = [
   ...branchFinanceRoutes,
   ...masterInvestorRoutes,
   ...authAccessRoutes,
+  ...authPortalRoutes,
   ...supportRoutes,
 ];
 
@@ -55,15 +58,23 @@ const router = createRouter({
 // Anda dapat menambahkan Navigation Guard (Middleware) di sini.
 // Misalnya, memeriksa otentikasi.
 router.beforeEach((to, _from, next) => {
-  const requiresAuth = to.meta.requiresAuth;
-  const isLoggedIn = false;
+  const isPublicRoute = Boolean(to.meta.publicAuth);
+  const isLoggedIn = hasAuthPortalStoredSession();
 
-  // if (requiresAuth && !isLoggedIn) {
-  //   // Redirect ke halaman login jika rute butuh autentikasi tapi belum login
-  //   next({ name: 'Login' });
-  // } else {
-  //   next();
-  // }
+  if (isPublicRoute && isLoggedIn) {
+    next({ path: '/dashboard' });
+    return;
+  }
+
+  if (!isPublicRoute && !isLoggedIn) {
+    next({
+      name: 'Login',
+      query: to.fullPath && to.fullPath !== '/login'
+        ? { redirect: to.fullPath }
+        : undefined,
+    });
+    return;
+  }
 
   next();
 });

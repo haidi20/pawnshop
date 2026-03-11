@@ -3,6 +3,7 @@ import { createFeatureDbTable } from '@core/data/datasources/db/feature_db.types
 
 export interface DashboardModulesRow {
     key: string;
+    company_id?: number | null;
     title: string;
     shortTitle: string;
     route: string;
@@ -24,6 +25,7 @@ export const dashboardModulesTable = createFeatureDbTable<DashboardModulesRow>({
     primaryKey: 'key',
     columns: [
         { name: 'key', dataType: 'string', nullable: false, sqlType: 'VIRTUAL' },
+        { name: 'company_id', dataType: 'number', nullable: true, sqlType: 'VIRTUAL' },
         { name: 'title', dataType: 'string', nullable: false, sqlType: 'VIRTUAL' },
         { name: 'shortTitle', dataType: 'string', nullable: false, sqlType: 'VIRTUAL' },
         { name: 'route', dataType: 'string', nullable: false, sqlType: 'VIRTUAL' },

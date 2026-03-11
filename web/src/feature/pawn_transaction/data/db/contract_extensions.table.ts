@@ -2,6 +2,7 @@ import { createFeatureDbTable } from '@core/data/datasources/db/feature_db.types
 
 export interface ContractExtensionsRow {
     id: number;
+    company_id?: number | null;
     contract_id: number;
     extension_date: string;
     previous_maturity_date: string;
@@ -22,6 +23,7 @@ export const contractExtensionsTable = createFeatureDbTable<ContractExtensionsRo
     seedPath: '/dummies/contract_extensions.dummy.json',
     columns: [
         { name: 'id', dataType: 'number', nullable: false, sqlType: 'BIGINT UNSIGNED' },
+        { name: 'company_id', dataType: 'number', nullable: true, sqlType: 'BIGINT UNSIGNED' },
         { name: 'contract_id', dataType: 'number', nullable: false, sqlType: 'BIGINT UNSIGNED' },
         { name: 'extension_date', dataType: 'date', nullable: false, sqlType: 'DATE' },
         { name: 'previous_maturity_date', dataType: 'date', nullable: false, sqlType: 'DATE' },
