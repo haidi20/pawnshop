@@ -57,7 +57,7 @@
               class="pawn-contract-page__tab pawn-contract-page__tab--index"
               :class="{ 'is-active': activeIndexTab === tab.key }"
               type="button"
-              @click="setActiveIndexTab(tab.key)"
+              @click="openIndexTab(tab.key)"
             >
               <span class="pawn-contract-page__tab-label">{{ tab.label }}</span>
               <strong class="pawn-contract-page__tab-count">{{ formatCount(tab.count) }}</strong>
@@ -195,14 +195,15 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, ref } from 'vue';
+import { onMounted, ref, watch } from 'vue';
 import { storeToRefs } from 'pinia';
-import { RouterLink } from 'vue-router';
+import { RouterLink, useRoute, useRouter } from 'vue-router';
 
 import type { PawnContractStatusModel } from '@core/util/helpers';
 import {
   PawnContractIndexTabKeyEnum,
   PawnContractNasabahTabKeyEnum,
+  type PawnContractIndexTabKeyModel,
   type PawnContractSummaryModel
 } from '@feature/pawn_contract/domain/models';
 import '@feature/pawn_contract/presentation/styles/pawn_contract.css';
@@ -214,8 +215,14 @@ import PawnContractMaintenanceSectionComponent from '@feature/pawn_contract/pres
 import PawnContractNasabahSectionComponent from '@feature/pawn_contract/presentation/components/pawn_contract_nasabah_section.component.vue';
 import PawnContractRingkasanSectionComponent from '@feature/pawn_contract/presentation/components/pawn_contract_ringkasan_section.component.vue';
 import PawnContractSettlementSectionComponent from '@feature/pawn_contract/presentation/components/pawn_contract_settlement_section.component.vue';
+import {
+  getPawnContractIndexRouteByKey,
+  resolvePawnContractIndexTabFromPath
+} from '@feature/pawn_contract/util/pawn_contract_index_navigation';
 import { pawnContractViewModel } from '@feature/pawn_contract/presentation/view_models/pawn_contract.vm';
 
+const route = useRoute();
+const router = useRouter();
 const vm = pawnContractViewModel();
 const {
   data,
@@ -299,6 +306,36 @@ const resetFilterModal = (): void => {
   resetFilters();
   closeFilterModal();
 };
+
+const syncActiveIndexTabFromRoute = (): void => {
+  const routeTabKey = resolvePawnContractIndexTabFromPath(route.path);
+
+  if (activeIndexTab.value !== routeTabKey) {
+    setActiveIndexTab(routeTabKey);
+  }
+};
+
+const openIndexTab = async (tabKey: PawnContractIndexTabKeyModel): Promise<void> => {
+  const targetRoute = getPawnContractIndexRouteByKey(tabKey);
+
+  if (activeIndexTab.value !== tabKey) {
+    setActiveIndexTab(tabKey);
+  }
+
+  if (route.path === targetRoute) {
+    return;
+  }
+
+  await router.push(targetRoute);
+};
+
+watch(
+  () => route.path,
+  () => {
+    syncActiveIndexTabFromRoute();
+  },
+  { immediate: true }
+);
 
 onMounted(() => {
   void vm.getPawnContractData();

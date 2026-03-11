@@ -26,6 +26,14 @@
       </template>
       <template #body="{ item }">
         <tr>
+          <td data-label="Print">
+            <button
+              class="btn btn-sm pawn-contract-page__action-button pawn-contract-page__action-button--secondary"
+              type="button"
+            >
+              Print
+            </button>
+          </td>
           <td data-label="ID">
             {{ item.source.contractId }}
           </td>
@@ -51,14 +59,6 @@
             >
               {{ item.source.checklistLabel }}
             </span>
-          </td>
-          <td data-label="Print">
-            <button
-              class="btn btn-sm btn-outline-secondary"
-              type="button"
-            >
-              Print
-            </button>
           </td>
         </tr>
       </template>

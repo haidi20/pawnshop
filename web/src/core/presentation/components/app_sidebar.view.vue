@@ -84,25 +84,76 @@
             v-if="isGroupExpanded(item)"
             class="sidebar-subnav"
           >
-            <RouterLink
+            <template
               v-for="child in item.children"
               :key="child.key"
-              :to="child.route ?? '/dashboard'"
-              class="sidebar-sublink"
-              :class="{ active: isItemActive(child.route) }"
-              :data-testid="`sidebar-link-${child.key}`"
-              :title="child.label"
-              @click="$emit('navigate')"
             >
-              <span class="sidebar-sublink-bullet" />
-              <span class="sidebar-sublink-icon">
-                <i
-                  class="bi"
-                  :class="child.icon"
-                />
-              </span>
-              <span class="sidebar-sublink-text">{{ child.label }}</span>
-            </RouterLink>
+              <RouterLink
+                v-if="!child.children?.length"
+                :to="child.route ?? '/dashboard'"
+                class="sidebar-sublink"
+                :class="{ active: isItemActive(child.route) }"
+                :data-testid="`sidebar-link-${child.key}`"
+                :title="child.label"
+                @click="$emit('navigate')"
+              >
+                <span class="sidebar-sublink-bullet" />
+                <span class="sidebar-sublink-icon">
+                  <i
+                    class="bi"
+                    :class="child.icon"
+                  />
+                </span>
+                <span class="sidebar-sublink-text">{{ child.label }}</span>
+              </RouterLink>
+
+              <section
+                v-else
+                class="sidebar-subgroup"
+                :class="{ 'is-active': isNavigationItemActive(child) }"
+                :data-testid="`sidebar-group-${child.key}`"
+              >
+                <component
+                  :is="child.route ? RouterLink : 'div'"
+                  :to="child.route ?? undefined"
+                  class="sidebar-subgroup-link"
+                  :class="{ active: child.route ? isItemActive(child.route) : isNavigationItemActive(child) }"
+                  :title="child.label"
+                  @click="child.route ? $emit('navigate') : undefined"
+                >
+                  <span class="sidebar-sublink-bullet" />
+                  <span class="sidebar-sublink-icon">
+                    <i
+                      class="bi"
+                      :class="child.icon"
+                    />
+                  </span>
+                  <span class="sidebar-sublink-text">{{ child.label }}</span>
+                </component>
+
+                <div class="sidebar-subnav sidebar-subnav--nested">
+                  <RouterLink
+                    v-for="grandChild in child.children"
+                    :key="grandChild.key"
+                    :to="grandChild.route ?? '/dashboard'"
+                    class="sidebar-sublink sidebar-sublink--nested"
+                    :class="{ active: isItemActive(grandChild.route) }"
+                    :data-testid="`sidebar-link-${grandChild.key}`"
+                    :title="grandChild.label"
+                    @click="$emit('navigate')"
+                  >
+                    <span class="sidebar-sublink-bullet" />
+                    <span class="sidebar-sublink-icon">
+                      <i
+                        class="bi"
+                        :class="grandChild.icon"
+                      />
+                    </span>
+                    <span class="sidebar-sublink-text">{{ grandChild.label }}</span>
+                  </RouterLink>
+                </div>
+              </section>
+            </template>
           </div>
         </section>
       </template>
@@ -162,13 +213,16 @@ const isCollapsed = computed<boolean>(() => props.isCollapsed);
 const isItemActive = (route?: string): boolean =>
   route !== undefined && (activePath.value === route || activePath.value.startsWith(`${route}/`));
 
+const isNavigationItemActive = (item: AppNavigationItem): boolean =>
+  isItemActive(item.route) || item.children?.some((child) => isNavigationItemActive(child)) || false;
+
 const isGroupActive = (item: AppNavigationItem): boolean =>
-  item.children?.some((child) => isItemActive(child.route)) ?? false;
+  item.children?.some((child) => isNavigationItemActive(child)) ?? false;
 
 const isGroupExpanded = (item: AppNavigationItem): boolean => isGroupActive(item) || expandedGroupKey.value === item.key;
 
 const findActiveGroupKey = (): string | null =>
-  props.items.find((item) => item.children?.some((child) => isItemActive(child.route)))?.key ?? null;
+  props.items.find((item) => item.children?.some((child) => isNavigationItemActive(child)))?.key ?? null;
 
 const toggleGroup = (item: AppNavigationItem): void => {
   if (isCollapsed.value || !item.children?.length) {

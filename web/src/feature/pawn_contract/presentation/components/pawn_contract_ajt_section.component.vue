@@ -22,6 +22,14 @@
       </template>
       <template #body="{ item }">
         <tr>
+          <td class="pawn-contract-page__cell-action" data-label="Aksi">
+            <RouterLink class="btn btn-sm pawn-contract-page__action-button" :to="{
+              name: 'PawnContractFormEdit',
+              params: { contractId: item.source.contract.id },
+            }">
+              Ubah
+            </RouterLink>
+          </td>
           <td data-label="No. Gadai">
             {{ item.source.contract.contractNumber }}
           </td>
@@ -48,14 +56,6 @@
               :class="getContractStatusClass(item.source.contract.contractStatus)">
               {{ getContractStatusLabel(item.source.contract.contractStatus) }}
             </span>
-          </td>
-          <td class="pawn-contract-page__cell-action text-end" data-label="Aksi">
-            <RouterLink class="btn btn-sm btn-outline-dark pawn-contract-page__action-button" :to="{
-              name: 'PawnContractFormEdit',
-              params: { contractId: item.source.contract.id },
-            }">
-              Ubah
-            </RouterLink>
           </td>
         </tr>
       </template>

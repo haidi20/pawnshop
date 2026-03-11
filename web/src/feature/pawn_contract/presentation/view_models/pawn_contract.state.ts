@@ -44,6 +44,7 @@ export type PawnContractTableField = {
 };
 
 export const nasabahTableFields = [
+    { key: 'actions', label: 'Aksi' },
     { key: 'customerName', label: 'Nama' },
     { key: 'customerPhone', label: 'No. Telp' },
     { key: 'customerIdentity', label: 'ID' },
@@ -52,8 +53,7 @@ export const nasabahTableFields = [
     { key: 'arrearsAmount', label: 'Tunggakan' },
     { key: 'contractDate', label: 'Tanggal Gadai' },
     { key: 'maturityDate', label: 'Jatuh Tempo' },
-    { key: 'processStatusLabel', label: 'Status Proses' },
-    { key: 'actions', label: 'Aksi', thClass: 'text-end', tdClass: 'text-end' }
+    { key: 'processStatusLabel', label: 'Status Proses' }
 ] satisfies PawnContractTableField[];
 
 export const ringkasanTableFields = [
@@ -74,13 +74,13 @@ export const ringkasanPendapatanTableFields = [
 ] satisfies PawnContractTableField[];
 
 export const ajtTableFields = [
+    { key: 'actions', label: 'Aksi' },
     { key: 'contractNumber', label: 'No. Gadai' },
     { key: 'customerName', label: 'Nasabah' },
     { key: 'itemNames', label: 'Jaminan' },
     { key: 'maturityDate', label: 'Jatuh Tempo' },
     { key: 'termLabel', label: 'Tenor' },
-    { key: 'statusLabel', label: 'Status' },
-    { key: 'actions', label: 'Aksi', thClass: 'text-end', tdClass: 'text-end' }
+    { key: 'statusLabel', label: 'Status' }
 ] satisfies PawnContractTableField[];
 
 export const settlementTableFields = [
@@ -93,22 +93,22 @@ export const settlementTableFields = [
 ] satisfies PawnContractTableField[];
 
 export const locationTableFields = [
+    { key: 'actions', label: 'Aksi' },
+    { key: 'print', label: 'Print' },
     { key: 'sequence', label: 'No' },
     { key: 'itemName', label: 'Nama Barang' },
     { key: 'customerName', label: 'Nasabah' },
     { key: 'branchName', label: 'Cabang' },
-    { key: 'currentLocationLabel', label: 'Lokasi' },
-    { key: 'actions', label: 'Action' },
-    { key: 'print', label: 'Print' }
+    { key: 'currentLocationLabel', label: 'Lokasi' }
 ] satisfies PawnContractTableField[];
 
 export const maintenanceTableFields = [
+    { key: 'print', label: 'Print' },
     { key: 'contractId', label: 'ID' },
     { key: 'customerName', label: 'Nama Nasabah' },
     { key: 'itemNames', label: 'Nama Barang' },
     { key: 'contractDate', label: 'Tanggal Gadai' },
-    { key: 'checklistLabel', label: 'Ceklis' },
-    { key: 'print', label: 'Print' }
+    { key: 'checklistLabel', label: 'Ceklis' }
 ] satisfies PawnContractTableField[];
 
 export const createPawnContractState = (): IPawnContractState => ({

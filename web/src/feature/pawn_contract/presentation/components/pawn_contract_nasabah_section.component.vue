@@ -78,6 +78,18 @@
           <template #body="{ item }">
             <tr>
               <td
+                class="pawn-contract-page__cell-action"
+                data-label="Aksi"
+              >
+                <button
+                  class="btn btn-sm pawn-contract-page__action-button"
+                  type="button"
+                  @click="emit('open-action', item.source)"
+                >
+                  Aksi
+                </button>
+              </td>
+              <td
                 class="pawn-contract-page__cell-primary"
                 data-label="Nama"
               >
@@ -140,18 +152,6 @@
                 >
                   {{ item.source.processStatusLabel }}
                 </span>
-              </td>
-              <td
-                class="pawn-contract-page__cell-action text-end"
-                data-label="Aksi"
-              >
-                <button
-                  class="btn btn-sm btn-outline-dark pawn-contract-page__action-button"
-                  type="button"
-                  @click="emit('open-action', item.source)"
-                >
-                  Aksi
-                </button>
               </td>
             </tr>
           </template>

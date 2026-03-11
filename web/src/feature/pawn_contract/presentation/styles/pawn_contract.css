@@ -274,7 +274,7 @@
 }
 
 .pawn-contract-page__datatable .ps-datatable__surface {
-  padding: 12px 16px 0;
+  padding: 0;
 }
 
 .pawn-contract-page__datatable .ps-datatable__table-wrap {
@@ -359,7 +359,7 @@
 }
 
 .pawn-contract-page__datatable .ps-datatable__overlay {
-  inset: 12px 16px 0;
+  inset: 0;
 }
 
 .pawn-contract-page__datatable .ps-datatable__overlay-card {
@@ -420,10 +420,61 @@
 }
 
 .pawn-contract-page__action-button {
+  background-color: var(--primary);
+  border: 1px solid var(--primary);
+  box-shadow: 0 8px 16px rgba(0, 94, 170, 0.14);
+  color: #ffffff;
+  font-weight: 600;
   min-width: 5rem;
   min-height: 32px;
   padding-inline: 0.75rem;
+  text-decoration: none;
+  transition:
+    background var(--transition-soft),
+    border-color var(--transition-soft),
+    box-shadow var(--transition-soft),
+    color var(--transition-soft),
+    transform var(--transition-soft);
   white-space: nowrap;
+}
+
+.pawn-contract-page__action-button:hover,
+.pawn-contract-page__action-button:focus-visible {
+  background-color: #004f8f;
+  border-color: #004f8f;
+  box-shadow: 0 10px 18px rgba(0, 94, 170, 0.16);
+  color: #ffffff;
+  transform: translateY(-1px);
+}
+
+.pawn-contract-page__action-button:active {
+  background-color: #00457b;
+  border-color: #00457b;
+  box-shadow: 0 6px 12px rgba(0, 94, 170, 0.14);
+  color: #ffffff;
+  transform: translateY(0);
+}
+
+.pawn-contract-page__action-button--secondary {
+  background: rgba(0, 94, 170, 0.08);
+  border-color: rgba(0, 94, 170, 0.22);
+  box-shadow: none;
+  color: var(--primary);
+}
+
+.pawn-contract-page__action-button--secondary:hover,
+.pawn-contract-page__action-button--secondary:focus-visible {
+  background: rgba(0, 94, 170, 0.14);
+  border-color: rgba(0, 94, 170, 0.32);
+  box-shadow: 0 10px 18px rgba(0, 94, 170, 0.1);
+  color: var(--primary);
+}
+
+.pawn-contract-page__action-button--secondary:active {
+  background: rgba(0, 94, 170, 0.18);
+  border-color: rgba(0, 94, 170, 0.36);
+  box-shadow: none;
+  color: var(--primary);
 }
 
 .pawn-contract-page__filter-modal {
@@ -693,11 +744,11 @@
   }
 
   .pawn-contract-page__datatable .ps-datatable__surface {
-    padding: 10px 12px 0;
+    padding: 0;
   }
 
   .pawn-contract-page__datatable .ps-datatable__overlay {
-    inset: 10px 12px 0;
+    inset: 0;
   }
 
   .pawn-contract-page__primary-action,

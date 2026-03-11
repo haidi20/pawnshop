@@ -62,6 +62,7 @@ Layout utama didefinisikan dalam `main.vue` dengan class `.admin-layout`.
 ### Buttons (`.btn`)
 - **Radius**: `12px` (`$input-radius`).
 - **Font**: Bold (`700`).
+- **Warna**: Untuk komponen yang mengikuti theme aplikasi, gunakan warna solid dari design token. Jangan gunakan gradient pada tombol atau elemen aksi bertema.
 - **Efek**: Skala membesar sedikit (`scale(1.02)`) saat di-hover.
 
 ### Form Inputs (`.form-control`, `.form-select`)

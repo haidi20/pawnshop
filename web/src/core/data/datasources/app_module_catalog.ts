@@ -1,4 +1,7 @@
 import type { AppModuleSummary, AppNavigationItem } from '@core/domain/interfaces/app_module.interface';
+import {
+    pawnContractIndexNavigationItems
+} from '@feature/pawn_contract/util/pawn_contract_index_navigation';
 
 export const appNavigationItems: AppNavigationItem[] = [
     {
@@ -26,7 +29,8 @@ export const appNavigationItems: AppNavigationItem[] = [
                 label: 'Lihat Data',
                 route: '/pawn-contracts/list',
                 icon: 'bi-table',
-                caption: 'Lihat daftar data gadai'
+                caption: 'Lihat daftar data gadai',
+                children: pawnContractIndexNavigationItems
             }
         ]
     }

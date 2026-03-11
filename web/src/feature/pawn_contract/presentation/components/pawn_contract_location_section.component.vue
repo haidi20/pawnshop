@@ -38,6 +38,34 @@
       </template>
       <template #body="{ item, index }">
         <tr>
+          <td
+            class="pawn-contract-page__cell-action"
+            data-label="Aksi"
+          >
+            <div class="d-flex flex-wrap gap-2">
+              <button
+                class="btn btn-sm pawn-contract-page__action-button"
+                type="button"
+              >
+                {{ item.source.primaryActionLabel }}
+              </button>
+              <button
+                v-if="item.source.secondaryActionLabel"
+                class="btn btn-sm pawn-contract-page__action-button pawn-contract-page__action-button--secondary"
+                type="button"
+              >
+                {{ item.source.secondaryActionLabel }}
+              </button>
+            </div>
+          </td>
+          <td data-label="Print">
+            <button
+              class="btn btn-sm pawn-contract-page__action-button pawn-contract-page__action-button--secondary"
+              type="button"
+            >
+              Print
+            </button>
+          </td>
           <td data-label="No">
             {{ dataTableVm.offset + index + 1 }}
           </td>
@@ -65,31 +93,6 @@
             >
               {{ item.source.currentLocationLabel }}
             </span>
-          </td>
-          <td data-label="Action">
-            <div class="d-flex flex-wrap gap-2">
-              <button
-                class="btn btn-sm btn-outline-dark"
-                type="button"
-              >
-                {{ item.source.primaryActionLabel }}
-              </button>
-              <button
-                v-if="item.source.secondaryActionLabel"
-                class="btn btn-sm btn-outline-secondary"
-                type="button"
-              >
-                {{ item.source.secondaryActionLabel }}
-              </button>
-            </div>
-          </td>
-          <td data-label="Print">
-            <button
-              class="btn btn-sm btn-outline-secondary"
-              type="button"
-            >
-              Print
-            </button>
           </td>
         </tr>
       </template>
