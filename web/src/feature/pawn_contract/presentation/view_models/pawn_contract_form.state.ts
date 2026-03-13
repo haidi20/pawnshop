@@ -11,6 +11,7 @@ import {
 import {
     type PawnContractFormReferenceModel,
     type PawnContractFormValueModel,
+    type PawnContractItemPresetModel,
     type SavePawnContractResultModel
 } from '@feature/pawn_contract/domain/models';
 import type {
@@ -45,6 +46,124 @@ export interface IPawnContractFormState {
     submitError: Ref<string | null>;
     lastSavedResult: Ref<SavePawnContractResultModel | null>;
 }
+
+export type GuideItemTypeSeed = {
+    kind: PawnContractItemKindEnum;
+    value: string;
+    label: string;
+    categoryCode: string;
+    categoryName: string;
+    typeCode: string;
+    typeName: string;
+    marginRate: number;
+    deductionRate: number;
+};
+
+export const guideItemTypeSeeds: GuideItemTypeSeed[] = [
+    {
+        kind: PawnContractItemKindEnum.Electronic,
+        value: 'smartphone',
+        label: 'Smartphone',
+        categoryCode: 'ELEC',
+        categoryName: 'Elektronik',
+        typeCode: 'ELEC-SMARTPHONE',
+        typeName: 'Smartphone',
+        marginRate: 12,
+        deductionRate: 2
+    },
+    {
+        kind: PawnContractItemKindEnum.Electronic,
+        value: 'laptop',
+        label: 'Laptop',
+        categoryCode: 'ELEC',
+        categoryName: 'Elektronik',
+        typeCode: 'ELEC-LAPTOP',
+        typeName: 'Laptop',
+        marginRate: 11,
+        deductionRate: 2
+    },
+    {
+        kind: PawnContractItemKindEnum.Electronic,
+        value: 'kamera',
+        label: 'Kamera',
+        categoryCode: 'ELEC',
+        categoryName: 'Elektronik',
+        typeCode: 'ELEC-CAMERA',
+        typeName: 'Kamera',
+        marginRate: 10,
+        deductionRate: 2
+    },
+    {
+        kind: PawnContractItemKindEnum.Electronic,
+        value: 'tv',
+        label: 'Televisi',
+        categoryCode: 'ELEC',
+        categoryName: 'Elektronik',
+        typeCode: 'ELEC-TV',
+        typeName: 'Televisi',
+        marginRate: 9,
+        deductionRate: 1
+    },
+    {
+        kind: PawnContractItemKindEnum.Electronic,
+        value: 'lain_lain',
+        label: 'Elektronik lain',
+        categoryCode: 'ELEC',
+        categoryName: 'Elektronik',
+        typeCode: 'ELEC-OTHER',
+        typeName: 'Elektronik Lain',
+        marginRate: 8,
+        deductionRate: 1
+    },
+    {
+        kind: PawnContractItemKindEnum.Vehicle,
+        value: 'motor',
+        label: 'Motor',
+        categoryCode: 'VEH',
+        categoryName: 'Kendaraan',
+        typeCode: 'VEH-MOTOR',
+        typeName: 'Motor',
+        marginRate: 14,
+        deductionRate: 4
+    },
+    {
+        kind: PawnContractItemKindEnum.Vehicle,
+        value: 'mobil',
+        label: 'Mobil',
+        categoryCode: 'VEH',
+        categoryName: 'Kendaraan',
+        typeCode: 'VEH-CAR',
+        typeName: 'Mobil',
+        marginRate: 13,
+        deductionRate: 3
+    }
+];
+
+export const itemPresetMeta: Record<
+    PawnContractItemKindEnum,
+    Pick<PawnContractItemPresetModel, 'label' | 'description' | 'administrationFeeAmount' | 'detailLabels'>
+> = {
+    [PawnContractItemKindEnum.Electronic]: {
+        label: 'Elektronik',
+        description: 'Gunakan untuk smartphone, laptop, kamera, TV, dan barang elektronik sejenis.',
+        administrationFeeAmount: 10_000,
+        detailLabels: {
+            first: 'Tipe / seri',
+            second: 'Merek',
+            third: 'IMEI / nomor serial'
+        }
+    },
+    [PawnContractItemKindEnum.Vehicle]: {
+        label: 'Kendaraan',
+        description: 'Gunakan untuk motor atau mobil dengan identitas kendaraan yang jelas.',
+        administrationFeeAmount: 50_000,
+        detailLabels: {
+            first: 'Nomor polisi',
+            second: 'Warna kendaraan',
+            third: 'Nomor rangka'
+        }
+    }
+};
 
 export const createPawnContractCustomerLookupKey = (): string =>
     `rahin-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;

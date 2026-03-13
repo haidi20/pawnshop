@@ -16,7 +16,7 @@ import {
     PawnContractIndexTabKeyEnum,
     PawnContractNasabahTabKeyEnum
 } from '@feature/pawn_contract/domain/models';
-import { getPawnContractAvailableActions } from '@feature/pawn_contract/presentation/view_models/pawn_contract.state';
+
 import type {
     PawnContractActionKeyModel,
     PawnContractActionOptionModel,
@@ -46,109 +46,16 @@ import type {
     PawnContractTableOptionModel
 } from '@feature/pawn_contract/domain/models';
 
-const RUNNING_CONTRACT_STATUSES = new Set<PawnContractStatusModel>(['active', 'extended']);
 
-const PAWN_CONTRACT_INDEX_TABS: Array<Omit<PawnContractIndexTabModel, 'count'>> = [
-    {
-        key: PawnContractIndexTabKeyEnum.CustomerContracts,
-        label: 'Nasabah Gadai',
-        description: 'Pantau daftar nasabah aktif, jatuh tempo, dan tindak lanjut utama berdasarkan filter cabang dan status.'
-    },
-    {
-        key: PawnContractIndexTabKeyEnum.DailySummary,
-        label: 'Ringkasan Harian',
-        description: 'Ringkas pergerakan gadai dan pendapatan harian untuk membantu monitoring operasional yang lebih cepat.'
-    },
-    {
-        key: PawnContractIndexTabKeyEnum.DueContracts,
-        label: 'Gadai Jatuh Tempo',
-        description: 'Kelompokkan gadai yang mendekati atau melewati jatuh tempo agar tindak lanjut tidak tertinggal.'
-    },
-    {
-        key: PawnContractIndexTabKeyEnum.SettlementAuction,
-        label: 'Pelunasan & Lelang',
-        description: 'Tinjau kontrak yang sudah lunas, masuk proses lelang, atau memerlukan refund dalam satu alur kerja.'
-    },
-    {
-        key: PawnContractIndexTabKeyEnum.LocationDistribution,
-        label: 'Lokasi / Distribusi',
-        description: 'Lihat perpindahan dan lokasi barang jaminan per cabang tanpa pindah halaman.'
-    },
-    {
-        key: PawnContractIndexTabKeyEnum.Maintenance,
-        label: 'Maintenance',
-        description: 'Awasi kontrak yang masuk window maintenance dan ceklis operasional yang perlu ditangani.'
-    }
-];
-
-const PAWN_CONTRACT_NASABAH_TABS: Array<
-    Omit<PawnContractTableOptionModel<PawnContractNasabahTabKeyModel>, 'count'>
-> = [
-        {
-            key: PawnContractNasabahTabKeyEnum.AllData,
-            label: 'All Data',
-            description: 'Review active contracts grouped by contract month.'
-        },
-        {
-            key: PawnContractNasabahTabKeyEnum.Daily,
-            label: 'Daily',
-            description: 'Active contracts with a daily payment schedule.'
-        },
-        {
-            key: PawnContractNasabahTabKeyEnum.SevenDays,
-            label: '7 Days',
-            description: 'Active contracts with a 7-day payment schedule.'
-        },
-        {
-            key: PawnContractNasabahTabKeyEnum.FifteenDays,
-            label: '15 Days',
-            description: 'Active contracts with a 15-day payment schedule.'
-        }
-    ];
-
-const PAWN_CONTRACT_AJT_OPTIONS: Array<
-    Omit<PawnContractTableOptionModel<PawnContractAjtTypeModel>, 'count'>
-> = [
-        { key: '7', label: '7 Hari', description: 'Gadai tenor 7 hari yang masih aktif dan mendekati jatuh tempo.' },
-        { key: '15', label: '15 Hari', description: 'Gadai tenor 15 hari yang perlu dipantau menjelang jatuh tempo.' },
-        { key: '30', label: '30 Hari', description: 'Gadai tenor 30 hari yang jatuh tempo dalam waktu dekat.' },
-        { key: '60', label: '60 Hari', description: 'Gadai tenor 60 hari yang mendekati tenggat kontrak.' },
-        { key: 'tertunggak', label: 'Tertunggak', description: 'Gadai aktif yang sudah melewati jatuh tempo.' },
-        {
-            key: 'mendekati_tempo_lelang',
-            label: 'Mendekati Lelang',
-            description: 'Gadai overdue awal yang masih punya ruang tindak lanjut sebelum lelang.'
-        },
-        {
-            key: 'tempo_lelang',
-            label: 'Tempo Lelang',
-            description: 'Gadai overdue lebih lanjut yang mulai masuk window lelang.'
-        },
-        {
-            key: 'tunda_lelang',
-            label: 'Tunda Lelang',
-            description: 'Gadai perpanjangan yang tetap overdue dan perlu keputusan lanjutan.'
-        }
-    ];
-
-const PAWN_CONTRACT_SETTLEMENT_OPTIONS: Array<
-    Omit<PawnContractTableOptionModel<PawnContractSettlementTypeModel>, 'count'>
-> = [
-        { key: 'lunas', label: 'Lunas', description: 'Kontrak yang sudah selesai melalui pelunasan atau penutupan.' },
-        { key: 'lelang', label: 'Lelang', description: 'Kontrak yang berakhir melalui proses lelang.' },
-        { key: 'refund', label: 'Refund', description: 'Kontrak batal yang memerlukan tindak lanjut pengembalian.' }
-    ];
-
-const PAWN_CONTRACT_LOCATION_OPTIONS: Array<
-    Omit<PawnContractTableOptionModel<PawnContractLocationTabModel>, 'count'>
-> = [
-        { key: 'kantor', label: 'Kantor', description: 'Barang jaminan yang saat ini berada di kantor cabang.' },
-        { key: 'proses', label: 'Proses', description: 'Barang jaminan yang sedang bergerak atau diproses.' },
-        { key: 'gudang', label: 'Gudang', description: 'Barang jaminan yang saat ini berada di gudang.' }
-    ];
 
 export class PawnContractIndexLocalDatasource {
-    getContractSummaries(data: PawnContractDataModel | null): PawnContractSummaryModel[] {
+    getContractSummaries(params: {
+        data: PawnContractDataModel | null;
+        runningContractStatuses: Set<PawnContractStatusModel>;
+        getAvailableActions: (params: { contractStatus: string; daysToMaturity: number }) => PawnContractActionOptionModel[];
+    }): PawnContractSummaryModel[] {
+        const { data, runningContractStatuses, getAvailableActions } = params;
+
         if (!data) {
             return [];
         }
@@ -160,7 +67,7 @@ export class PawnContractIndexLocalDatasource {
                 const itemNames = detail.items.map(({ item }) => item.itemName).join(', ') || 'Belum ada barang';
                 const locationStatuses = Array.from(new Set(detail.items.map(({ item }) => item.currentLocationStatus)));
                 const daysToMaturity = getPawnContractDaysToDate(detail.contract.maturityDate);
-                const isOpenContract = RUNNING_CONTRACT_STATUSES.has(detail.contract.contractStatus);
+                const isOpenContract = runningContractStatuses.has(detail.contract.contractStatus);
 
                 return {
                     ...detail,
@@ -188,7 +95,7 @@ export class PawnContractIndexLocalDatasource {
                         contractStatus: detail.contract.contractStatus,
                         daysToMaturity
                     }),
-                    availableActions: getPawnContractAvailableActions({
+                    availableActions: getAvailableActions({
                         contractStatus: detail.contract.contractStatus,
                         daysToMaturity
                     })
@@ -197,9 +104,11 @@ export class PawnContractIndexLocalDatasource {
             .sort((left, right) => sortDateOnlyDesc(left.contract.contractDate, right.contract.contractDate));
     }
 
-    getNasabahTable(params: GetPawnContractNasabahTableParamsModel): PawnContractNasabahTableModel {
+    getNasabahTable(params: GetPawnContractNasabahTableParamsModel & {
+        nasabahTabs: Array<Omit<PawnContractTableOptionModel<PawnContractNasabahTabKeyModel>, 'count'>>;
+    }): PawnContractNasabahTableModel {
         const tabRows = this.getNasabahTabRows(params.summaries, params.activeTab);
-        const tabs = PAWN_CONTRACT_NASABAH_TABS.map((tab) => ({
+        const tabs = params.nasabahTabs.map((tab) => ({
             ...tab,
             count: this.getNasabahTabRows(params.summaries, tab.key).length
         }));
@@ -274,11 +183,13 @@ export class PawnContractIndexLocalDatasource {
         };
     }
 
-    getAjtTable(params: GetPawnContractAjtTableParamsModel): PawnContractAjtTableModel {
+    getAjtTable(params: GetPawnContractAjtTableParamsModel & {
+        ajtOptions: Array<Omit<PawnContractTableOptionModel<PawnContractAjtTypeModel>, 'count'>>;
+    }): PawnContractAjtTableModel {
         return {
             title: 'Pilihan jenis jatuh tempo',
             description: 'Fokuskan pemantauan gadai aktif berdasarkan tenor dan tingkat keterlambatan.',
-            options: PAWN_CONTRACT_AJT_OPTIONS.map((item) => ({
+            options: params.ajtOptions.map((item) => ({
                 ...item,
                 count: this.getAjtRows(params.summaries, item.key).length
             })),
@@ -286,11 +197,13 @@ export class PawnContractIndexLocalDatasource {
         };
     }
 
-    getSettlementTable(params: GetPawnContractSettlementTableParamsModel): PawnContractSettlementTableModel {
+    getSettlementTable(params: GetPawnContractSettlementTableParamsModel & {
+        settlementOptions: Array<Omit<PawnContractTableOptionModel<PawnContractSettlementTypeModel>, 'count'>>;
+    }): PawnContractSettlementTableModel {
         return {
             title: 'Data lunas, lelang, dan refund',
             description: 'Satukan status penyelesaian kontrak agar proses back office lebih mudah dipantau.',
-            options: PAWN_CONTRACT_SETTLEMENT_OPTIONS.map((item) => ({
+            options: params.settlementOptions.map((item) => ({
                 ...item,
                 count: this.getSettlementRows(params.summaries, item.key).length
             })),
@@ -298,11 +211,13 @@ export class PawnContractIndexLocalDatasource {
         };
     }
 
-    getLocationTable(params: GetPawnContractLocationTableParamsModel): PawnContractLocationTableModel {
+    getLocationTable(params: GetPawnContractLocationTableParamsModel & {
+        locationOptions: Array<Omit<PawnContractTableOptionModel<PawnContractLocationTabModel>, 'count'>>;
+    }): PawnContractLocationTableModel {
         return {
             title: 'Mutasi lokasi barang jaminan',
             description: 'Lacak barang jaminan per lokasi agar distribusi dan perpindahan tidak terlewat.',
-            options: PAWN_CONTRACT_LOCATION_OPTIONS.map((item) => ({
+            options: params.locationOptions.map((item) => ({
                 ...item,
                 count: this.getLocationRows(params.summaries, item.key).length
             })),
@@ -318,8 +233,10 @@ export class PawnContractIndexLocalDatasource {
         };
     }
 
-    getIndexTabs(params: GetPawnContractIndexTabsParamsModel): PawnContractIndexTabModel[] {
-        return PAWN_CONTRACT_INDEX_TABS.map((item) => ({
+    getIndexTabs(params: GetPawnContractIndexTabsParamsModel & {
+        indexTabs: Array<Omit<PawnContractIndexTabModel, 'count'>>;
+    }): PawnContractIndexTabModel[] {
+        return params.indexTabs.map((item) => ({
             ...item,
             count: this.getIndexTabCount(item.key, params)
         }));

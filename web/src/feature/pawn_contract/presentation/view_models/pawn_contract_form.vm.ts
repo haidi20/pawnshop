@@ -38,7 +38,9 @@ import {
     createPawnContractCustomerLookupKey,
     createInitialPawnContractFormFieldErrors,
     createInitialPawnContractTouchedFields,
-    createPawnContractFormState
+    createPawnContractFormState,
+    guideItemTypeSeeds,
+    itemPresetMeta
 } from '@feature/pawn_contract/presentation/view_models/pawn_contract_form.state';
 import {
     buildPawnContractCustomerSuggestions,
@@ -502,12 +504,20 @@ export const pawnContractFormViewModel = defineStore('pawnContractFormStore', ()
         setError(null);
 
         try {
-            const referenceData = unwrapEitherOrThrow(await pawnContractRepository.getFormReferenceData());
+            const referenceData = unwrapEitherOrThrow(
+                await pawnContractRepository.getFormReferenceData({
+                    guideItemTypeSeeds,
+                    itemPresetMeta
+                })
+            );
             state.referenceData.value = referenceData;
 
             if (isEditMode.value && state.currentContractId.value !== null) {
                 const formValue = unwrapEitherOrThrow(
-                    await pawnContractRepository.getFormValue(state.currentContractId.value)
+                    await pawnContractRepository.getFormValue({
+                        contractId: state.currentContractId.value,
+                        guideItemTypeSeeds
+                    })
                 );
                 applyLoadedFormValue(formValue);
                 return;
@@ -568,7 +578,12 @@ export const pawnContractFormViewModel = defineStore('pawnContractFormStore', ()
 
         try {
             const savePayload = createSavePayload();
-            const result = unwrapEitherOrThrow(await pawnContractRepository.saveContract(savePayload));
+            const result = unwrapEitherOrThrow(
+                await pawnContractRepository.saveContract({
+                    payload: savePayload,
+                    guideItemTypeSeeds
+                })
+            );
             state.lastSavedResult.value = result;
 
             const successMessage = buildSaveSuccessMessage({

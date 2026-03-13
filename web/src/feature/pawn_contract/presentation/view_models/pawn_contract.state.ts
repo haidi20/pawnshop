@@ -4,9 +4,11 @@ import type {
     PawnContractAjtTypeModel,
     PawnContractDataModel,
     PawnContractIndexTabKeyModel,
+    PawnContractIndexTabModel,
     PawnContractLocationTabModel,
     PawnContractNasabahTabKeyModel,
-    PawnContractSettlementTypeModel
+    PawnContractSettlementTypeModel,
+    PawnContractTableOptionModel
 } from '@feature/pawn_contract/domain/models';
 import {
     PawnContractIndexTabKeyEnum,
@@ -14,6 +16,7 @@ import {
     type PawnContractActionKeyModel,
     type PawnContractActionOptionModel
 } from '@feature/pawn_contract/domain/models';
+import type { PawnContractStatusModel } from '@core/util/helpers';
 import {
     createEmptyIndexTabFilters,
     type PawnContractIndexTabFilterStateModel
@@ -168,6 +171,107 @@ export const maintenanceTableFields = [
     { key: 'contractDate', label: 'Tanggal Gadai' },
     { key: 'checklistLabel', label: 'Ceklis' }
 ] satisfies PawnContractTableField[];
+
+export const RUNNING_CONTRACT_STATUSES = new Set<PawnContractStatusModel>(['active', 'extended']);
+
+export const PAWN_CONTRACT_INDEX_TABS: Array<Omit<PawnContractIndexTabModel, 'count'>> = [
+    {
+        key: PawnContractIndexTabKeyEnum.CustomerContracts,
+        label: 'Nasabah Gadai',
+        description: 'Pantau daftar nasabah aktif, jatuh tempo, dan tindak lanjut utama berdasarkan filter cabang dan status.'
+    },
+    {
+        key: PawnContractIndexTabKeyEnum.DailySummary,
+        label: 'Ringkasan Harian',
+        description: 'Ringkas pergerakan gadai dan pendapatan harian untuk membantu monitoring operasional yang lebih cepat.'
+    },
+    {
+        key: PawnContractIndexTabKeyEnum.DueContracts,
+        label: 'Gadai Jatuh Tempo',
+        description: 'Kelompokkan gadai yang mendekati atau melewati jatuh tempo agar tindak lanjut tidak tertinggal.'
+    },
+    {
+        key: PawnContractIndexTabKeyEnum.SettlementAuction,
+        label: 'Pelunasan & Lelang',
+        description: 'Tinjau kontrak yang sudah lunas, masuk proses lelang, atau memerlukan refund dalam satu alur kerja.'
+    },
+    {
+        key: PawnContractIndexTabKeyEnum.LocationDistribution,
+        label: 'Lokasi / Distribusi',
+        description: 'Lihat perpindahan dan lokasi barang jaminan per cabang tanpa pindah halaman.'
+    },
+    {
+        key: PawnContractIndexTabKeyEnum.Maintenance,
+        label: 'Maintenance',
+        description: 'Awasi kontrak yang masuk window maintenance dan ceklis operasional yang perlu ditangani.'
+    }
+];
+
+export const PAWN_CONTRACT_NASABAH_TABS: Array<
+    Omit<PawnContractTableOptionModel<PawnContractNasabahTabKeyModel>, 'count'>
+> = [
+        {
+            key: PawnContractNasabahTabKeyEnum.AllData,
+            label: 'All Data',
+            description: 'Review active contracts grouped by contract month.'
+        },
+        {
+            key: PawnContractNasabahTabKeyEnum.Daily,
+            label: 'Daily',
+            description: 'Active contracts with a daily payment schedule.'
+        },
+        {
+            key: PawnContractNasabahTabKeyEnum.SevenDays,
+            label: '7 Days',
+            description: 'Active contracts with a 7-day payment schedule.'
+        },
+        {
+            key: PawnContractNasabahTabKeyEnum.FifteenDays,
+            label: '15 Days',
+            description: 'Active contracts with a 15-day payment schedule.'
+        }
+    ];
+
+export const PAWN_CONTRACT_AJT_OPTIONS: Array<
+    Omit<PawnContractTableOptionModel<PawnContractAjtTypeModel>, 'count'>
+> = [
+        { key: '7', label: '7 Hari', description: 'Gadai tenor 7 hari yang masih aktif dan mendekati jatuh tempo.' },
+        { key: '15', label: '15 Hari', description: 'Gadai tenor 15 hari yang perlu dipantau menjelang jatuh tempo.' },
+        { key: '30', label: '30 Hari', description: 'Gadai tenor 30 hari yang jatuh tempo dalam waktu dekat.' },
+        { key: '60', label: '60 Hari', description: 'Gadai tenor 60 hari yang mendekati tenggat kontrak.' },
+        { key: 'tertunggak', label: 'Tertunggak', description: 'Gadai aktif yang sudah melewati jatuh tempo.' },
+        {
+            key: 'mendekati_tempo_lelang',
+            label: 'Mendekati Lelang',
+            description: 'Gadai overdue awal yang masih punya ruang tindak lanjut sebelum lelang.'
+        },
+        {
+            key: 'tempo_lelang',
+            label: 'Tempo Lelang',
+            description: 'Gadai overdue lebih lanjut yang mulai masuk window lelang.'
+        },
+        {
+            key: 'tunda_lelang',
+            label: 'Tunda Lelang',
+            description: 'Gadai perpanjangan yang tetap overdue dan perlu keputusan lanjutan.'
+        }
+    ];
+
+export const PAWN_CONTRACT_SETTLEMENT_OPTIONS: Array<
+    Omit<PawnContractTableOptionModel<PawnContractSettlementTypeModel>, 'count'>
+> = [
+        { key: 'lunas', label: 'Lunas', description: 'Kontrak yang sudah selesai melalui pelunasan atau penutupan.' },
+        { key: 'lelang', label: 'Lelang', description: 'Kontrak yang berakhir melalui proses lelang.' },
+        { key: 'refund', label: 'Refund', description: 'Kontrak batal yang memerlukan tindak lanjut pengembalian.' }
+    ];
+
+export const PAWN_CONTRACT_LOCATION_OPTIONS: Array<
+    Omit<PawnContractTableOptionModel<PawnContractLocationTabModel>, 'count'>
+> = [
+        { key: 'kantor', label: 'Kantor', description: 'Barang jaminan yang saat ini berada di kantor cabang.' },
+        { key: 'proses', label: 'Proses', description: 'Barang jaminan yang sedang bergerak atau diproses.' },
+        { key: 'gudang', label: 'Gudang', description: 'Barang jaminan yang saat ini berada di gudang.' }
+    ];
 
 export const createPawnContractState = (): IPawnContractState => ({
     data: ref(null),

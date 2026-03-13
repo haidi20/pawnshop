@@ -60,23 +60,12 @@ import type {
     PawnItemSpecificationModel,
     PawnContractItemTypeOptionModel,
     SavePawnContractPayloadModel,
-    SavePawnContractResultModel
+    SavePawnContractResultModel,
+    GuideItemTypeSeed
 } from '@feature/pawn_contract/domain/models';
 import {
     PawnContractCustomerGenderEnum as PawnContractCustomerGender
 } from '@feature/pawn_contract/domain/models';
-
-type GuideItemTypeSeed = {
-    kind: PawnContractItemKindModel;
-    value: string;
-    label: string;
-    categoryCode: string;
-    categoryName: string;
-    typeCode: string;
-    typeName: string;
-    marginRate: number;
-    deductionRate: number;
-};
 
 type PawnContractFormCollections = {
     branchRows: BranchesRow[];
@@ -121,112 +110,6 @@ const getNextId = <TRow extends { id: number }>(rows: TRow[]): number =>
     rows.reduce((maxValue, row) => Math.max(maxValue, row.id), 0) + 1;
 
 const formatContractSequence = (value: number): string => String(value).padStart(4, '0');
-
-const guideItemTypeSeeds: GuideItemTypeSeed[] = [
-    {
-        kind: PawnContractItemKindEnum.Electronic,
-        value: 'smartphone',
-        label: 'Smartphone',
-        categoryCode: 'ELEC',
-        categoryName: 'Elektronik',
-        typeCode: 'ELEC-SMARTPHONE',
-        typeName: 'Smartphone',
-        marginRate: 12,
-        deductionRate: 2
-    },
-    {
-        kind: PawnContractItemKindEnum.Electronic,
-        value: 'laptop',
-        label: 'Laptop',
-        categoryCode: 'ELEC',
-        categoryName: 'Elektronik',
-        typeCode: 'ELEC-LAPTOP',
-        typeName: 'Laptop',
-        marginRate: 11,
-        deductionRate: 2
-    },
-    {
-        kind: PawnContractItemKindEnum.Electronic,
-        value: 'kamera',
-        label: 'Kamera',
-        categoryCode: 'ELEC',
-        categoryName: 'Elektronik',
-        typeCode: 'ELEC-CAMERA',
-        typeName: 'Kamera',
-        marginRate: 10,
-        deductionRate: 2
-    },
-    {
-        kind: PawnContractItemKindEnum.Electronic,
-        value: 'tv',
-        label: 'Televisi',
-        categoryCode: 'ELEC',
-        categoryName: 'Elektronik',
-        typeCode: 'ELEC-TV',
-        typeName: 'Televisi',
-        marginRate: 9,
-        deductionRate: 1
-    },
-    {
-        kind: PawnContractItemKindEnum.Electronic,
-        value: 'lain_lain',
-        label: 'Elektronik lain',
-        categoryCode: 'ELEC',
-        categoryName: 'Elektronik',
-        typeCode: 'ELEC-OTHER',
-        typeName: 'Elektronik Lain',
-        marginRate: 8,
-        deductionRate: 1
-    },
-    {
-        kind: PawnContractItemKindEnum.Vehicle,
-        value: 'motor',
-        label: 'Motor',
-        categoryCode: 'VEH',
-        categoryName: 'Kendaraan',
-        typeCode: 'VEH-MOTOR',
-        typeName: 'Motor',
-        marginRate: 14,
-        deductionRate: 4
-    },
-    {
-        kind: PawnContractItemKindEnum.Vehicle,
-        value: 'mobil',
-        label: 'Mobil',
-        categoryCode: 'VEH',
-        categoryName: 'Kendaraan',
-        typeCode: 'VEH-CAR',
-        typeName: 'Mobil',
-        marginRate: 13,
-        deductionRate: 3
-    }
-];
-
-const itemPresetMeta: Record<
-    PawnContractItemKindModel,
-    Pick<PawnContractItemPresetModel, 'label' | 'description' | 'administrationFeeAmount' | 'detailLabels'>
-> = {
-    [PawnContractItemKindEnum.Electronic]: {
-        label: 'Elektronik',
-        description: 'Gunakan untuk smartphone, laptop, kamera, TV, dan barang elektronik sejenis.',
-        administrationFeeAmount: 10_000,
-        detailLabels: {
-            first: 'Tipe / seri',
-            second: 'Merek',
-            third: 'IMEI / nomor serial'
-        }
-    },
-    [PawnContractItemKindEnum.Vehicle]: {
-        label: 'Kendaraan',
-        description: 'Gunakan untuk motor atau mobil dengan identitas kendaraan yang jelas.',
-        administrationFeeAmount: 50_000,
-        detailLabels: {
-            first: 'Nomor polisi',
-            second: 'Warna kendaraan',
-            third: 'Nomor rangka'
-        }
-    }
-};
 
 const supportedIdentityTypes = new Set<PawnContractIdentityTypeModel>([
     PawnContractIdentityTypeEnum.Ktp,
@@ -328,8 +211,14 @@ export class PawnContractLocalDatasource {
         return pawnItemsDao.findContractIdsByLocationStatus('in_warehouse');
     }
 
-    async getFormReferenceData(): Promise<PawnContractFormReferenceModel> {
-        await this.ensureGuideReferenceData();
+    async getFormReferenceData(params: {
+        guideItemTypeSeeds: GuideItemTypeSeed[];
+        itemPresetMeta: Record<
+            PawnContractItemKindModel,
+            Pick<PawnContractItemPresetModel, 'label' | 'description' | 'administrationFeeAmount' | 'detailLabels'>
+        >;
+    }): Promise<PawnContractFormReferenceModel> {
+        await this.ensureGuideReferenceData(params.guideItemTypeSeeds);
 
         const { branchRows, cashAccountRows, customerRows, contactRows, documentRows, contractRows, itemTypeRows, itemSettingRows } =
             await this.getFormCollections();
@@ -340,7 +229,13 @@ export class PawnContractLocalDatasource {
         const branches = this.buildBranchReferences(activeBranchRows, cashAccountRows);
         const defaultBranchId = branches[0]?.id ?? null;
         const customers = this.buildCustomerReferences(customerRows, contactRows, documentRows);
-        const itemPresets = this.buildItemPresets(itemTypeRows, itemSettingRows, defaultBranchId);
+        const itemPresets = this.buildItemPresets(
+            itemTypeRows,
+            itemSettingRows,
+            defaultBranchId,
+            params.guideItemTypeSeeds,
+            params.itemPresetMeta
+        );
 
         const defaultContractDate = getTodayDateValue();
 
@@ -357,13 +252,16 @@ export class PawnContractLocalDatasource {
         };
     }
 
-    async getFormValue(contractId: number): Promise<PawnContractFormValueModel> {
-        await this.ensureGuideReferenceData();
+    async getFormValue(params: {
+        contractId: number;
+        guideItemTypeSeeds: GuideItemTypeSeed[];
+    }): Promise<PawnContractFormValueModel> {
+        await this.ensureGuideReferenceData(params.guideItemTypeSeeds);
 
         const { contractRows, itemRows, accessoryRows, issueRows, customerRows, contactRows, documentRows, itemTypeRows } =
             await this.getFormCollections();
 
-        const contractRow = contractRows.find((row) => row.id === contractId) ?? null;
+        const contractRow = contractRows.find((row) => row.id === params.contractId) ?? null;
         if (!contractRow) {
             throw new Error('Data gadai yang akan diubah tidak ditemukan.');
         }
@@ -372,7 +270,7 @@ export class PawnContractLocalDatasource {
             throw new Error('User ini tidak memiliki akses ke cabang data gadai tersebut.');
         }
 
-        const itemRow = itemRows.find((row) => row.contract_id === contractId) ?? null;
+        const itemRow = itemRows.find((row) => row.contract_id === params.contractId) ?? null;
         if (!itemRow) {
             throw new Error('Barang jaminan untuk data gadai ini tidak ditemukan.');
         }
@@ -391,8 +289,8 @@ export class PawnContractLocalDatasource {
         const primaryDocument = this.findPrimaryDocumentForCustomer(documentRows, customerRow.id);
         const itemSpecification = this.readItemSpecification(itemRow.specification_json);
         const guideItemType =
-            this.resolveGuideItemType(itemSpecification.itemDetailType, itemSpecification.itemKind) ??
-            this.resolveGuideItemTypeByItemTypeId(itemRow.item_type_id, itemTypeRows);
+            this.resolveGuideItemType(itemSpecification.itemDetailType, itemSpecification.itemKind, params.guideItemTypeSeeds) ??
+            this.resolveGuideItemTypeByItemTypeId(itemRow.item_type_id, itemTypeRows, params.guideItemTypeSeeds);
         const itemKind = guideItemType?.kind ?? itemSpecification.itemKind ?? PawnContractItemKindEnum.Electronic;
 
         return {
@@ -429,8 +327,13 @@ export class PawnContractLocalDatasource {
         };
     }
 
-    async saveContract(payload: SavePawnContractPayloadModel): Promise<SavePawnContractResultModel> {
-        await this.ensureGuideReferenceData();
+    async saveContract(params: {
+        payload: SavePawnContractPayloadModel;
+        guideItemTypeSeeds: GuideItemTypeSeed[];
+    }): Promise<SavePawnContractResultModel> {
+        await this.ensureGuideReferenceData(params.guideItemTypeSeeds);
+        
+        const { payload, guideItemTypeSeeds } = params;
 
         const {
             branchRows,
@@ -592,7 +495,7 @@ export class PawnContractLocalDatasource {
             ]);
         }
 
-        const selectedGuideType = this.resolveGuideItemType(payload.itemDetailType, payload.itemKind);
+        const selectedGuideType = this.resolveGuideItemType(payload.itemDetailType, payload.itemKind, guideItemTypeSeeds);
         const selectedTypeRow = selectedGuideType
             ? itemTypeRows.find((row) => row.type_code === selectedGuideType.typeCode) ?? null
             : null;
@@ -877,7 +780,8 @@ export class PawnContractLocalDatasource {
 
     private resolveGuideItemType(
         itemDetailType: string,
-        itemKind: PawnContractItemKindModel | null
+        itemKind: PawnContractItemKindModel | null,
+        guideItemTypeSeeds: GuideItemTypeSeed[]
     ): GuideItemTypeSeed | null {
         if (!itemDetailType || !itemKind) {
             return null;
@@ -888,7 +792,8 @@ export class PawnContractLocalDatasource {
 
     private resolveGuideItemTypeByItemTypeId(
         itemTypeId: number | null,
-        itemTypeRows: ItemTypesRow[]
+        itemTypeRows: ItemTypesRow[],
+        guideItemTypeSeeds: GuideItemTypeSeed[]
     ): GuideItemTypeSeed | null {
         if (itemTypeId === null) {
             return null;
@@ -982,7 +887,12 @@ export class PawnContractLocalDatasource {
     private buildItemPresets(
         itemTypeRows: ItemTypesRow[],
         itemSettingRows: BranchItemSettingsRow[],
-        defaultBranchId: number | null
+        defaultBranchId: number | null,
+        guideItemTypeSeeds: GuideItemTypeSeed[],
+        itemPresetMeta: Record<
+            PawnContractItemKindModel,
+            Pick<PawnContractItemPresetModel, 'label' | 'description' | 'administrationFeeAmount' | 'detailLabels'>
+        >
     ): Record<PawnContractItemKindModel, PawnContractItemPresetModel> {
         const result = {
             [PawnContractItemKindEnum.Electronic]: {
@@ -1039,7 +949,7 @@ export class PawnContractLocalDatasource {
         ].join(' ');
     }
 
-    private async ensureGuideReferenceData(): Promise<void> {
+    private async ensureGuideReferenceData(guideItemTypeSeeds: GuideItemTypeSeed[]): Promise<void> {
         const timestamp = createTimestamp();
         const [branchRows, categoryRows, itemTypeRows, itemSettingRows] = await Promise.all([
             branchesDao.getAll(),

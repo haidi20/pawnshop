@@ -3,6 +3,10 @@ import { toError } from '@core/util/either';
 import type { PawnContractSummaryModel } from '@feature/pawn_contract/domain/models';
 import type { PawnContractRepository } from '@feature/pawn_contract/domain/repositories/pawn_contract.repository';
 
+/**
+ * Mengambil ringkasan (summary) satu kontrak gadai berdasarkan ID,
+ * digunakan untuk menampilkan detail riwayat kontrak di halaman history.
+ */
 export class GetPawnContractHistoryUsecase {
     constructor(private readonly repository: PawnContractRepository) {}
 

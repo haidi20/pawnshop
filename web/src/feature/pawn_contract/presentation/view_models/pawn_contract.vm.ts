@@ -56,6 +56,13 @@ import {
     ringkasanPendapatanTableFields,
     ringkasanTableFields,
     settlementTableFields,
+    RUNNING_CONTRACT_STATUSES,
+    PAWN_CONTRACT_INDEX_TABS,
+    PAWN_CONTRACT_NASABAH_TABS,
+    PAWN_CONTRACT_AJT_OPTIONS,
+    PAWN_CONTRACT_SETTLEMENT_OPTIONS,
+    PAWN_CONTRACT_LOCATION_OPTIONS,
+    getPawnContractAvailableActions,
     type PawnContractAjtTypeModel,
     type PawnContractIndexTabKeyModel,
     type PawnContractLocationTabModel,
@@ -207,7 +214,11 @@ export const pawnContractViewModel = defineStore('pawnContractStore', () => {
         )
     );
     const contractSummaries = computed(() =>
-        unwrapEitherOrThrow(getPawnContractSummariesUsecase.execute(state.data.value))
+        unwrapEitherOrThrow(getPawnContractSummariesUsecase.execute({
+            data: state.data.value,
+            runningContractStatuses: RUNNING_CONTRACT_STATUSES,
+            getAvailableActions: getPawnContractAvailableActions
+        }))
     );
     const filteredSummariesByTab = computed(
         (): Record<PawnContractIndexTabKeyModel, PawnContractSummaryModel[]> => ({
@@ -272,7 +283,8 @@ export const pawnContractViewModel = defineStore('pawnContractStore', () => {
         unwrapEitherOrThrow(
             getPawnContractNasabahTableUsecase.execute({
                 summaries: openCustomerContractSummaries.value,
-                activeTab: state.activeNasabahTab.value
+                activeTab: state.activeNasabahTab.value,
+                nasabahTabs: PAWN_CONTRACT_NASABAH_TABS
             })
         )
     );
@@ -287,7 +299,8 @@ export const pawnContractViewModel = defineStore('pawnContractStore', () => {
         unwrapEitherOrThrow(
             getPawnContractAjtTableUsecase.execute({
                 summaries: openDueContractSummaries.value,
-                activeType: state.activeAjtType.value
+                activeType: state.activeAjtType.value,
+                ajtOptions: PAWN_CONTRACT_AJT_OPTIONS
             })
         )
     );
@@ -295,7 +308,8 @@ export const pawnContractViewModel = defineStore('pawnContractStore', () => {
         unwrapEitherOrThrow(
             getPawnContractSettlementTableUsecase.execute({
                 summaries: settlementSummaries.value,
-                activeType: state.activeSettlementType.value
+                activeType: state.activeSettlementType.value,
+                settlementOptions: PAWN_CONTRACT_SETTLEMENT_OPTIONS
             })
         )
     );
@@ -303,7 +317,8 @@ export const pawnContractViewModel = defineStore('pawnContractStore', () => {
         unwrapEitherOrThrow(
             getPawnContractLocationTableUsecase.execute({
                 summaries: locationSummaries.value,
-                activeTab: state.activeLocationTab.value
+                activeTab: state.activeLocationTab.value,
+                locationOptions: PAWN_CONTRACT_LOCATION_OPTIONS
             })
         )
     );
@@ -326,7 +341,8 @@ export const pawnContractViewModel = defineStore('pawnContractStore', () => {
                 ajtRowCount: ajtTable.value.rows.length,
                 settlementRowCount: settlementTable.value.rows.length,
                 locationRowCount: locationTable.value.rows.length,
-                maintenanceRowCount: maintenanceTable.value.rows.length
+                maintenanceRowCount: maintenanceTable.value.rows.length,
+                indexTabs: PAWN_CONTRACT_INDEX_TABS
             })
         )
     );

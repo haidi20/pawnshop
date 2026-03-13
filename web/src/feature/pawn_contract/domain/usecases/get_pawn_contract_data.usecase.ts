@@ -6,6 +6,11 @@ import type {
 } from '@feature/pawn_contract/domain/models';
 import type { PawnContractRepository } from '@feature/pawn_contract/domain/repositories/pawn_contract.repository';
 
+/**
+ * Mengambil data utama gadai (kontrak, nasabah, cabang, barang jaminan)
+ * dari local database berdasarkan filter yang diberikan.
+ * Data ini menjadi sumber utama untuk seluruh tampilan index gadai.
+ */
 export class GetPawnContractDataUsecase {
     constructor(private readonly repository: PawnContractRepository) {}
 

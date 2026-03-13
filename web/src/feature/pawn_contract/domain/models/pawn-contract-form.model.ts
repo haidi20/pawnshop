@@ -66,6 +66,18 @@ export interface PawnContractItemPresetModel {
     detailOptions: PawnContractItemTypeOptionModel[];
 }
 
+export type GuideItemTypeSeed = {
+    kind: PawnContractItemKindEnum;
+    value: string;
+    label: string;
+    categoryCode: string;
+    categoryName: string;
+    typeCode: string;
+    typeName: string;
+    marginRate: number;
+    deductionRate: number;
+};
+
 export interface PawnContractFormReferenceModel {
     nextContractNumber: string;
     defaultBranchId: number | null;
