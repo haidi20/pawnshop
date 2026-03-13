@@ -16,7 +16,9 @@ import {
     PawnContractIndexTabKeyEnum,
     PawnContractNasabahTabKeyEnum
 } from '@feature/pawn_contract/domain/models';
+import { getPawnContractAvailableActions } from '@feature/pawn_contract/presentation/view_models/pawn_contract.state';
 import type {
+    PawnContractActionKeyModel,
     PawnContractActionOptionModel,
     GetPawnContractAjtTableParamsModel,
     GetPawnContractIndexTabsParamsModel,
@@ -186,7 +188,7 @@ export class PawnContractIndexLocalDatasource {
                         contractStatus: detail.contract.contractStatus,
                         daysToMaturity
                     }),
-                    availableActions: this.getAvailableActions({
+                    availableActions: getPawnContractAvailableActions({
                         contractStatus: detail.contract.contractStatus,
                         daysToMaturity
                     })
@@ -547,61 +549,10 @@ export class PawnContractIndexLocalDatasource {
         }
 
         if (params.daysToMaturity <= 7) {
-            return 'Bayar B. Titip';
+            return 'Bayar Biaya Titip';
         }
 
         return 'Gadai Aktif';
-    }
-
-    private getAvailableActions(params: {
-        contractStatus: PawnContractStatusModel;
-        daysToMaturity: number;
-    }): PawnContractActionOptionModel[] {
-        const actions: PawnContractActionOptionModel[] = [
-            {
-                key: 'edit',
-                label: 'Ubah Data',
-                description: 'Buka form gadai untuk memperbarui data kontrak dan jaminan.'
-            },
-            {
-                key: 'history',
-                label: 'History',
-                description: 'Lihat ringkasan riwayat perubahan, jatuh tempo, dan aktivitas penting gadai.'
-            }
-        ];
-
-        if (['active', 'extended'].includes(params.contractStatus)) {
-            actions.push({
-                key: 'storage_fee',
-                label: 'Bayar B. Titip',
-                description: 'Tandai tindak lanjut pembayaran biaya titip untuk gadai yang masih berjalan.'
-            });
-            actions.push({
-                key: 'settlement',
-                label: 'Pelunasan',
-                description: 'Siapkan proses pelunasan jika nasabah ingin menutup gadai.'
-            });
-        }
-
-        if (params.contractStatus === 'active') {
-            actions.push({
-                key: 'extension',
-                label: 'Perpanjangan',
-                description: 'Lanjutkan gadai dengan proses perpanjangan atau gadai ulang.'
-            });
-        }
-
-        if (params.daysToMaturity < 0 || params.contractStatus === 'auctioned') {
-            actions.push({
-                key: 'auction',
-                label: 'Lelang',
-                description: 'Tindak lanjuti gadai yang sudah lewat jatuh tempo atau masuk proses lelang.'
-            });
-        }
-
-        return actions.filter(
-            (action, index, items) => items.findIndex((item) => item.key === action.key) === index
-        );
     }
 
     private getPrimaryLocationActionLabel(status: string | null): string {

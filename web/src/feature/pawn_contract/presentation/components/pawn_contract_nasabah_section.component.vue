@@ -223,7 +223,7 @@ const getProcessStatusClass = (label: string): string => {
     case 'Data Baru':
     case 'Perpanjangan':
       return 'status-badge--accent';
-    case 'Bayar B. Titip':
+    case 'Bayar Biaya Titip':
       return 'status-badge--warning';
     case 'Pelunasan':
       return 'status-badge--success';

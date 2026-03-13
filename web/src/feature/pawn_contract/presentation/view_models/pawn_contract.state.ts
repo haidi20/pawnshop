@@ -10,7 +10,9 @@ import type {
 } from '@feature/pawn_contract/domain/models';
 import {
     PawnContractIndexTabKeyEnum,
-    PawnContractNasabahTabKeyEnum
+    PawnContractNasabahTabKeyEnum,
+    type PawnContractActionKeyModel,
+    type PawnContractActionOptionModel
 } from '@feature/pawn_contract/domain/models';
 import {
     createEmptyIndexTabFilters,
@@ -36,6 +38,61 @@ export interface IPawnContractState {
     activeLocationTab: Ref<PawnContractLocationTabModel>;
     tableFilters: Ref<PawnContractIndexTabFilterStateModel>;
 }
+
+export const pawnContractActionOptions: PawnContractActionOptionModel[] = [
+    {
+        key: 'edit',
+        label: 'Ubah Data',
+        description: 'Buka form gadai untuk memperbarui data kontrak dan jaminan.'
+    },
+    {
+        key: 'history',
+        label: 'History',
+        description: 'Lihat ringkasan riwayat perubahan, jatuh tempo, dan aktivitas penting gadai.'
+    },
+    {
+        key: 'storage_fee',
+        label: 'Bayar Biaya Titip',
+        description: 'Tandai tindak lanjut pembayaran biaya titip untuk gadai yang masih berjalan.'
+    },
+    {
+        key: 'settlement',
+        label: 'Pelunasan',
+        description: 'Siapkan proses pelunasan jika nasabah ingin menutup gadai.'
+    },
+    {
+        key: 'extension',
+        label: 'Perpanjangan',
+        description: 'Lanjutkan gadai dengan proses perpanjangan atau gadai ulang.'
+    },
+    {
+        key: 'auction',
+        label: 'Lelang',
+        description: 'Tindak lanjuti gadai yang sudah lewat jatuh tempo atau masuk proses lelang.'
+    }
+];
+
+export const getPawnContractAvailableActions = (params: {
+    contractStatus: string;
+    daysToMaturity: number;
+}): PawnContractActionOptionModel[] => {
+    const availableKeys: PawnContractActionKeyModel[] = ['edit', 'history'];
+
+    if (['active', 'extended'].includes(params.contractStatus)) {
+        availableKeys.push('storage_fee');
+        availableKeys.push('settlement');
+    }
+
+    if (params.contractStatus === 'active') {
+        availableKeys.push('extension');
+    }
+
+    if (params.daysToMaturity < 0 || params.contractStatus === 'auctioned') {
+        availableKeys.push('auction');
+    }
+
+    return pawnContractActionOptions.filter((action) => availableKeys.includes(action.key));
+};
 
 export type PawnContractTableField = {
     key: string;

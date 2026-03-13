@@ -65,7 +65,7 @@ export interface PawnContractSummaryModel extends PawnContractDetailModel {
     isOpenContract: boolean;
     arrears: PawnContractEstimatedArrearsModel;
     processStatusLabel: string;
-    availableActions: PawnContractActionOptionModel[];
+    availableActions?: PawnContractActionOptionModel[];
 }
 
 export interface GetPawnContractNasabahTableParamsModel {

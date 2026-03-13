@@ -64,10 +64,10 @@ const emit = defineEmits<{
 const LINK_ACTION_KEYS: PawnContractActionKeyModel[] = ['edit', 'history'];
 
 const linkActions = computed(() =>
-  props.row?.availableActions.filter((action) => LINK_ACTION_KEYS.includes(action.key)) ?? []
+  props.row?.availableActions?.filter((action) => LINK_ACTION_KEYS.includes(action.key)) ?? []
 );
 const buttonActions = computed(
-  () => props.row?.availableActions.filter((action) => !LINK_ACTION_KEYS.includes(action.key)) ?? []
+  () => props.row?.availableActions?.filter((action) => !LINK_ACTION_KEYS.includes(action.key)) ?? []
 );
 
 const getActionRoute = (key: PawnContractActionKeyModel) => {
