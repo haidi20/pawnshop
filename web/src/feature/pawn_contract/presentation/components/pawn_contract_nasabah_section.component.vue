@@ -1,10 +1,10 @@
 <template>
   <section class="pawn-contract-page__content-section">
     <div class="pawn-contract-page__section-eyebrow">
-      Customer Contracts
+      Kontrak Nasabah
     </div>
     <h2 class="pawn-contract-page__section-title mb-1">
-      Active contract list
+      Daftar kontrak aktif
     </h2>
     <div class="pawn-contract-page__tabs mt-3">
       <button
@@ -24,15 +24,15 @@
       class="pawn-contract-page__totals pawn-contract-page__totals--overview mt-3"
     >
       <div class="pawn-contract-page__total-item">
-        <span>Total Loan Value</span>
+        <span>Total Nilai Pinjaman</span>
         <strong>{{ formatCurrency(overviewTotals.principalAmount) }}</strong>
       </div>
       <div class="pawn-contract-page__total-item">
-        <span>Total Arrears</span>
+        <span>Total Tunggakan</span>
         <strong>{{ formatCurrency(overviewTotals.arrearsAmount) }}</strong>
       </div>
       <div class="pawn-contract-page__total-item">
-        <span>Due Today</span>
+        <span>Jatuh Tempo Hari Ini</span>
         <strong>{{ formatCurrency(overviewTotals.dueTodayAmount) }}</strong>
       </div>
     </div>
@@ -68,7 +68,7 @@
             </p>
           </div>
           <div class="pawn-contract-page__panel-count text-secondary small">
-            {{ formatCount(sectionTable.rows.length) }} contracts
+            {{ formatCount(sectionTable.rows.length) }} kontrak
           </div>
         </div>
 
@@ -170,15 +170,15 @@
 
         <div class="pawn-contract-page__totals">
           <div class="pawn-contract-page__total-item">
-            <span>Total Loan Value</span>
+            <span>Total Nilai Pinjaman</span>
             <strong>{{ formatCurrency(sectionTable.totals.principalAmount) }}</strong>
           </div>
           <div class="pawn-contract-page__total-item">
-            <span>Total Arrears</span>
+            <span>Total Tunggakan</span>
             <strong>{{ formatCurrency(sectionTable.totals.arrearsAmount) }}</strong>
           </div>
           <div class="pawn-contract-page__total-item">
-            <span>Due Today</span>
+            <span>Jatuh Tempo Hari Ini</span>
             <strong>{{ formatCurrency(sectionTable.totals.dueTodayAmount) }}</strong>
           </div>
         </div>

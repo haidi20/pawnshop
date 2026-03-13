@@ -182,7 +182,7 @@ export const refundTableFields: PawnContractTableField[] = [
 
 export const locationTableFields = [
     { key: 'actions', label: 'Aksi' },
-    { key: 'print', label: 'Print' },
+    { key: 'print', label: 'Cetak' },
     { key: 'sequence', label: 'No' },
     { key: 'itemName', label: 'Nama Barang' },
     { key: 'customerName', label: 'Nasabah' },
@@ -191,7 +191,7 @@ export const locationTableFields = [
 ] satisfies PawnContractTableField[];
 
 export const maintenanceTableFields = [
-    { key: 'print', label: 'Print' },
+    { key: 'print', label: 'Cetak' },
     { key: 'contractId', label: 'ID' },
     { key: 'customerName', label: 'Nama Nasabah' },
     { key: 'itemNames', label: 'Nama Barang' },
@@ -249,23 +249,23 @@ export const PAWN_CONTRACT_NASABAH_TABS: Array<
 > = [
         {
             key: PawnContractNasabahTabKeyEnum.AllData,
-            label: 'All Data',
-            description: 'Review active contracts grouped by contract month.'
+            label: 'Semua Data',
+            description: 'Tinjau kontrak aktif yang dikelompokkan berdasarkan bulan kontrak.'
         },
         {
             key: PawnContractNasabahTabKeyEnum.Daily,
-            label: 'Daily',
-            description: 'Active contracts with a daily payment schedule.'
+            label: 'Harian',
+            description: 'Kontrak aktif dengan jadwal pembayaran harian.'
         },
         {
             key: PawnContractNasabahTabKeyEnum.SevenDays,
-            label: '7 Days',
-            description: 'Active contracts with a 7-day payment schedule.'
+            label: '7 Hari',
+            description: 'Kontrak aktif dengan jadwal pembayaran 7 harian.'
         },
         {
             key: PawnContractNasabahTabKeyEnum.FifteenDays,
-            label: '15 Days',
-            description: 'Active contracts with a 15-day payment schedule.'
+            label: '15 Hari',
+            description: 'Kontrak aktif dengan jadwal pembayaran 15 harian.'
         }
     ];
 

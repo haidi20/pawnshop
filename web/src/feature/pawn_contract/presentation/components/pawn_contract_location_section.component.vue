@@ -58,12 +58,12 @@
               </button>
             </div>
           </td>
-          <td data-label="Print">
+          <td data-label="Cetak">
             <button
               class="btn btn-sm pawn-contract-page__action-button pawn-contract-page__action-button--secondary"
               type="button"
             >
-              Print
+              Cetak
             </button>
           </td>
           <td data-label="No">

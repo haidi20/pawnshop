@@ -76,7 +76,7 @@
             :format-currency="formatCurrency" :get-contract-status-label="getContractStatusLabel"
             :get-contract-status-class="getContractStatusClass" @open-filter="openFilterModal()" />
 
-          <PawnContractAjtSectionComponent v-else-if="activeIndexTab === pawnContractIndexTabKey.DueContracts"
+          <PawnContractGjtSectionComponent v-else-if="activeIndexTab === pawnContractIndexTabKey.DueContracts"
             :options="ajtOptions" :active-type="activeAjtType" :data-table-vm="ajtDataTableVm"
             :has-active-filters="hasActiveFilters" :format-count="formatCount" :format-date="formatDate"
             :get-due-state-class="getDueStateClass" :get-term-label="getTermLabel"
