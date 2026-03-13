@@ -129,7 +129,7 @@
             @open-filter="openFilterModal()"
           />
 
-          <PawnContractAjtSectionComponent
+          <PawnContractGjtSectionComponent
             v-else-if="activeIndexTab === pawnContractIndexTabKey.DueContracts"
             :options="ajtOptions"
             :active-type="activeAjtType"
@@ -186,6 +186,15 @@
     <PawnContractActionModalComponent
       :row="selectedActionRow"
       @close="closeActionModal()"
+      @action="handleAction($event)"
+    />
+
+    <PawnContractStorageFeeModalComponent
+      :row="storageFeeActionRow"
+      :format-currency="formatCurrency"
+      :format-date="formatDate"
+      @close="closeStorageFeeModal"
+      @confirm="handleStorageFeeConfirm"
     />
 
     <PawnContractIndexFilterModalComponent
@@ -219,13 +228,14 @@ import {
 } from '@feature/pawn_contract/domain/models';
 import '@feature/pawn_contract/presentation/styles/pawn_contract.css';
 import PawnContractActionModalComponent from '@feature/pawn_contract/presentation/components/pawn_contract_action_modal.component.vue';
-import PawnContractAjtSectionComponent from '@feature/pawn_contract/presentation/components/pawn_contract_ajt_section.component.vue';
+import PawnContractGjtSectionComponent from '@feature/pawn_contract/presentation/components/pawn_contract_gjt_section.component.vue';
 import PawnContractIndexFilterModalComponent from '@feature/pawn_contract/presentation/components/pawn_contract_index_filter_modal.component.vue';
 import PawnContractLocationSectionComponent from '@feature/pawn_contract/presentation/components/pawn_contract_location_section.component.vue';
 import PawnContractMaintenanceSectionComponent from '@feature/pawn_contract/presentation/components/pawn_contract_maintenance_section.component.vue';
 import PawnContractNasabahSectionComponent from '@feature/pawn_contract/presentation/components/pawn_contract_nasabah_section.component.vue';
 import PawnContractRingkasanSectionComponent from '@feature/pawn_contract/presentation/components/pawn_contract_ringkasan_section.component.vue';
 import PawnContractSettlementSectionComponent from '@feature/pawn_contract/presentation/components/pawn_contract_settlement_section.component.vue';
+import PawnContractStorageFeeModalComponent from '@feature/pawn_contract/presentation/components/pawn_contract_storage_fee_modal.component.vue';
 import {
   getPawnContractIndexRouteByKey,
   resolvePawnContractIndexTabFromPath
@@ -272,6 +282,7 @@ const pawnContractIndexTabKey = PawnContractIndexTabKeyEnum;
 const pawnContractNasabahTabKey = PawnContractNasabahTabKeyEnum;
 const isFilterModalOpen = ref(false);
 const selectedActionRow = ref<PawnContractSummaryModel | null>(null);
+const storageFeeActionRow = ref<PawnContractSummaryModel | null>(null);
 
 const {
   formatCurrency,
@@ -297,6 +308,25 @@ const openActionModal = (row: PawnContractSummaryModel): void => {
 
 const closeActionModal = (): void => {
   selectedActionRow.value = null;
+};
+
+const handleAction = (key: string): void => {
+  if (key === 'storage_fee') {
+    openStorageFeeModal(selectedActionRow.value);
+  }
+};
+
+const openStorageFeeModal = (row: PawnContractSummaryModel | null): void => {
+  storageFeeActionRow.value = row;
+};
+
+const closeStorageFeeModal = (): void => {
+  storageFeeActionRow.value = null;
+};
+
+const handleStorageFeeConfirm = (row: PawnContractSummaryModel): void => {
+  console.log('Confirm storage fee for:', row.contract.contractNumber);
+  closeStorageFeeModal();
 };
 
 const openFilterModal = (): void => {

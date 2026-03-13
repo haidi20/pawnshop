@@ -1,13 +1,26 @@
 <template>
-  <LocalDbFeedbackStateComponent v-if="isLoading" state="loading" title="Memuat pengguna"
+  <LocalDbFeedbackStateComponent
+    v-if="isLoading"
+    state="loading"
+    title="Memuat pengguna"
     description="Mengambil daftar user dan assignment cabang perusahaan aktif dari database lokal."
-    note="Owner akan melihat seluruh user yang tersimpan pada scope perusahaan aktif." />
+    note="Owner akan melihat seluruh user yang tersimpan pada scope perusahaan aktif."
+  />
 
-  <LocalDbFeedbackStateComponent v-else-if="error && !data" state="error" title="Gagal memuat pengguna"
-    :description="error" note="Coba muat ulang agar daftar user dan cabang dibaca ulang dari DB lokal."
-    action-label="Muat ulang" @action="vm.loadData()" />
+  <LocalDbFeedbackStateComponent
+    v-else-if="error && !data"
+    state="error"
+    title="Gagal memuat pengguna"
+    :description="error"
+    note="Coba muat ulang agar daftar user dan cabang dibaca ulang dari DB lokal."
+    action-label="Muat ulang"
+    @action="vm.loadData()"
+  />
 
-  <section v-else-if="data" class="system-users-page">
+  <section
+    v-else-if="data"
+    class="system-users-page"
+  >
     <section class="card border-0 shadow-sm system-users-page__hero">
       <div class="card-body p-3">
         <div class="system-users-page__hero-head">
@@ -28,8 +41,12 @@
               <i class="bi bi-diagram-3" />
               <span>{{ data.companyName }}</span>
             </div>
-            <button type="button" class="system-users-page__hero-badge is-soft is-actionable"
-              aria-label="Buka menu cabang" @click="openMasterBranchPage">
+            <button
+              type="button"
+              class="system-users-page__hero-badge is-soft is-actionable"
+              aria-label="Buka menu cabang"
+              @click="openMasterBranchPage"
+            >
               <i class="bi bi-shop" />
               <span>{{ branchOptions.length }} cabang tersedia</span>
             </button>
@@ -38,24 +55,36 @@
       </div>
     </section>
 
-    <section v-if="error" class="system-users-page__inline-error">
+    <section
+      v-if="error"
+      class="system-users-page__inline-error"
+    >
       <i class="bi bi-exclamation-circle" />
       <span>{{ error }}</span>
     </section>
 
-    <section v-if="branchOptions.length === 0" class="card border-0 shadow-sm">
+    <section
+      v-if="branchOptions.length === 0"
+      class="card border-0 shadow-sm"
+    >
       <div class="card-body p-3">
-        <LocalDbFeedbackStateComponent state="empty" title="Belum ada cabang"
+        <LocalDbFeedbackStateComponent
+          state="empty"
+          title="Belum ada cabang"
           description="Assignment cabang user baru tersedia setelah data cabang perusahaan dibuat di database lokal."
-          note="Setelah cabang dibuat, owner bisa mendelegasikan cabang pertama ke user karyawan." :framed="false"
-          compact />
+          note="Setelah cabang dibuat, owner bisa mendelegasikan cabang pertama ke user karyawan."
+          :framed="false"
+          compact
+        />
       </div>
     </section>
 
     <section class="card border-0 shadow-sm system-users-page__table-card">
       <div class="card-body p-3">
-
-        <DataTableClientSideComponent :vm="dataTableVm" class="mt-3 system-users-page__datatable">
+        <DataTableClientSideComponent
+          :vm="dataTableVm"
+          class="mt-3 system-users-page__datatable"
+        >
           <template #extra-actions>
             <div class="system-users-page__table-insights">
               <span class="system-users-page__insight-chip">
@@ -67,28 +96,46 @@
             </div>
           </template>
           <template #body="{ item }">
-            <tr :class="{
-              'is-needs-attention': item.needsAttention
-            }">
+            <tr
+              :class="{
+                'is-needs-attention': item.needsAttention
+              }"
+            >
               <td data-label="Aksi">
-                <div v-if="item.source.role !== 'owner'" class="system-users-page__action-cell">
-                  <button class="btn btn-outline-primary system-users-page__action-button" type="button"
+                <div
+                  v-if="item.source.role !== 'owner'"
+                  class="system-users-page__action-cell"
+                >
+                  <button
+                    class="btn btn-outline-primary system-users-page__action-button"
+                    type="button"
                     :aria-label="`Aksi untuk ${item.source.fullName}`"
-                    :data-testid="`open-action-modal-${item.source.id}`" @click="vm.openActionModal(item.source.id)">
+                    :data-testid="`open-action-modal-${item.source.id}`"
+                    @click="vm.openActionModal(item.source.id)"
+                  >
                     <span>Aksi</span>
                   </button>
                 </div>
-                <span v-else class="system-users-page__action-placeholder">
+                <span
+                  v-else
+                  class="system-users-page__action-placeholder"
+                >
                   Semua cabang
                 </span>
               </td>
               <td data-label="Role">
-                <span class="system-users-page__role-badge" :class="`is-${item.source.role}`">
+                <span
+                  class="system-users-page__role-badge"
+                  :class="`is-${item.source.role}`"
+                >
                   {{ item.roleLabel }}
                 </span>
               </td>
               <td data-label="User">
-                <div class="system-users-page__user-cell" :data-testid="`system-user-row-${item.source.id}`">
+                <div
+                  class="system-users-page__user-cell"
+                  :data-testid="`system-user-row-${item.source.id}`"
+                >
                   <div class="system-users-page__user-main">
                     <strong>{{ item.source.fullName }}</strong>
                     <span class="system-users-page__muted-text">{{ item.usernameLabel }}</span>
@@ -107,7 +154,10 @@
               </td>
               <td data-label="Status">
                 <div class="system-users-page__status-cell">
-                  <span class="system-users-page__status-badge" :class="{ 'is-active': item.source.isActive }">
+                  <span
+                    class="system-users-page__status-badge"
+                    :class="{ 'is-active': item.source.isActive }"
+                  >
                     {{ item.statusLabel }}
                   </span>
                   <span class="system-users-page__status-note">
@@ -116,15 +166,25 @@
                 </div>
               </td>
               <td data-label="Cabang Akses">
-                <div v-if="item.source.role === 'owner'" class="system-users-page__owner-access">
+                <div
+                  v-if="item.source.role === 'owner'"
+                  class="system-users-page__owner-access"
+                >
                   <i class="bi bi-stars" />
                   <div class="system-users-page__owner-access-copy">
                     <strong>Owner otomatis melihat semua cabang</strong>
                     <span>Tidak perlu assignment manual untuk role ini.</span>
                   </div>
                 </div>
-                <div v-else class="system-users-page__assignment-display" :class="`is-${item.assignmentTone}`">
-                  <div class="system-users-page__assignment-note" :class="`is-${item.assignmentTone}`">
+                <div
+                  v-else
+                  class="system-users-page__assignment-display"
+                  :class="`is-${item.assignmentTone}`"
+                >
+                  <div
+                    class="system-users-page__assignment-note"
+                    :class="`is-${item.assignmentTone}`"
+                  >
                     <div class="system-users-page__assignment-note-head">
                       <strong>{{ item.assignmentStatusLabel }}</strong>
                       <span>{{ item.assignmentHelpText }}</span>
@@ -141,24 +201,36 @@
             </tr>
           </template>
           <template #empty>
-            <LocalDbFeedbackStateComponent state="empty" title="Belum ada pengguna"
+            <LocalDbFeedbackStateComponent
+              state="empty"
+              title="Belum ada pengguna"
               description="Data user akan tampil otomatis setelah dimuat dari database lokal perusahaan aktif."
-              note="Owner dapat membuat akun baru melalui proses registrasi atau sinkronisasi data." :framed="false"
-              compact />
+              note="Owner dapat membuat akun baru melalui proses registrasi atau sinkronisasi data."
+              :framed="false"
+              compact
+            />
           </template>
         </DataTableClientSideComponent>
       </div>
     </section>
 
-    <AuthPortalUserActionModalComponent :user="activeActionModalUser" @close="vm.closeActionModal()"
-      @edit-branch="vm.openBranchModalFromAction()" />
+    <AuthPortalUserActionModalComponent
+      :user="activeActionModalUser"
+      @close="vm.closeActionModal()"
+      @edit-branch="vm.openBranchModalFromAction()"
+    />
 
-    <AuthPortalUserBranchModalComponent :user="activeBranchModalUser" :state="activeBranchModalState"
+    <AuthPortalUserBranchModalComponent
+      :user="activeBranchModalUser"
+      :state="activeBranchModalState"
       :branch-options="branchOptions"
       :draft-value="activeBranchModalUser ? branchDrafts[activeBranchModalUser.id] ?? '' : ''"
       :can-save="activeBranchModalUser ? vm.canSaveUser(activeBranchModalUser.id) : false"
       :saving="activeBranchModalUser ? vm.isSavingUser(activeBranchModalUser.id) : false"
-      @update:draft-value="updateActiveBranchDraft" @cancel="vm.cancelBranchModal()" @save="saveBranchFromModal" />
+      @update:draft-value="updateActiveBranchDraft"
+      @cancel="vm.cancelBranchModal()"
+      @save="saveBranchFromModal"
+    />
   </section>
 </template>
 

@@ -4,8 +4,16 @@
       <div class="ps-datatable__toolbar-left">
         <div class="ps-datatable__entries">
           <span>Tampilkan</span>
-          <select v-model="limitModel" class="form-select ps-field" @change="onLimitChange">
-            <option v-for="option in vmData.limitOptions" :key="option" :value="option">
+          <select
+            v-model="limitModel"
+            class="form-select ps-field"
+            @change="onLimitChange"
+          >
+            <option
+              v-for="option in vmData.limitOptions"
+              :key="option"
+              :value="option"
+            >
               {{ formatLimitOption(option) }}
             </option>
           </select>
@@ -16,11 +24,22 @@
       </div>
 
       <div class="ps-datatable__toolbar-right">
-        <form class="ps-datatable__search" @submit.prevent="vm.searchData()">
+        <form
+          class="ps-datatable__search"
+          @submit.prevent="vm.searchData()"
+        >
           <i class="bi bi-search ps-datatable__search-icon" />
-          <input v-model="searchModel" type="search" class="ps-datatable__search-input" :placeholder="searchPlaceholder"
-            @input="vm.searchData()">
-          <button class="btn btn-primary ps-datatable__search-submit" type="submit">
+          <input
+            v-model="searchModel"
+            type="search"
+            class="ps-datatable__search-input"
+            :placeholder="searchPlaceholder"
+            @input="vm.searchData()"
+          >
+          <button
+            class="btn btn-primary ps-datatable__search-submit"
+            type="submit"
+          >
             <i class="bi bi-funnel" />
             <span>Filter</span>
           </button>
@@ -32,12 +51,22 @@
       <div class="ps-datatable__table-wrap">
         <table class="table table-hover align-middle ps-datatable__table">
           <thead v-if="hasCustomHead">
-            <slot name="head" :fields="normalizedFields" />
+            <slot
+              name="head"
+              :fields="normalizedFields"
+            />
           </thead>
           <thead v-else>
             <tr>
-              <th v-for="field in normalizedFields" :key="field.key" :class="field.thClass">
-                <slot :name="`head(${field.key})`" :field="field">
+              <th
+                v-for="field in normalizedFields"
+                :key="field.key"
+                :class="field.thClass"
+              >
+                <slot
+                  :name="`head(${field.key})`"
+                  :field="field"
+                >
                   {{ field.label }}
                 </slot>
               </th>
@@ -45,15 +74,36 @@
           </thead>
 
           <tbody v-if="hasCustomBody && vmData.items.length > 0">
-            <template v-for="(item, index) in vmData.items" :key="getRowKey(item, index)">
-              <slot name="body" :item="item" :index="index" :fields="normalizedFields" />
+            <template
+              v-for="(item, index) in vmData.items"
+              :key="getRowKey(item, index)"
+            >
+              <slot
+                name="body"
+                :item="item"
+                :index="index"
+                :fields="normalizedFields"
+              />
             </template>
           </tbody>
           <tbody v-else-if="vmData.items.length > 0">
-            <tr v-for="(item, index) in vmData.items" :key="getRowKey(item, index)">
-              <td v-for="field in normalizedFields" :key="field.key" :class="field.tdClass" :data-label="field.label">
-                <slot :name="`cell(${field.key})`" :item="item" :field="field" :index="index"
-                  :value="getCellValue(item, field.key)">
+            <tr
+              v-for="(item, index) in vmData.items"
+              :key="getRowKey(item, index)"
+            >
+              <td
+                v-for="field in normalizedFields"
+                :key="field.key"
+                :class="field.tdClass"
+                :data-label="field.label"
+              >
+                <slot
+                  :name="`cell(${field.key})`"
+                  :item="item"
+                  :field="field"
+                  :index="index"
+                  :value="getCellValue(item, field.key)"
+                >
                   {{ formatCellValue(item, field) }}
                 </slot>
               </td>
@@ -61,7 +111,10 @@
           </tbody>
           <tbody v-else>
             <tr>
-              <td :colspan="Math.max(normalizedFields.length, 1)" class="ps-datatable__empty-cell">
+              <td
+                :colspan="Math.max(normalizedFields.length, 1)"
+                class="ps-datatable__empty-cell"
+              >
                 <slot name="empty">
                   <div class="ps-datatable__empty-state">
                     <span class="ps-datatable__empty-icon">
@@ -81,9 +134,16 @@
         </table>
       </div>
 
-      <div v-if="vmData.loading" class="ps-datatable__overlay">
+      <div
+        v-if="vmData.loading"
+        class="ps-datatable__overlay"
+      >
         <div class="ps-datatable__overlay-card">
-          <div class="spinner-border text-primary" role="status" aria-hidden="true" />
+          <div
+            class="spinner-border text-primary"
+            role="status"
+            aria-hidden="true"
+          />
           <div class="ps-datatable__overlay-copy">
             <div class="ps-datatable__overlay-title">
               Memproses tampilan tabel
@@ -104,27 +164,54 @@
         </template>
       </div>
 
-      <div v-if="vmData.totalPages > 1" class="ps-datatable__pagination">
-        <button type="button" class="ps-datatable__page-btn" :disabled="vmData.currentPage === 1"
-          @click="vm.changePage(1)">
+      <div
+        v-if="vmData.totalPages > 1"
+        class="ps-datatable__pagination"
+      >
+        <button
+          type="button"
+          class="ps-datatable__page-btn"
+          :disabled="vmData.currentPage === 1"
+          @click="vm.changePage(1)"
+        >
           <i class="bi bi-chevron-double-left" />
         </button>
-        <button type="button" class="ps-datatable__page-btn" :disabled="vmData.currentPage === 1"
-          @click="vm.changePage(vmData.currentPage - 1)">
+        <button
+          type="button"
+          class="ps-datatable__page-btn"
+          :disabled="vmData.currentPage === 1"
+          @click="vm.changePage(vmData.currentPage - 1)"
+        >
           <i class="bi bi-chevron-left" />
         </button>
-        <button v-for="page in vmData.pageNumbers" :key="`${page}`" type="button" class="ps-datatable__page-btn" :class="{
-          'is-active': page === vmData.currentPage,
-          'is-gap': page === '...',
-        }" :disabled="page === '...'" @click="typeof page === 'number' ? vm.changePage(page) : undefined">
+        <button
+          v-for="page in vmData.pageNumbers"
+          :key="`${page}`"
+          type="button"
+          class="ps-datatable__page-btn"
+          :class="{
+            'is-active': page === vmData.currentPage,
+            'is-gap': page === '...',
+          }"
+          :disabled="page === '...'"
+          @click="typeof page === 'number' ? vm.changePage(page) : undefined"
+        >
           {{ page }}
         </button>
-        <button type="button" class="ps-datatable__page-btn" :disabled="vmData.currentPage === vmData.totalPages"
-          @click="vm.changePage(vmData.currentPage + 1)">
+        <button
+          type="button"
+          class="ps-datatable__page-btn"
+          :disabled="vmData.currentPage === vmData.totalPages"
+          @click="vm.changePage(vmData.currentPage + 1)"
+        >
           <i class="bi bi-chevron-right" />
         </button>
-        <button type="button" class="ps-datatable__page-btn" :disabled="vmData.currentPage === vmData.totalPages"
-          @click="vm.changePage(vmData.totalPages)">
+        <button
+          type="button"
+          class="ps-datatable__page-btn"
+          :disabled="vmData.currentPage === vmData.totalPages"
+          @click="vm.changePage(vmData.totalPages)"
+        >
           <i class="bi bi-chevron-double-right" />
         </button>
       </div>

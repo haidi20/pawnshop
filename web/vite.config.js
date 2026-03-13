@@ -25,10 +25,37 @@ function forbidParentRelativeImportsPlugin(isBuild) {
   };
 }
 
+function strictImportValidationPlugin() {
+  return {
+    name: 'strict-import-validation',
+    async resolveId(source, importer) {
+      if (!importer || source.startsWith('\0') || source.includes('node_modules')) {
+        return null;
+      }
+
+      // Only validate local aliases, relative paths, or src paths
+      const isLocal = source.startsWith('.') || source.startsWith('@') || source.startsWith('/src');
+      if (!isLocal) {
+        return null;
+      }
+
+      const resolved = await this.resolve(source, importer, { skipSelf: true });
+      if (!resolved) {
+        this.error(
+          `[Strict Import Error] Could not find the file "${source}" imported from "${importer}". Please ensure the file exists and the path is correct.`
+        );
+      }
+
+      return null;
+    },
+  };
+}
+
 export default defineConfig(({ command, mode }) => {
   const env = loadEnv(mode, process.cwd(), '');
   const isProduction = env.VITE_MODE_ENV === 'production';
   const plugins = [
+    strictImportValidationPlugin(),
     forbidParentRelativeImportsPlugin(command === 'build'),
     vue(),
     ...(isProduction ? [] : [vueDevTools()]),

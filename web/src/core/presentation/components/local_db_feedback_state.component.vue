@@ -1,14 +1,24 @@
 <template>
-  <div class="local-db-feedback" :class="[
-    `is-${state}`,
-    { 'is-framed': framed, 'is-compact': compact },
-  ]" :role="state === 'error' ? 'alert' : 'status'">
+  <div
+    class="local-db-feedback"
+    :class="[
+      `is-${state}`,
+      { 'is-framed': framed, 'is-compact': compact },
+    ]"
+    :role="state === 'error' ? 'alert' : 'status'"
+  >
     <div class="local-db-feedback__icon-shell">
       <span class="local-db-feedback__icon">
-        <i :class="resolvedIcon" aria-hidden="true" />
+        <i
+          :class="resolvedIcon"
+          aria-hidden="true"
+        />
       </span>
-      <span v-if="state === 'loading'" class="spinner-border spinner-border-sm local-db-feedback__spinner"
-        aria-hidden="true" />
+      <span
+        v-if="state === 'loading'"
+        class="spinner-border spinner-border-sm local-db-feedback__spinner"
+        aria-hidden="true"
+      />
     </div>
 
     <div class="local-db-feedback__body">
@@ -21,13 +31,24 @@
       <p class="local-db-feedback__description">
         {{ description }}
       </p>
-      <p v-if="note" class="local-db-feedback__note">
+      <p
+        v-if="note"
+        class="local-db-feedback__note"
+      >
         {{ note }}
       </p>
 
-      <div v-if="hasActions" class="local-db-feedback__actions">
+      <div
+        v-if="hasActions"
+        class="local-db-feedback__actions"
+      >
         <slot name="actions">
-          <button v-if="actionLabel" class="btn btn-primary" type="button" @click="emit('action')">
+          <button
+            v-if="actionLabel"
+            class="btn btn-primary"
+            type="button"
+            @click="emit('action')"
+          >
             {{ actionLabel }}
           </button>
         </slot>

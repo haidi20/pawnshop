@@ -1,7 +1,7 @@
 <template>
   <section class="pawn-contract-page__content-section">
     <div class="pawn-contract-page__section-eyebrow">
-      Gadai Jatuh Tempo
+      Jatuh Tempo
     </div>
     <h2 class="pawn-contract-page__section-title mb-1">
       Pilihan jenis jatuh tempo

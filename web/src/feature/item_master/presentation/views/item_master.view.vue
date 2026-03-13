@@ -1,17 +1,34 @@
 <template>
-  <LocalDbFeedbackStateComponent v-if="isLoading" state="loading" title="Memuat item master"
+  <LocalDbFeedbackStateComponent
+    v-if="isLoading"
+    state="loading"
+    title="Memuat item master"
     description="Mengambil kategori, tipe, dan pengaturan item dari database lokal."
-    note="Data akan tampil otomatis setelah pembacaan tabel lokal selesai." />
+    note="Data akan tampil otomatis setelah pembacaan tabel lokal selesai."
+  />
 
-  <LocalDbFeedbackStateComponent v-else-if="error" state="error" title="Gagal memuat item master" :description="error"
-    note="Coba muat ulang agar pembacaan data master dari DB lokal diulang." action-label="Muat ulang"
-    @action="vm.getItemMasterData()" />
+  <LocalDbFeedbackStateComponent
+    v-else-if="error"
+    state="error"
+    title="Gagal memuat item master"
+    :description="error"
+    note="Coba muat ulang agar pembacaan data master dari DB lokal diulang."
+    action-label="Muat ulang"
+    @action="vm.getItemMasterData()"
+  />
 
-  <LocalDbFeedbackStateComponent v-else-if="data && data.totalRows === 0" state="empty" title="Belum ada item master"
+  <LocalDbFeedbackStateComponent
+    v-else-if="data && data.totalRows === 0"
+    state="empty"
+    title="Belum ada item master"
     description="Database lokal perusahaan aktif belum memiliki data kategori atau tipe item."
-    note="Isi tabel item master akan muncul setelah data referensi lokal tersedia." />
+    note="Isi tabel item master akan muncul setelah data referensi lokal tersedia."
+  />
 
-  <section v-else-if="data" class="feature-data-page">
+  <section
+    v-else-if="data"
+    class="feature-data-page"
+  >
     <div class="module-stats-grid row row-cols-1 row-cols-md-2 row-cols-xl-4 g-3">
       <article class="metric-card card col h-100">
         <div class="metric-label">
@@ -25,7 +42,11 @@
         </div>
       </article>
 
-      <article v-for="metric in data.tableCounts.slice(0, 3)" :key="metric.key" class="metric-card card col h-100">
+      <article
+        v-for="metric in data.tableCounts.slice(0, 3)"
+        :key="metric.key"
+        class="metric-card card col h-100"
+      >
         <div class="metric-label">
           {{ metric.label }}
         </div>
@@ -39,9 +60,14 @@
     </div>
 
     <section class="feature-data-page__tables">
-      <article v-for="table in featureTables" :key="table.entity.key" class="feature-data-page__table-section">
+      <article
+        v-for="table in featureTables"
+        :key="table.entity.key"
+        class="feature-data-page__table-section"
+      >
         <div
-          class="feature-data-page__table-head d-flex flex-column flex-lg-row align-items-start justify-content-between gap-3">
+          class="feature-data-page__table-head d-flex flex-column flex-lg-row align-items-start justify-content-between gap-3"
+        >
           <div>
             <div class="table-card-role">
               {{ table.entity.role }}

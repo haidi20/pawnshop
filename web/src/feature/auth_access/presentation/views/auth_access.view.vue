@@ -1,18 +1,34 @@
 <template>
-  <LocalDbFeedbackStateComponent v-if="isLoading" state="loading" title="Memuat akses user"
+  <LocalDbFeedbackStateComponent
+    v-if="isLoading"
+    state="loading"
+    title="Memuat akses user"
     description="Mengambil role, assignment, dan sesi login dari database lokal."
-    note="Panel akan terisi setelah data otorisasi lokal selesai dimuat." />
+    note="Panel akan terisi setelah data otorisasi lokal selesai dimuat."
+  />
 
-  <LocalDbFeedbackStateComponent v-else-if="error" state="error" title="Gagal memuat akses user" :description="error"
-    note="Coba muat ulang agar pembacaan tabel akses dari DB lokal diulang." action-label="Muat ulang"
-    @action="vm.getAuthAccessData()" />
+  <LocalDbFeedbackStateComponent
+    v-else-if="error"
+    state="error"
+    title="Gagal memuat akses user"
+    :description="error"
+    note="Coba muat ulang agar pembacaan tabel akses dari DB lokal diulang."
+    action-label="Muat ulang"
+    @action="vm.getAuthAccessData()"
+  />
 
-  <LocalDbFeedbackStateComponent v-else-if="data && data.totalRows === 0" state="empty"
+  <LocalDbFeedbackStateComponent
+    v-else-if="data && data.totalRows === 0"
+    state="empty"
     title="Belum ada data akses user"
     description="Database lokal perusahaan aktif belum memiliki data role atau assignment user."
-    note="Hak akses operasional akan tampil di sini setelah data tersedia." />
+    note="Hak akses operasional akan tampil di sini setelah data tersedia."
+  />
 
-  <section v-else-if="data" class="feature-data-page">
+  <section
+    v-else-if="data"
+    class="feature-data-page"
+  >
     <div class="module-stats-grid row row-cols-1 row-cols-md-2 row-cols-xl-4 g-3">
       <article class="metric-card card col h-100">
         <div class="metric-label">
@@ -26,7 +42,11 @@
         </div>
       </article>
 
-      <article v-for="metric in data.tableCounts.slice(0, 3)" :key="metric.key" class="metric-card card col h-100">
+      <article
+        v-for="metric in data.tableCounts.slice(0, 3)"
+        :key="metric.key"
+        class="metric-card card col h-100"
+      >
         <div class="metric-label">
           {{ metric.label }}
         </div>
@@ -40,9 +60,14 @@
     </div>
 
     <section class="feature-data-page__tables">
-      <article v-for="table in featureTables" :key="table.entity.key" class="feature-data-page__table-section">
+      <article
+        v-for="table in featureTables"
+        :key="table.entity.key"
+        class="feature-data-page__table-section"
+      >
         <div
-          class="feature-data-page__table-head d-flex flex-column flex-lg-row align-items-start justify-content-between gap-3">
+          class="feature-data-page__table-head d-flex flex-column flex-lg-row align-items-start justify-content-between gap-3"
+        >
           <div>
             <div class="table-card-role">
               {{ table.entity.role }}
