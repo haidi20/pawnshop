@@ -8,7 +8,7 @@ const pawnContractIndexView = () => import('@feature/pawn_contract/presentation/
 const pawnContractHistoryView = () =>
     import('@feature/pawn_contract/presentation/views/pawn_contract_history.view.vue');
 
-const pawnContractRoutes: Array<RouteRecordRaw> = [
+const pawnContractRoutes: RouteRecordRaw[] = [
     {
         path: '/pawn-contracts',
         redirect: pawnContractIndexDefaultRoute

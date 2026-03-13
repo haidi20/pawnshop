@@ -1,15 +1,17 @@
 import { createRouter, createWebHistory, type RouteRecordRaw } from 'vue-router';
-import dashboardRoutes from '@feature/dashboard/util/dashboard_router';
-import masterBranchRoutes from '@feature/master_branch/util/master_branch_router';
-import customerRoutes from '@feature/customer/util/customer_router';
-import itemMasterRoutes from '@feature/item_master/util/item_master_router';
-import pawnContractRoutes from '@feature/pawn_contract/util/pawn_contract_router';
-import pawnTransactionRoutes from '@feature/pawn_transaction/util/pawn_transaction_router';
-import branchFinanceRoutes from '@feature/branch_finance/util/branch_finance_router';
-import masterInvestorRoutes from '@feature/master_investor/util/master_investor_router';
-import authAccessRoutes from '@feature/auth_access/util/auth_access_router';
-import authPortalRoutes from '@feature/auth_portal/util/auth_portal_router';
-import supportRoutes from '@feature/support/util/support_router';
+
+import dashboardRoutes from '@core/presentation/routes/dashboard_router';
+import masterBranchRoutes from '@core/presentation/routes/master_branch_router';
+import customerRoutes from '@core/presentation/routes/customer_router';
+import itemMasterRoutes from '@core/presentation/routes/item_master_router';
+import pawnContractRoutes from '@core/presentation/routes/pawn_contract_router';
+import pawnTransactionRoutes from '@core/presentation/routes/pawn_transaction_router';
+import branchFinanceRoutes from '@core/presentation/routes/branch_finance_router';
+import masterInvestorRoutes from '@core/presentation/routes/master_investor_router';
+import authAccessRoutes from '@core/presentation/routes/auth_access_router';
+import authPortalRoutes from '@core/presentation/routes/auth_portal_router';
+import supportRoutes from '@core/presentation/routes/support_router';
+
 import {
   hasAuthPortalStoredSession,
   isCurrentAuthPortalOwner
@@ -60,13 +62,11 @@ const globalRoutes: RouteRecordRaw[] = [
   }
 ];
 
-
 // Gabungkan rute global dan rute fitur
 const routes: RouteRecordRaw[] = [
   ...globalRoutes,
   ...featureRoutes,
 ];
-
 
 // Buat instance Vue Router
 const router = createRouter({
@@ -102,6 +102,5 @@ router.beforeEach((to, _from, next) => {
 
   next();
 });
-
 
 export default router;
