@@ -1,9 +1,9 @@
 <template>
-  <LocalDbFeedbackStateComponent v-if="isLoading" state="loading" title="Memuat user perusahaan"
+  <LocalDbFeedbackStateComponent v-if="isLoading" state="loading" title="Memuat pengguna"
     description="Mengambil daftar user dan assignment cabang perusahaan aktif dari database lokal."
     note="Owner akan melihat seluruh user yang tersimpan pada scope perusahaan aktif." />
 
-  <LocalDbFeedbackStateComponent v-else-if="error && !data" state="error" title="Gagal memuat user perusahaan"
+  <LocalDbFeedbackStateComponent v-else-if="error && !data" state="error" title="Gagal memuat pengguna"
     :description="error" note="Coba muat ulang agar daftar user dan cabang dibaca ulang dari DB lokal."
     action-label="Muat ulang" @action="vm.loadData()" />
 
@@ -141,10 +141,10 @@
             </tr>
           </template>
           <template #empty>
-            <LocalDbFeedbackStateComponent state="empty" title="Belum ada user perusahaan"
+            <LocalDbFeedbackStateComponent state="empty" title="Belum ada pengguna"
               description="Data user akan tampil otomatis setelah dimuat dari database lokal perusahaan aktif."
-              note="Owner dapat membuat akun baru melalui proses registrasi atau sinkronisasi data lokal."
-              :framed="false" compact />
+              note="Owner dapat membuat akun baru melalui proses registrasi atau sinkronisasi data." :framed="false"
+              compact />
           </template>
         </DataTableClientSideComponent>
       </div>

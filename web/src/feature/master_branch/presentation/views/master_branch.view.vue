@@ -1,7 +1,7 @@
 <template>
   <LocalDbFeedbackStateComponent v-if="isLoading && !data" state="loading" title="Memuat master cabang"
     description="Mengambil data cabang dari database lokal perusahaan aktif."
-    note="Tabel cabang akan siap dipakai setelah pembacaan data lokal selesai." />
+    note="Tabel cabang akan siap dipakai setelah pembacaan data selesai." />
 
   <LocalDbFeedbackStateComponent v-else-if="error && !data" state="error" title="Gagal memuat master cabang"
     :description="error" note="Coba muat ulang agar data cabang dari DB lokal dibaca kembali." action-label="Muat ulang"
@@ -268,7 +268,7 @@
                 @click="confirmDeleteBranch(vm.branchActionModal.item); vm.closeBranchActionModal()">
                 <i class="bi bi-trash me-2" />
                 <span>{{ vm.isDeletingBranch(vm.branchActionModal.item.source.id) ? 'Menghapus...' : 'Hapus'
-                }}</span>
+                  }}</span>
               </button>
             </div>
           </div>

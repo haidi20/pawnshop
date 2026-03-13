@@ -1,34 +1,17 @@
 <template>
-  <LocalDbFeedbackStateComponent
-    v-if="isLoading"
-    state="loading"
-    title="Memuat master investor"
+  <LocalDbFeedbackStateComponent v-if="isLoading" state="loading" title="Memuat master investor"
     description="Mengambil investor, relasi cabang, dan transaksi modal dari database lokal."
-    note="Seluruh tabel investor lokal akan diringkas setelah pembacaan selesai."
-  />
+    note="Seluruh tabel investor lokal akan diringkas setelah pembacaan selesai." />
 
-  <LocalDbFeedbackStateComponent
-    v-else-if="error"
-    state="error"
-    title="Gagal memuat master investor"
-    :description="error"
-    note="Coba muat ulang agar data investor dari DB lokal dibaca kembali."
-    action-label="Muat ulang"
-    @action="vm.getMasterInvestorData()"
-  />
+  <LocalDbFeedbackStateComponent v-else-if="error" state="error" title="Gagal memuat master investor"
+    :description="error" note="Coba muat ulang agar data investor dari DB lokal dibaca kembali."
+    action-label="Muat ulang" @action="vm.getMasterInvestorData()" />
 
-  <LocalDbFeedbackStateComponent
-    v-else-if="data && data.totalRows === 0"
-    state="empty"
-    title="Belum ada data investor"
+  <LocalDbFeedbackStateComponent v-else-if="data && data.totalRows === 0" state="empty" title="Belum ada data investor"
     description="Database lokal perusahaan aktif belum memiliki data investor atau mutasi modal."
-    note="Halaman ini akan terisi setelah data investor lokal tersedia."
-  />
+    note="Halaman ini akan terisi setelah data investor lokal tersedia." />
 
-  <section
-    v-else-if="data"
-    class="feature-data-page"
-  >
+  <section v-else-if="data" class="feature-data-page">
     <div class="module-stats-grid row row-cols-1 row-cols-md-2 row-cols-xl-4 g-3">
       <article class="metric-card card col h-100">
         <div class="metric-label">
@@ -42,11 +25,7 @@
         </div>
       </article>
 
-      <article
-        v-for="metric in data.tableCounts.slice(0, 3)"
-        :key="metric.key"
-        class="metric-card card col h-100"
-      >
+      <article v-for="metric in data.tableCounts.slice(0, 3)" :key="metric.key" class="metric-card card col h-100">
         <div class="metric-label">
           {{ metric.label }}
         </div>
@@ -54,18 +33,15 @@
           {{ metric.count }}
         </div>
         <div class="metric-note">
-          Data lokal untuk tabel {{ metric.key }}.
+          Data untuk tabel {{ metric.key }}.
         </div>
       </article>
     </div>
 
     <section class="feature-data-page__tables">
-      <article
-        v-for="table in featureTables"
-        :key="table.entity.key"
-        class="feature-data-page__table-section"
-      >
-        <div class="feature-data-page__table-head d-flex flex-column flex-lg-row align-items-start justify-content-between gap-3">
+      <article v-for="table in featureTables" :key="table.entity.key" class="feature-data-page__table-section">
+        <div
+          class="feature-data-page__table-head d-flex flex-column flex-lg-row align-items-start justify-content-between gap-3">
           <div>
             <div class="table-card-role">
               {{ table.entity.role }}
@@ -105,7 +81,6 @@ const { data, isLoading, error } = storeToRefs(vm);
 const featureTables = useFeatureTableSections(data);
 
 onMounted(() => {
-    void vm.getMasterInvestorData();
+  void vm.getMasterInvestorData();
 });
 </script>
-

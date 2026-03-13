@@ -16,121 +16,61 @@
 
     <div class="row g-3 mt-1">
       <div class="col-12 col-lg-6">
-        <label
-          class="form-label"
-          for="branchId"
-        >Cabang aktif</label>
-        <select
-          id="branchId"
-          v-model.number="branchIdModel"
-          class="form-select"
-          :class="{ 'is-invalid': !!fieldErrors.branchId }"
-        >
-          <option
-            :value="0"
-            disabled
-          >
+        <label class="form-label" for="branchId">Cabang aktif</label>
+        <select id="branchId" v-model.number="branchIdModel" class="form-select"
+          :class="{ 'is-invalid': !!fieldErrors.branchId }">
+          <option :value="0" disabled>
             Pilih cabang
           </option>
-          <option
-            v-for="branch in referenceData.branches"
-            :key="branch.id"
-            :value="branch.id"
-          >
+          <option v-for="branch in referenceData.branches" :key="branch.id" :value="branch.id">
             {{ branch.branchName }} | saldo {{ formatCurrency(branch.availableBalance) }}
           </option>
         </select>
         <div class="form-text">
           Hanya cabang dengan akun kas aktif yang ditampilkan.
         </div>
-        <div
-          v-if="fieldErrors.branchId"
-          class="invalid-feedback d-block"
-        >
+        <div v-if="fieldErrors.branchId" class="invalid-feedback d-block">
           {{ fieldErrors.branchId }}
         </div>
       </div>
 
       <div class="col-12 col-lg-6">
-        <label
-          class="form-label"
-          for="contractNumber"
-        >Nomor gadai</label>
-        <input
-          id="contractNumber"
-          :value="form.contractNumber"
-          class="form-control"
-          type="text"
-          readonly
-        >
+        <label class="form-label" for="contractNumber">Nomor gadai</label>
+        <input id="contractNumber" :value="form.contractNumber" class="form-control" type="text" readonly>
         <div class="form-text">
-          Nomor dibuat otomatis dari data lokal terakhir.
+          Nomor dibuat otomatis dari data terakhir.
         </div>
       </div>
 
       <div class="col-12 col-md-4">
-        <label
-          class="form-label"
-          for="termDays"
-        >Durasi gadai</label>
-        <select
-          id="termDays"
-          v-model.number="termDaysModel"
-          class="form-select"
-        >
-          <option
-            v-for="option in referenceData.termOptions"
-            :key="option.value"
-            :value="option.value"
-          >
+        <label class="form-label" for="termDays">Durasi gadai</label>
+        <select id="termDays" v-model.number="termDaysModel" class="form-select">
+          <option v-for="option in referenceData.termOptions" :key="option.value" :value="option.value">
             {{ option.label }}
           </option>
         </select>
       </div>
 
       <div class="col-12 col-md-4">
-        <label
-          class="form-label"
-          for="contractDate"
-        >Tanggal mulai gadai</label>
-        <input
-          id="contractDate"
-          v-model="contractDateModel"
-          class="form-control"
-          :class="{ 'is-invalid': !!fieldErrors.contractDate }"
-          type="date"
-        >
-        <div
-          v-if="fieldErrors.contractDate"
-          class="invalid-feedback d-block"
-        >
+        <label class="form-label" for="contractDate">Tanggal mulai gadai</label>
+        <input id="contractDate" v-model="contractDateModel" class="form-control"
+          :class="{ 'is-invalid': !!fieldErrors.contractDate }" type="date">
+        <div v-if="fieldErrors.contractDate" class="invalid-feedback d-block">
           {{ fieldErrors.contractDate }}
         </div>
       </div>
 
       <div class="col-12 col-md-4">
         <div class="pawn-contract-create-page__readonly-label">
-          <label
-            class="form-label mb-0"
-            for="maturityDate"
-          >Jatuh tempo</label>
+          <label class="form-label mb-0" for="maturityDate">Jatuh tempo</label>
           <span class="pawn-contract-create-page__readonly-badge">
             Otomatis
           </span>
         </div>
         <div class="pawn-contract-create-page__readonly-field">
-          <input
-            id="maturityDate"
-            class="form-control pawn-contract-create-page__readonly-input"
-            type="date"
-            :value="maturityDate"
-            readonly
-            aria-readonly="true"
-          >
-          <i
-            class="bi bi-lock"
-            aria-hidden="true"
-          />
+          <input id="maturityDate" class="form-control pawn-contract-create-page__readonly-input" type="date"
+            :value="maturityDate" readonly aria-readonly="true">
+          <i class="bi bi-lock" aria-hidden="true" />
         </div>
         <div class="form-text">
           Tanggal jatuh tempo dihitung otomatis dari tanggal mulai dan durasi gadai.

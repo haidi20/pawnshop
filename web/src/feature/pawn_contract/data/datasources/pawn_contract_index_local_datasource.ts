@@ -82,68 +82,68 @@ const PAWN_CONTRACT_INDEX_TABS: Array<Omit<PawnContractIndexTabModel, 'count'>> 
 const PAWN_CONTRACT_NASABAH_TABS: Array<
     Omit<PawnContractTableOptionModel<PawnContractNasabahTabKeyModel>, 'count'>
 > = [
-    {
-        key: PawnContractNasabahTabKeyEnum.AllData,
-        label: 'All Data',
-        description: 'Review active contracts grouped by contract month.'
-    },
-    {
-        key: PawnContractNasabahTabKeyEnum.Daily,
-        label: 'Daily',
-        description: 'Active contracts with a daily payment schedule.'
-    },
-    {
-        key: PawnContractNasabahTabKeyEnum.SevenDays,
-        label: '7 Days',
-        description: 'Active contracts with a 7-day payment schedule.'
-    },
-    {
-        key: PawnContractNasabahTabKeyEnum.FifteenDays,
-        label: '15 Days',
-        description: 'Active contracts with a 15-day payment schedule.'
-    }
-];
+        {
+            key: PawnContractNasabahTabKeyEnum.AllData,
+            label: 'All Data',
+            description: 'Review active contracts grouped by contract month.'
+        },
+        {
+            key: PawnContractNasabahTabKeyEnum.Daily,
+            label: 'Daily',
+            description: 'Active contracts with a daily payment schedule.'
+        },
+        {
+            key: PawnContractNasabahTabKeyEnum.SevenDays,
+            label: '7 Days',
+            description: 'Active contracts with a 7-day payment schedule.'
+        },
+        {
+            key: PawnContractNasabahTabKeyEnum.FifteenDays,
+            label: '15 Days',
+            description: 'Active contracts with a 15-day payment schedule.'
+        }
+    ];
 
 const PAWN_CONTRACT_AJT_OPTIONS: Array<
     Omit<PawnContractTableOptionModel<PawnContractAjtTypeModel>, 'count'>
 > = [
-    { key: '7', label: '7 Hari', description: 'Gadai tenor 7 hari yang masih aktif dan mendekati jatuh tempo.' },
-    { key: '15', label: '15 Hari', description: 'Gadai tenor 15 hari yang perlu dipantau menjelang jatuh tempo.' },
-    { key: '30', label: '30 Hari', description: 'Gadai tenor 30 hari yang jatuh tempo dalam waktu dekat.' },
-    { key: '60', label: '60 Hari', description: 'Gadai tenor 60 hari yang mendekati tenggat kontrak.' },
-    { key: 'tertunggak', label: 'Tertunggak', description: 'Gadai aktif yang sudah melewati jatuh tempo.' },
-    {
-        key: 'mendekati_tempo_lelang',
-        label: 'Mendekati Lelang',
-        description: 'Gadai overdue awal yang masih punya ruang tindak lanjut sebelum lelang.'
-    },
-    {
-        key: 'tempo_lelang',
-        label: 'Tempo Lelang',
-        description: 'Gadai overdue lebih lanjut yang mulai masuk window lelang.'
-    },
-    {
-        key: 'tunda_lelang',
-        label: 'Tunda Lelang',
-        description: 'Gadai perpanjangan yang tetap overdue dan perlu keputusan lanjutan.'
-    }
-];
+        { key: '7', label: '7 Hari', description: 'Gadai tenor 7 hari yang masih aktif dan mendekati jatuh tempo.' },
+        { key: '15', label: '15 Hari', description: 'Gadai tenor 15 hari yang perlu dipantau menjelang jatuh tempo.' },
+        { key: '30', label: '30 Hari', description: 'Gadai tenor 30 hari yang jatuh tempo dalam waktu dekat.' },
+        { key: '60', label: '60 Hari', description: 'Gadai tenor 60 hari yang mendekati tenggat kontrak.' },
+        { key: 'tertunggak', label: 'Tertunggak', description: 'Gadai aktif yang sudah melewati jatuh tempo.' },
+        {
+            key: 'mendekati_tempo_lelang',
+            label: 'Mendekati Lelang',
+            description: 'Gadai overdue awal yang masih punya ruang tindak lanjut sebelum lelang.'
+        },
+        {
+            key: 'tempo_lelang',
+            label: 'Tempo Lelang',
+            description: 'Gadai overdue lebih lanjut yang mulai masuk window lelang.'
+        },
+        {
+            key: 'tunda_lelang',
+            label: 'Tunda Lelang',
+            description: 'Gadai perpanjangan yang tetap overdue dan perlu keputusan lanjutan.'
+        }
+    ];
 
 const PAWN_CONTRACT_SETTLEMENT_OPTIONS: Array<
     Omit<PawnContractTableOptionModel<PawnContractSettlementTypeModel>, 'count'>
 > = [
-    { key: 'lunas', label: 'Lunas', description: 'Kontrak yang sudah selesai melalui pelunasan atau penutupan.' },
-    { key: 'lelang', label: 'Lelang', description: 'Kontrak yang berakhir melalui proses lelang.' },
-    { key: 'refund', label: 'Refund', description: 'Kontrak batal yang memerlukan tindak lanjut pengembalian.' }
-];
+        { key: 'lunas', label: 'Lunas', description: 'Kontrak yang sudah selesai melalui pelunasan atau penutupan.' },
+        { key: 'lelang', label: 'Lelang', description: 'Kontrak yang berakhir melalui proses lelang.' },
+        { key: 'refund', label: 'Refund', description: 'Kontrak batal yang memerlukan tindak lanjut pengembalian.' }
+    ];
 
 const PAWN_CONTRACT_LOCATION_OPTIONS: Array<
     Omit<PawnContractTableOptionModel<PawnContractLocationTabModel>, 'count'>
 > = [
-    { key: 'kantor', label: 'Kantor', description: 'Barang jaminan yang saat ini berada di kantor cabang.' },
-    { key: 'proses', label: 'Proses', description: 'Barang jaminan yang sedang bergerak atau diproses.' },
-    { key: 'gudang', label: 'Gudang', description: 'Barang jaminan yang saat ini berada di gudang.' }
-];
+        { key: 'kantor', label: 'Kantor', description: 'Barang jaminan yang saat ini berada di kantor cabang.' },
+        { key: 'proses', label: 'Proses', description: 'Barang jaminan yang sedang bergerak atau diproses.' },
+        { key: 'gudang', label: 'Gudang', description: 'Barang jaminan yang saat ini berada di gudang.' }
+    ];
 
 export class PawnContractIndexLocalDatasource {
     getContractSummaries(data: PawnContractDataModel | null): PawnContractSummaryModel[] {
@@ -246,12 +246,12 @@ export class PawnContractIndexLocalDatasource {
 
         return {
             title: 'Aktivitas hari ini',
-            description: 'Lihat realisasi gadai baru, gadai ulang, dan pendapatan harian dari data lokal.',
+            description: 'Lihat realisasi gadai baru, gadai ulang, dan pendapatan harian.',
             sections: [
                 {
                     key: 'akad_baru',
                     label: 'Data Gadai Baru',
-                    description: 'Kontrak yang tercatat pada hari ini dari data lokal.',
+                    description: 'Kontrak yang tercatat pada hari ini.',
                     rows: akadBaruRows
                 },
                 {

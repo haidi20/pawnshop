@@ -84,7 +84,7 @@ export const pawnContractFormViewModel = defineStore('pawnContractFormStore', ()
     const pageSubtitle = computed(() =>
         isEditMode.value
             ? 'Perbarui data gadai, cek kembali hitungan biaya, lalu simpan perubahan setelah konfirmasi.'
-            : 'Isi data gadai, cek hitungan biaya secara otomatis, lalu simpan ke data lokal setelah konfirmasi.'
+            : 'Isi data gadai, cek hitungan biaya secara otomatis, lalu simpan kontrak setelah konfirmasi.'
     );
     const submitButtonLabel = computed(() => {
         if (state.isSubmitting.value) {
@@ -96,9 +96,9 @@ export const pawnContractFormViewModel = defineStore('pawnContractFormStore', ()
     const itemPresetList = computed(() =>
         state.referenceData.value
             ? [
-                  state.referenceData.value.itemPresets[PawnContractItemKindEnum.Electronic],
-                  state.referenceData.value.itemPresets[PawnContractItemKindEnum.Vehicle]
-              ]
+                state.referenceData.value.itemPresets[PawnContractItemKindEnum.Electronic],
+                state.referenceData.value.itemPresets[PawnContractItemKindEnum.Vehicle]
+            ]
             : []
     );
     const currentPreset = computed(() => state.referenceData.value?.itemPresets[state.form.itemKind] ?? null);
@@ -118,28 +118,28 @@ export const pawnContractFormViewModel = defineStore('pawnContractFormStore', ()
     const matchedCustomerByName = computed(() =>
         state.referenceData.value
             ? findMatchedPawnContractCustomer({
-                  customers: state.referenceData.value.customers,
-                  keyword: state.form.customerFullName,
-                  field: PawnContractCustomerLookupFieldEnum.FullName
-              })
+                customers: state.referenceData.value.customers,
+                keyword: state.form.customerFullName,
+                field: PawnContractCustomerLookupFieldEnum.FullName
+            })
             : null
     );
     const matchedCustomerByPhone = computed(() =>
         state.referenceData.value
             ? findMatchedPawnContractCustomer({
-                  customers: state.referenceData.value.customers,
-                  keyword: state.form.customerPhone,
-                  field: PawnContractCustomerLookupFieldEnum.PhoneNumber
-              })
+                customers: state.referenceData.value.customers,
+                keyword: state.form.customerPhone,
+                field: PawnContractCustomerLookupFieldEnum.PhoneNumber
+            })
             : null
     );
     const matchedCustomerByIdentityNumber = computed(() =>
         state.referenceData.value
             ? findMatchedPawnContractCustomer({
-                  customers: state.referenceData.value.customers,
-                  keyword: state.form.customerIdentityNumber,
-                  field: PawnContractCustomerLookupFieldEnum.IdentityNumber
-              })
+                customers: state.referenceData.value.customers,
+                keyword: state.form.customerIdentityNumber,
+                field: PawnContractCustomerLookupFieldEnum.IdentityNumber
+            })
             : null
     );
     const matchedCustomer = computed(
@@ -148,28 +148,28 @@ export const pawnContractFormViewModel = defineStore('pawnContractFormStore', ()
     const customerNameSuggestions = computed(() =>
         state.referenceData.value
             ? buildPawnContractCustomerSuggestions({
-                  customers: state.referenceData.value.customers,
-                  keyword: state.form.customerFullName,
-                  field: PawnContractCustomerLookupFieldEnum.FullName
-              })
+                customers: state.referenceData.value.customers,
+                keyword: state.form.customerFullName,
+                field: PawnContractCustomerLookupFieldEnum.FullName
+            })
             : []
     );
     const customerPhoneSuggestions = computed(() =>
         state.referenceData.value
             ? buildPawnContractCustomerSuggestions({
-                  customers: state.referenceData.value.customers,
-                  keyword: state.form.customerPhone,
-                  field: PawnContractCustomerLookupFieldEnum.PhoneNumber
-              })
+                customers: state.referenceData.value.customers,
+                keyword: state.form.customerPhone,
+                field: PawnContractCustomerLookupFieldEnum.PhoneNumber
+            })
             : []
     );
     const customerIdentityNumberSuggestions = computed(() =>
         state.referenceData.value
             ? buildPawnContractCustomerSuggestions({
-                  customers: state.referenceData.value.customers,
-                  keyword: state.form.customerIdentityNumber,
-                  field: PawnContractCustomerLookupFieldEnum.IdentityNumber
-              })
+                customers: state.referenceData.value.customers,
+                keyword: state.form.customerIdentityNumber,
+                field: PawnContractCustomerLookupFieldEnum.IdentityNumber
+            })
             : []
     );
     const customerLookupMessage = computed(() =>
@@ -178,8 +178,8 @@ export const pawnContractFormViewModel = defineStore('pawnContractFormStore', ()
             : customerNameSuggestions.value.length > 0 ||
                 customerPhoneSuggestions.value.length > 0 ||
                 customerIdentityNumberSuggestions.value.length > 0
-              ? 'Pilih salah satu saran nama, telepon, atau identitas untuk memuat data nasabah lama.'
-              : 'Jika data belum ada, sistem akan membuat data nasabah baru.'
+                ? 'Pilih salah satu saran nama, telepon, atau identitas untuk memuat data nasabah lama.'
+                : 'Jika data belum ada, sistem akan membuat data nasabah baru.'
     );
     const availablePaymentOptions = computed(() => getAvailablePawnContractPaymentOptions(state.form.termDays));
     const maturityDate = computed(() => calculatePawnContractMaturityDate(state.form.contractDate, state.form.termDays));

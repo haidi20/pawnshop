@@ -365,7 +365,7 @@ export class AuthPortalLocalDatasource {
         }
 
         if (session.user.role !== 'owner') {
-            throw new Error('Hanya owner yang dapat mengelola user perusahaan.');
+            throw new Error('Hanya owner yang dapat mengelola pengguna.');
         }
 
         const [userRows, branchRows] = await Promise.all([
@@ -438,7 +438,7 @@ export class AuthPortalLocalDatasource {
         );
 
         if (!targetUser) {
-            throw new Error('User perusahaan tidak ditemukan.');
+            throw new Error('Pengguna tidak ditemukan.');
         }
 
         if (targetUser.role === 'owner') {

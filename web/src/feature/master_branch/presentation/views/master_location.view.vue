@@ -1,7 +1,7 @@
 <template>
   <LocalDbFeedbackStateComponent v-if="isLoading && !data" state="loading" title="Memuat lokasi penyimpanan"
     description="Mengambil data lokasi penyimpanan dari database lokal perusahaan aktif."
-    note="Tabel lokasi akan siap dipakai setelah pembacaan data lokal selesai." />
+    note="Tabel lokasi akan siap dipakai setelah pembacaan data selesai." />
 
   <LocalDbFeedbackStateComponent v-else-if="error && !data" state="error" title="Gagal memuat lokasi penyimpanan"
     :description="error" note="Coba muat ulang agar data lokasi dari DB lokal dibaca kembali." action-label="Muat ulang"

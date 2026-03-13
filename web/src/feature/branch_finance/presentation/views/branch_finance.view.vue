@@ -1,34 +1,18 @@
 <template>
-  <LocalDbFeedbackStateComponent
-    v-if="isLoading"
-    state="loading"
-    title="Memuat keuangan cabang"
+  <LocalDbFeedbackStateComponent v-if="isLoading" state="loading" title="Memuat keuangan cabang"
     description="Mengambil kas, utang, pembayaran, dan transfer cabang dari database lokal."
-    note="Tampilan akan diperbarui setelah seluruh tabel keuangan lokal selesai dibaca."
-  />
+    note="Tampilan akan diperbarui setelah seluruh tabel keuangan lokal selesai dibaca." />
 
-  <LocalDbFeedbackStateComponent
-    v-else-if="error"
-    state="error"
-    title="Gagal memuat keuangan cabang"
-    :description="error"
-    note="Coba muat ulang untuk membaca ulang tabel keuangan dari DB lokal."
-    action-label="Muat ulang"
-    @action="vm.getBranchFinanceData()"
-  />
+  <LocalDbFeedbackStateComponent v-else-if="error" state="error" title="Gagal memuat keuangan cabang"
+    :description="error" note="Coba muat ulang untuk membaca ulang tabel keuangan dari DB lokal."
+    action-label="Muat ulang" @action="vm.getBranchFinanceData()" />
 
-  <LocalDbFeedbackStateComponent
-    v-else-if="data && data.totalRows === 0"
-    state="empty"
+  <LocalDbFeedbackStateComponent v-else-if="data && data.totalRows === 0" state="empty"
     title="Belum ada data keuangan cabang"
     description="Belum ada baris kas atau transaksi cabang di database lokal perusahaan aktif."
-    note="Kondisi ini umum pada workspace baru atau setelah data lokal dihapus."
-  />
+    note="Kondisi ini umum pada workspace baru atau setelah data dihapus." />
 
-  <section
-    v-else-if="data"
-    class="feature-data-page"
-  >
+  <section v-else-if="data" class="feature-data-page">
     <div class="module-stats-grid row row-cols-1 row-cols-md-2 row-cols-xl-4 g-3">
       <article class="metric-card card col h-100">
         <div class="metric-label">
@@ -42,11 +26,7 @@
         </div>
       </article>
 
-      <article
-        v-for="metric in data.tableCounts.slice(0, 3)"
-        :key="metric.key"
-        class="metric-card card col h-100"
-      >
+      <article v-for="metric in data.tableCounts.slice(0, 3)" :key="metric.key" class="metric-card card col h-100">
         <div class="metric-label">
           {{ metric.label }}
         </div>
@@ -54,18 +34,15 @@
           {{ metric.count }}
         </div>
         <div class="metric-note">
-          Data lokal untuk tabel {{ metric.key }}.
+          Data untuk tabel {{ metric.key }}.
         </div>
       </article>
     </div>
 
     <section class="feature-data-page__tables">
-      <article
-        v-for="table in featureTables"
-        :key="table.entity.key"
-        class="feature-data-page__table-section"
-      >
-        <div class="feature-data-page__table-head d-flex flex-column flex-lg-row align-items-start justify-content-between gap-3">
+      <article v-for="table in featureTables" :key="table.entity.key" class="feature-data-page__table-section">
+        <div
+          class="feature-data-page__table-head d-flex flex-column flex-lg-row align-items-start justify-content-between gap-3">
           <div>
             <div class="table-card-role">
               {{ table.entity.role }}
@@ -105,7 +82,6 @@ const { data, isLoading, error } = storeToRefs(vm);
 const featureTables = useFeatureTableSections(data);
 
 onMounted(() => {
-    void vm.getBranchFinanceData();
+  void vm.getBranchFinanceData();
 });
 </script>
-
