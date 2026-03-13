@@ -11,7 +11,7 @@ import 'bootstrap-icons/font/bootstrap-icons.css';
 
 // 🔹 App & plugins
 import App from './App.vue';
-import router from './core/util/router';
+import router from './core/presentation/routes';
 
 const app = createApp(App);
 

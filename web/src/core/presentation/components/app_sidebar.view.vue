@@ -191,7 +191,7 @@ import { computed, ref, watch } from 'vue';
 import { RouterLink } from 'vue-router';
 
 import type { AppNavigationItem } from '@core/domain/interfaces/app_module.interface';
-import router from '@core/util/router';
+import router from '@core/presentation/routes';
 import { showErrorMessage, showSuccessMessage } from '@core/util/alert';
 import { authPortalViewModel } from '@feature/auth_portal/presentation/view_models/auth_portal.vm';
 

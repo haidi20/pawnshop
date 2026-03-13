@@ -19,7 +19,7 @@ import {
     getAvailablePawnContractPaymentOptions,
     getPawnContractPrepaidStorageOptions
 } from '@core/util/pawn-contract-form';
-import router from '@core/util/router';
+import router from '@core/presentation/routes';
 import type {
     PawnContractCustomerLookupModel,
     PawnContractFormReferenceModel,

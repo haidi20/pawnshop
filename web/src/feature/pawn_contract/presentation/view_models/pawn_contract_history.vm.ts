@@ -11,7 +11,7 @@ import {
     getPawnItemLocationStatusLabel
 } from '@core/util/helpers';
 import { unwrapEitherOrThrow } from '@core/util/either';
-import router from '@core/util/router';
+import router from '@core/presentation/routes';
 import type { PawnContractSummaryModel } from '@feature/pawn_contract/domain/models';
 import { getPawnContractHistoryUsecase } from '@feature/pawn_contract/presentation/di/pawn_contract.di';
 import type { PawnContractHistoryEntryModel } from '@feature/pawn_contract/presentation/models/pawn_contract_history_ui.model';
