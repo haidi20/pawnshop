@@ -44,7 +44,7 @@
           <div class="d-flex flex-column flex-xl-row justify-content-between align-items-xl-center gap-3">
             <div class="pawn-contract-page__toolbar-copy">
               <div class="pawn-contract-page__section-eyebrow">
-                Index Gadai
+                Data Gadai
               </div>
               <h1 class="pawn-contract-page__toolbar-title mb-1">
                 {{ activeIndexTabMeta.label }}
@@ -90,6 +90,16 @@
             :format-currency="formatCurrency" :get-contract-status-label="getContractStatusLabel"
             :get-contract-status-class="getContractStatusClass" @select-type="setActiveSettlementType($event)"
             @open-filter="openFilterModal()" />
+
+          <PawnContractRedeemedSectionComponent v-else-if="activeIndexTab === pawnContractIndexTabKey.RedeemedContracts"
+            :data-table-vm="redeemedDataTableVm" :has-active-filters="hasActiveFilters" :format-date="formatDate"
+            :format-currency="formatCurrency" :get-contract-status-label="getContractStatusLabel"
+            :get-contract-status-class="getContractStatusClass" @open-filter="openFilterModal()" />
+
+          <PawnContractAuctionSectionComponent v-else-if="activeIndexTab === pawnContractIndexTabKey.AuctionContracts"
+            :data-table-vm="auctionDataTableVm" :has-active-filters="hasActiveFilters" :format-date="formatDate"
+            :format-currency="formatCurrency" :get-contract-status-label="getContractStatusLabel"
+            :get-contract-status-class="getContractStatusClass" @open-filter="openFilterModal()" />
 
           <PawnContractLocationSectionComponent
             v-else-if="activeIndexTab === pawnContractIndexTabKey.LocationDistribution" :options="locationOptions"
@@ -138,6 +148,8 @@ import PawnContractIndexFilterModalComponent from '@feature/pawn_contract/presen
 import PawnContractLocationSectionComponent from '@feature/pawn_contract/presentation/components/pawn_contract_location_section.component.vue';
 import PawnContractMaintenanceSectionComponent from '@feature/pawn_contract/presentation/components/pawn_contract_maintenance_section.component.vue';
 import PawnContractNasabahSectionComponent from '@feature/pawn_contract/presentation/components/pawn_contract_nasabah_section.component.vue';
+import PawnContractRedeemedSectionComponent from '@feature/pawn_contract/presentation/components/pawn_contract_redeemed_section.component.vue';
+import PawnContractAuctionSectionComponent from '@feature/pawn_contract/presentation/components/pawn_contract_auction_section.component.vue';
 import PawnContractRingkasanSectionComponent from '@feature/pawn_contract/presentation/components/pawn_contract_ringkasan_section.component.vue';
 import PawnContractSettlementSectionComponent from '@feature/pawn_contract/presentation/components/pawn_contract_settlement_section.component.vue';
 import PawnContractStorageFeeView from '@feature/pawn_contract/presentation/views/pawn_contract_storage_fee.view.vue';
@@ -175,6 +187,8 @@ const {
   ajtDataTableVm,
   settlementOptions,
   settlementDataTableVm,
+  redeemedDataTableVm,
+  auctionDataTableVm,
   locationOptions,
   locationDataTableVm,
   maintenanceDataTableVm,

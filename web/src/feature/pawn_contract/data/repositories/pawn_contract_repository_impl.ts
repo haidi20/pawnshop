@@ -81,6 +81,10 @@ export class PawnContractRepositoryImpl implements PawnContractRepository {
         private readonly indexLocalDataSource: PawnContractIndexLocalDatasource
     ) {}
 
+    /**
+     * Mengambil data operasional gadai (branch, status, dll) dari database lokal.
+     * Secara otomatis menjalankan seeder demo data jika database masih kosong.
+     */
     async getData(filters?: PawnContractDataFilterModel): Promise<Either<Error, PawnContractDataModel>> {
         try {
             await ensurePawnContractDemoDataSeed();
@@ -92,6 +96,9 @@ export class PawnContractRepositoryImpl implements PawnContractRepository {
         }
     }
 
+    /**
+     * Mengambil ringkasan data satu kontrak berdasarkan ID untuk keperluan history.
+     */
     async getHistorySummaryById(contractId: number): Promise<Either<Error, PawnContractSummaryModel | null>> {
         try {
             await ensurePawnContractDemoDataSeed();
@@ -114,6 +121,10 @@ export class PawnContractRepositoryImpl implements PawnContractRepository {
         }
     }
 
+    /**
+     * Mengambil data referensi untuk pengisian formulir akad gadai baru
+     * (cabang, nasabah, akun kas, kategori barang, dll).
+     */
     async getFormReferenceData(params: {
         guideItemTypeSeeds: GuideItemTypeSeed[];
         itemPresetMeta: Record<
@@ -130,6 +141,9 @@ export class PawnContractRepositoryImpl implements PawnContractRepository {
         }
     }
 
+    /**
+     * Mengambil nilai existing dari sebuah kontrak untuk keperluan edit formulir.
+     */
     async getFormValue(params: {
         contractId: number;
         guideItemTypeSeeds: GuideItemTypeSeed[];
@@ -143,6 +157,9 @@ export class PawnContractRepositoryImpl implements PawnContractRepository {
         }
     }
 
+    /**
+     * Menyimpan data kontrak baru atau pembaruan kontrak ke database lokal.
+     */
     async saveContract(params: {
         payload: SavePawnContractPayloadModel;
         guideItemTypeSeeds: GuideItemTypeSeed[];
@@ -156,6 +173,10 @@ export class PawnContractRepositoryImpl implements PawnContractRepository {
         }
     }
 
+    /**
+     * Menyusun data ringkasan kontrak (summaries) dari raw data database
+     * untuk keperluan tampilan tabel-tabel di halaman index.
+     */
     getContractSummaries(params: {
         data: PawnContractDataModel | null;
         runningContractStatuses: Set<PawnContractStatusModel>;
@@ -168,6 +189,10 @@ export class PawnContractRepositoryImpl implements PawnContractRepository {
         }
     }
 
+    /**
+     * Menyusun data untuk tabel tab "Nasabah Gadai", membagi kontrak
+     * berdasarkan kategori tab nasabah (Semua, Harian, 7 Hari, dll).
+     */
     getNasabahTable(
         params: GetPawnContractNasabahTableParamsModel & {
             nasabahTabs: Array<Omit<PawnContractTableOptionModel<PawnContractNasabahTabKeyModel>, 'count'>>;
@@ -180,6 +205,10 @@ export class PawnContractRepositoryImpl implements PawnContractRepository {
         }
     }
 
+    /**
+     * Menyusun data untuk tabel tab "Ringkasan Harian", mencakup metrik
+     * operasional dan ringkasan pendapatan harian.
+     */
     getRingkasanTable(
         params: GetPawnContractRingkasanTableParamsModel
     ): Either<Error, PawnContractRingkasanTableModel> {
@@ -190,6 +219,10 @@ export class PawnContractRepositoryImpl implements PawnContractRepository {
         }
     }
 
+    /**
+     * Menyusun data untuk tabel tab "Gadai Jatuh Tempo" (AJT), memfilter
+     * berdasarkan jenis jatuh tempo (tenor tertentu atau tertunggak).
+     */
     getAjtTable(params: GetPawnContractAjtTableParamsModel & {
         ajtOptions: Array<Omit<PawnContractTableOptionModel<PawnContractAjtTypeModel>, 'count'>>;
     }): Either<Error, PawnContractAjtTableModel> {
@@ -200,6 +233,10 @@ export class PawnContractRepositoryImpl implements PawnContractRepository {
         }
     }
 
+    /**
+     * Menyusun data untuk tabel tab "Pelunasan & Lelang" (Legacy/Gabungan),
+     * memfilter berdasarkan tipe (lunas, lelang, atau refund).
+     */
     getSettlementTable(
         params: GetPawnContractSettlementTableParamsModel & {
             settlementOptions: Array<Omit<PawnContractTableOptionModel<PawnContractSettlementTypeModel>, 'count'>>;
@@ -212,6 +249,36 @@ export class PawnContractRepositoryImpl implements PawnContractRepository {
         }
     }
 
+    /**
+     * Mengambil data khusus untuk tabel tab "Lunas" (Redeemed/Closed).
+     */
+    getRedeemedTable(params: {
+        summaries: PawnContractSummaryModel[];
+    }): Either<Error, PawnContractSettlementTableModel> {
+        try {
+            return right(this.indexLocalDataSource.getRedeemedTable(params));
+        } catch (error) {
+            return left(toError(error));
+        }
+    }
+
+    /**
+     * Mengambil data khusus untuk tabel tab "Lelang" (Auctioned).
+     */
+    getAuctionTable(params: {
+        summaries: PawnContractSummaryModel[];
+    }): Either<Error, PawnContractSettlementTableModel> {
+        try {
+            return right(this.indexLocalDataSource.getAuctionTable(params));
+        } catch (error) {
+            return left(toError(error));
+        }
+    }
+
+    /**
+     * Menyusun data untuk tabel tab "Lokasi / Distribusi", memantau keberadaan
+     * fisik barang jaminan di kantor, gudang, atau dalam proses mutasi.
+     */
     getLocationTable(
         params: GetPawnContractLocationTableParamsModel & {
             locationOptions: Array<Omit<PawnContractTableOptionModel<PawnContractLocationTabModel>, 'count'>>;
@@ -224,6 +291,10 @@ export class PawnContractRepositoryImpl implements PawnContractRepository {
         }
     }
 
+    /**
+     * Menyusun data untuk tabel tab "Maintenance", mengawasi kontrak yang
+     * memerlukan inspeksi atau pemeliharaan berkala.
+     */
     getMaintenanceTable(
         params: GetPawnContractMaintenanceTableParamsModel
     ): Either<Error, PawnContractMaintenanceTableModel> {
@@ -234,6 +305,10 @@ export class PawnContractRepositoryImpl implements PawnContractRepository {
         }
     }
 
+    /**
+     * Mengambil konfigurasi tab index gadai beserta jumlah baris (badge count)
+     * untuk masing-masing kategori tab.
+     */
     getIndexTabs(params: GetPawnContractIndexTabsParamsModel & {
         indexTabs: Array<Omit<PawnContractIndexTabModel, 'count'>>;
     }): Either<Error, PawnContractIndexTabModel[]> {

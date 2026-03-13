@@ -10,6 +10,8 @@ export enum PawnContractIndexTabKeyEnum {
     DailySummary = 'daily_summary',
     DueContracts = 'due_contracts',
     SettlementAuction = 'settlement_auction',
+    RedeemedContracts = 'redeemed_contracts',
+    AuctionContracts = 'auction_contracts',
     LocationDistribution = 'location_distribution',
     Maintenance = 'maintenance'
 }
@@ -101,6 +103,8 @@ export interface GetPawnContractIndexTabsParamsModel {
     ringkasanRowCount: number;
     ajtRowCount: number;
     settlementRowCount: number;
+    redeemedRowCount: number;
+    auctionRowCount: number;
     locationRowCount: number;
     maintenanceRowCount: number;
 }

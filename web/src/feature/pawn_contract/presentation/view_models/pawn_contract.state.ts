@@ -153,6 +153,24 @@ export const settlementTableFields = [
     { key: 'statusLabel', label: 'Status' }
 ] satisfies PawnContractTableField[];
 
+export const redeemedTableFields: PawnContractTableField[] = [
+    { key: 'contractNumber', label: 'No. Gadai' },
+    { key: 'customerName', label: 'Nasabah' },
+    { key: 'itemNames', label: 'Jaminan' },
+    { key: 'redeemedDate', label: 'Tanggal Lunas' },
+    { key: 'principalAmount', label: 'Nilai Pencairan' },
+    { key: 'statusLabel', label: 'Status' }
+];
+
+export const auctionTableFields: PawnContractTableField[] = [
+    { key: 'contractNumber', label: 'No. Gadai' },
+    { key: 'customerName', label: 'Nasabah' },
+    { key: 'itemNames', label: 'Jaminan' },
+    { key: 'auctionDate', label: 'Tanggal Lelang' },
+    { key: 'principalAmount', label: 'Nilai Pencairan' },
+    { key: 'statusLabel', label: 'Status' }
+];
+
 export const locationTableFields = [
     { key: 'actions', label: 'Aksi' },
     { key: 'print', label: 'Print' },
@@ -194,6 +212,16 @@ export const PAWN_CONTRACT_INDEX_TABS: Array<Omit<PawnContractIndexTabModel, 'co
         key: PawnContractIndexTabKeyEnum.SettlementAuction,
         label: 'Pelunasan & Lelang',
         description: 'Tinjau kontrak yang sudah lunas, masuk proses lelang, atau memerlukan refund dalam satu alur kerja.'
+    },
+    {
+        key: PawnContractIndexTabKeyEnum.RedeemedContracts,
+        label: 'Lunas',
+        description: 'Daftar kontrak yang sudah dilunasi oleh nasabah secara penuh.'
+    },
+    {
+        key: PawnContractIndexTabKeyEnum.AuctionContracts,
+        label: 'Lelang',
+        description: 'Daftar kontrak yang sudah masuk dalam proses lelang.'
     },
     {
         key: PawnContractIndexTabKeyEnum.LocationDistribution,

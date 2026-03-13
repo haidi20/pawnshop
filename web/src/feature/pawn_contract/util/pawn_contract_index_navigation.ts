@@ -65,6 +65,26 @@ export const pawnContractIndexNavigationItems: PawnContractIndexNavigationItem[]
         caption: 'Lihat mutasi lokasi barang jaminan'
     },
     {
+        key: 'gadai-lihat-data-lunas',
+        label: 'Lunas',
+        route: `${pawnContractIndexBaseRoute}/lunas`,
+        routeName: 'PawnContractRedeemedContracts',
+        title: 'Data Gadai - Lunas',
+        tabKey: PawnContractIndexTabKeyEnum.RedeemedContracts,
+        icon: 'bi-check-circle',
+        caption: 'Pantau kontrak yang sudah dilunasi nasabah'
+    },
+    {
+        key: 'gadai-lihat-data-lelang',
+        label: 'Lelang',
+        route: `${pawnContractIndexBaseRoute}/lelang`,
+        routeName: 'PawnContractAuctionContracts',
+        title: 'Data Gadai - Lelang',
+        tabKey: PawnContractIndexTabKeyEnum.AuctionContracts,
+        icon: 'bi-hammer',
+        caption: 'Pantau kontrak yang sudah masuk proses lelang'
+    },
+    {
         key: 'gadai-lihat-data-maintenance',
         label: 'Maintenance',
         route: `${pawnContractIndexBaseRoute}/maintenance`,

@@ -68,6 +68,8 @@ function createIndexTabFilters(branchFilter: string): PawnContractIndexTabFilter
         [PawnContractIndexTabKeyEnum.DailySummary]: createIndexTabFilter(branchFilter),
         [PawnContractIndexTabKeyEnum.DueContracts]: createIndexTabFilter(branchFilter),
         [PawnContractIndexTabKeyEnum.SettlementAuction]: createIndexTabFilter(branchFilter),
+        [PawnContractIndexTabKeyEnum.RedeemedContracts]: createIndexTabFilter(branchFilter),
+        [PawnContractIndexTabKeyEnum.AuctionContracts]: createIndexTabFilter(branchFilter),
         [PawnContractIndexTabKeyEnum.LocationDistribution]: createIndexTabFilter(branchFilter),
         [PawnContractIndexTabKeyEnum.Maintenance]: createIndexTabFilter(branchFilter)
     };

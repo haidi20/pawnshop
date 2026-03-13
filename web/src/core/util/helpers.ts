@@ -20,9 +20,9 @@ export const pawnContractStatusLabelMap: Record<PawnContractStatusModel, string>
     draft: 'Draf',
     active: 'Aktif',
     extended: 'Diperpanjang',
-    redeemed: 'Ditebus',
+    redeemed: 'Lunas',
     auctioned: 'Dilelang',
-    closed: 'Ditutup',
+    closed: 'Lunas',
     cancelled: 'Dibatalkan'
 };
 
@@ -121,6 +121,8 @@ export const getPawnContractStatusBadgeClass = (status: PawnContractStatusModel)
             return 'status-badge--warning';
         case 'active':
         case 'extended':
+        case 'redeemed':
+        case 'closed':
             return 'status-badge--success';
         case 'auctioned':
             return 'status-badge--danger';

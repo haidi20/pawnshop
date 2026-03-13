@@ -32,11 +32,13 @@ import type {
 } from '@feature/pawn_contract/domain/models';
 import {
     getPawnContractAjtTableUsecase,
+    getPawnContractAuctionTableUsecase,
     getPawnContractDataUsecase,
     getPawnContractIndexTabsUsecase,
     getPawnContractLocationTableUsecase,
     getPawnContractMaintenanceTableUsecase,
     getPawnContractNasabahTableUsecase,
+    getPawnContractRedeemedTableUsecase,
     getPawnContractRingkasanTableUsecase,
     getPawnContractSettlementTableUsecase,
     getPawnContractSummariesUsecase
@@ -49,10 +51,12 @@ import {
 } from '@feature/pawn_contract/presentation/view_models/pawn_contract_index_filters';
 import {
     ajtTableFields,
+    auctionTableFields,
     createPawnContractState,
     locationTableFields,
     maintenanceTableFields,
     nasabahTableFields,
+    redeemedTableFields,
     ringkasanPendapatanTableFields,
     ringkasanTableFields,
     settlementTableFields,
@@ -242,6 +246,16 @@ export const pawnContractViewModel = defineStore('pawnContractStore', () => {
                 state.tableFilters.value[PawnContractIndexTabKeyEnum.SettlementAuction],
                 branchAccess.value
             ),
+            [PawnContractIndexTabKeyEnum.RedeemedContracts]: filterContractSummariesByTableFilter(
+                contractSummaries.value,
+                state.tableFilters.value[PawnContractIndexTabKeyEnum.RedeemedContracts],
+                branchAccess.value
+            ),
+            [PawnContractIndexTabKeyEnum.AuctionContracts]: filterContractSummariesByTableFilter(
+                contractSummaries.value,
+                state.tableFilters.value[PawnContractIndexTabKeyEnum.AuctionContracts],
+                branchAccess.value
+            ),
             [PawnContractIndexTabKeyEnum.LocationDistribution]: filterContractSummariesByTableFilter(
                 contractSummaries.value,
                 state.tableFilters.value[PawnContractIndexTabKeyEnum.LocationDistribution],
@@ -271,6 +285,12 @@ export const pawnContractViewModel = defineStore('pawnContractStore', () => {
     );
     const settlementSummaries = computed(
         () => filteredSummariesByTab.value[PawnContractIndexTabKeyEnum.SettlementAuction]
+    );
+    const redeemedSummaries = computed(
+        () => filteredSummariesByTab.value[PawnContractIndexTabKeyEnum.RedeemedContracts]
+    );
+    const auctionSummaries = computed(
+        () => filteredSummariesByTab.value[PawnContractIndexTabKeyEnum.AuctionContracts]
     );
     const locationSummaries = computed(
         () => filteredSummariesByTab.value[PawnContractIndexTabKeyEnum.LocationDistribution]
@@ -313,6 +333,20 @@ export const pawnContractViewModel = defineStore('pawnContractStore', () => {
             })
         )
     );
+    const redeemedTable = computed(() =>
+        unwrapEitherOrThrow(
+            getPawnContractRedeemedTableUsecase.execute({
+                summaries: redeemedSummaries.value
+            })
+        )
+    );
+    const auctionTable = computed(() =>
+        unwrapEitherOrThrow(
+            getPawnContractAuctionTableUsecase.execute({
+                summaries: auctionSummaries.value
+            })
+        )
+    );
     const locationTable = computed(() =>
         unwrapEitherOrThrow(
             getPawnContractLocationTableUsecase.execute({
@@ -340,6 +374,8 @@ export const pawnContractViewModel = defineStore('pawnContractStore', () => {
                 ),
                 ajtRowCount: ajtTable.value.rows.length,
                 settlementRowCount: settlementTable.value.rows.length,
+                redeemedRowCount: redeemedTable.value.rows.length,
+                auctionRowCount: auctionTable.value.rows.length,
                 locationRowCount: locationTable.value.rows.length,
                 maintenanceRowCount: maintenanceTable.value.rows.length,
                 indexTabs: PAWN_CONTRACT_INDEX_TABS
@@ -367,6 +403,8 @@ export const pawnContractViewModel = defineStore('pawnContractStore', () => {
     const ajtRows = computed(() => ajtTable.value.rows);
     const settlementOptions = computed(() => settlementTable.value.options);
     const settlementRows = computed(() => settlementTable.value.rows);
+    const redeemedRows = computed(() => redeemedTable.value.rows);
+    const auctionRows = computed(() => auctionTable.value.rows);
     const locationOptions = computed(() => locationTable.value.options);
     const locationRows = computed(() => locationTable.value.rows);
     const maintenanceRows = computed(() => maintenanceTable.value.rows);
@@ -463,6 +501,37 @@ export const pawnContractViewModel = defineStore('pawnContractStore', () => {
         statusLabel: formatters.getContractStatusLabel(row.contract.contractStatus)
     });
 
+    const mapRedeemedTableRow = (
+        row: PawnContractSummaryModel
+    ): PawnContractClientTableRow<PawnContractSummaryModel> => ({
+        id: row.contract.id,
+        source: row,
+        contractNumber: row.contract.contractNumber,
+        customerName: row.customerName,
+        branchName: row.branchName,
+        itemNames: row.itemNames,
+        redeemedDate: formatters.formatDate(
+            row.contract.updatedAt?.slice(0, 10) ?? row.contract.maturityDate
+        ),
+        principalAmount: formatters.formatCurrency(row.contract.disbursedValue),
+        statusLabel: formatters.getContractStatusLabel(row.contract.contractStatus)
+    });
+
+    const mapAuctionTableRow = (
+        row: PawnContractSummaryModel
+    ): PawnContractClientTableRow<PawnContractSummaryModel> => ({
+        id: row.contract.id,
+        source: row,
+        contractNumber: row.contract.contractNumber,
+        customerName: row.customerName,
+        itemNames: row.itemNames,
+        auctionDate: formatters.formatDate(
+            row.contract.updatedAt?.slice(0, 10) ?? row.contract.maturityDate
+        ),
+        principalAmount: formatters.formatCurrency(row.contract.disbursedValue),
+        statusLabel: formatters.getContractStatusLabel(row.contract.contractStatus)
+    });
+
     const mapLocationTableRow = (
         row: PawnContractLocationRowModel,
         index: number
@@ -511,6 +580,16 @@ export const pawnContractViewModel = defineStore('pawnContractStore', () => {
         settlementRows,
         settlementTableFields,
         mapSettlementTableRow
+    );
+    const redeemedDataTableVm = createClientTableVm(
+        redeemedRows,
+        redeemedTableFields,
+        mapRedeemedTableRow
+    );
+    const auctionDataTableVm = createClientTableVm(
+        auctionRows,
+        auctionTableFields,
+        mapAuctionTableRow
     );
     const locationDataTableVm = createClientTableVm(
         locationRows,
@@ -608,6 +687,8 @@ export const pawnContractViewModel = defineStore('pawnContractStore', () => {
         ajtDataTableVm,
         settlementOptions,
         settlementDataTableVm,
+        redeemedDataTableVm,
+        auctionDataTableVm,
         locationOptions,
         locationDataTableVm,
         maintenanceDataTableVm,

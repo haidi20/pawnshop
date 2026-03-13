@@ -72,6 +72,12 @@ export interface PawnContractRepository {
             settlementOptions: Array<Omit<PawnContractTableOptionModel<PawnContractSettlementTypeModel>, 'count'>>;
         }
     ): Either<Error, PawnContractSettlementTableModel>;
+    getRedeemedTable(params: {
+        summaries: PawnContractSummaryModel[];
+    }): Either<Error, PawnContractSettlementTableModel>;
+    getAuctionTable(params: {
+        summaries: PawnContractSummaryModel[];
+    }): Either<Error, PawnContractSettlementTableModel>;
     getLocationTable(
         params: GetPawnContractLocationTableParamsModel & {
             locationOptions: Array<Omit<PawnContractTableOptionModel<PawnContractLocationTabModel>, 'count'>>;

@@ -197,17 +197,71 @@ export class PawnContractIndexLocalDatasource {
         };
     }
 
-    getSettlementTable(params: GetPawnContractSettlementTableParamsModel & {
-        settlementOptions: Array<Omit<PawnContractTableOptionModel<PawnContractSettlementTypeModel>, 'count'>>;
-    }): PawnContractSettlementTableModel {
+    getSettlementTable(
+        params: GetPawnContractSettlementTableParamsModel & {
+            settlementOptions: Array<Omit<PawnContractTableOptionModel<PawnContractSettlementTypeModel>, 'count'>>;
+        }
+    ): PawnContractSettlementTableModel {
+        const { summaries, activeType, settlementOptions } = params;
+
+        const filteredRows = summaries.filter((item) => {
+            if (activeType === 'lunas') {
+                return ['redeemed', 'closed'].includes(item.contract.contractStatus);
+            }
+            if (activeType === 'lelang') {
+                return item.contract.contractStatus === 'auctioned';
+            }
+            if (activeType === 'refund') {
+                return item.contract.contractStatus === 'cancelled';
+            }
+            return false;
+        });
+
+        const options = settlementOptions.map((opt) => ({
+            ...opt,
+            count: summaries.filter((item) => {
+                if (opt.key === 'lunas') {
+                    return ['redeemed', 'closed'].includes(item.contract.contractStatus);
+                }
+                if (opt.key === 'lelang') {
+                    return item.contract.contractStatus === 'auctioned';
+                }
+                if (opt.key === 'refund') {
+                    return item.contract.contractStatus === 'cancelled';
+                }
+                return false;
+            }).length
+        }));
+
         return {
-            title: 'Data lunas, lelang, dan refund',
-            description: 'Satukan status penyelesaian kontrak agar proses back office lebih mudah dipantau.',
-            options: params.settlementOptions.map((item) => ({
-                ...item,
-                count: this.getSettlementRows(params.summaries, item.key).length
-            })),
-            rows: this.getSettlementRows(params.summaries, params.activeType)
+            title: 'Pelunasan & Lelang',
+            description: 'Kelola kontrak yang sudah lunas atau masuk proses lelang.',
+            options,
+            rows: filteredRows
+        };
+    }
+
+    getRedeemedTable(params: { summaries: PawnContractSummaryModel[] }): PawnContractSettlementTableModel {
+        const rows = params.summaries.filter((item) =>
+            ['redeemed', 'closed'].includes(item.contract.contractStatus)
+        );
+
+        return {
+            title: 'Lunas',
+            description: 'Daftar kontrak yang sudah dilunasi.',
+            options: [],
+            rows
+        };
+    }
+
+    getAuctionTable(params: { summaries: PawnContractSummaryModel[] }): PawnContractSettlementTableModel {
+        const rows = params.summaries.filter((item) => item.contract.contractStatus === 'auctioned');
+
+        return {
+            title: 'Lelang',
+            description: 'Daftar kontrak yang sudah masuk proses lelang.',
+            options: [],
+            rows
         };
     }
 
@@ -429,6 +483,10 @@ export class PawnContractIndexLocalDatasource {
                 return params.ajtRowCount;
             case PawnContractIndexTabKeyEnum.SettlementAuction:
                 return params.settlementRowCount;
+            case PawnContractIndexTabKeyEnum.RedeemedContracts:
+                return params.redeemedRowCount;
+            case PawnContractIndexTabKeyEnum.AuctionContracts:
+                return params.auctionRowCount;
             case PawnContractIndexTabKeyEnum.LocationDistribution:
                 return params.locationRowCount;
             case PawnContractIndexTabKeyEnum.Maintenance:
