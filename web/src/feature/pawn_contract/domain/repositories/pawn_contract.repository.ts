@@ -92,4 +92,6 @@ export interface PawnContractRepository {
     getIndexTabs(params: GetPawnContractIndexTabsParamsModel & {
         indexTabs: Array<Omit<PawnContractIndexTabModel, 'count'>>;
     }): Either<Error, PawnContractIndexTabModel[]>;
+    runDefaultSeeder(): Promise<Either<Error, void>>;
+    runSingleActiveSeeder(): Promise<Either<Error, void>>;
 }

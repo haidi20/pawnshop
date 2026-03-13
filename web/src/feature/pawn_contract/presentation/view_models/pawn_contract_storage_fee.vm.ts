@@ -1,14 +1,15 @@
 import { computed, watch } from 'vue';
 import { defineStore } from 'pinia';
-import { convertNumberToIndonesianCurrencyWords } from '@core/util/pawn-contract-form';
+import { convertNumberToIndonesianCurrencyWords, getPawnContractPrepaidStorageMax } from '@core/util/pawn-contract-form';
 import type { PawnContractSummaryModel } from '@feature/pawn_contract/domain/models';
 import { createPawnContractStorageFeeState } from './pawn_contract_storage_fee.state';
 
 export interface SelectablePeriod {
-    id: number;
+    id: number | string;
     label: string;
     dueDateLabel: string;
     amount: number;
+    isPaid?: boolean;
 }
 
 export const pawnContractStorageFeeViewModel = defineStore('pawnContractStorageFeeStore', () => {
@@ -20,24 +21,39 @@ export const pawnContractStorageFeeViewModel = defineStore('pawnContractStorageF
         const periods: SelectablePeriod[] = [];
         const unit = state.row.value.arrears.unitLabel;
         const storageFee = state.row.value.contract.storageFeeAmount;
+        const termDays = state.row.value.contract.termDays;
+        const intervalDays = state.row.value.contract.paymentOptionDays && state.row.value.contract.paymentOptionDays > 0 
+            ? state.row.value.contract.paymentOptionDays 
+            : termDays;
 
-        // Add overdue periods
-        for (let i = 1; i <= state.row.value.arrears.overduePeriods; i++) {
-            periods.push({
-                id: i,
-                label: `Tunggakan ke-${i}`,
-                dueDateLabel: `Tunggakan ${unit}`,
-                amount: storageFee
-            });
-        }
+        // Add paid periods from item specification
+        const item = state.row.value.items[0]?.item;
+        const prepaidPeriodsCount = item?.specificationJson?.prepaid_storage_periods ?? 0;
+        
+        // Calculate total periods based on duration
+        const totalBasePeriods = Math.ceil(termDays / intervalDays);
 
-        // Add due today period if exists
-        if (state.row.value.arrears.dueTodayAmount > 0) {
+        // Calculate max period (base + overdue)
+        const currentMaxPeriod = Math.max(
+            totalBasePeriods, 
+            prepaidPeriodsCount, 
+            totalBasePeriods + state.row.value.arrears.overduePeriods + (state.row.value.arrears.dueTodayAmount > 0 ? 1 : 0)
+        );
+
+        for (let i = 1; i <= currentMaxPeriod; i++) {
+            const isPaid = i <= prepaidPeriodsCount;
+            const isTunggakan = i > totalBasePeriods;
+            
             periods.push({
-                id: state.row.value.arrears.overduePeriods + 1,
-                label: 'Jatuh Tempo Hari Ini',
-                dueDateLabel: 'Periode berjalan',
-                amount: storageFee
+                id: isPaid ? `paid-${i}` : i,
+                label: isTunggakan ? `Tunggakan ke-${i}` : `Periode ke-${i}`,
+                dueDateLabel: isPaid 
+                    ? 'Sudah lunas' 
+                    : (isTunggakan 
+                        ? `Tunggakan ${unit}` 
+                        : (i === totalBasePeriods ? 'Jatuh tempo akhir' : 'Biaya titip')),
+                amount: storageFee,
+                isPaid: isPaid
             });
         }
 
@@ -64,9 +80,10 @@ export const pawnContractStorageFeeViewModel = defineStore('pawnContractStorageF
     });
 
     const isAllSelected = computed(() => {
+        const selectableNonPaid = selectablePeriods.value.filter((p) => !p.isPaid);
         return (
-            selectablePeriods.value.length > 0 &&
-            state.selectedPeriodIds.value.length === selectablePeriods.value.length
+            selectableNonPaid.length > 0 &&
+            selectableNonPaid.every((p) => state.selectedPeriodIds.value.includes(p.id))
         );
     });
 
@@ -74,7 +91,10 @@ export const pawnContractStorageFeeViewModel = defineStore('pawnContractStorageF
         state.row.value = row;
     };
 
-    const togglePeriod = (id: number): void => {
+    const togglePeriod = (id: number | string): void => {
+        const period = selectablePeriods.value.find((p) => p.id === id);
+        if (period?.isPaid) return;
+
         const index = state.selectedPeriodIds.value.indexOf(id);
         if (index === -1) {
             state.selectedPeriodIds.value.push(id);
@@ -87,7 +107,9 @@ export const pawnContractStorageFeeViewModel = defineStore('pawnContractStorageF
         if (isAllSelected.value) {
             state.selectedPeriodIds.value = [];
         } else {
-            state.selectedPeriodIds.value = selectablePeriods.value.map((p) => p.id);
+            state.selectedPeriodIds.value = selectablePeriods.value
+                .filter((p) => !p.isPaid)
+                .map((p) => p.id);
         }
     };
 

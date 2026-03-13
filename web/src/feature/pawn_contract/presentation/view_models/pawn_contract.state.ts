@@ -81,7 +81,7 @@ export const getPawnContractAvailableActions = (params: {
 }): PawnContractActionOptionModel[] => {
     const availableKeys: PawnContractActionKeyModel[] = ['edit', 'history'];
 
-    if (['active', 'extended'].includes(params.contractStatus)) {
+    if (['active', 'extended', 'auctioned'].includes(params.contractStatus)) {
         availableKeys.push('storage_fee');
         availableKeys.push('settlement');
     }

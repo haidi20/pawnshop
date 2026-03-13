@@ -65,10 +65,10 @@
                 class="admin-header-user-dropdown-item"
                 type="button"
                 role="menuitem"
-                @click="openProfileDialog"
+                @click="navigateToProfile"
               >
                 <i class="bi bi-person-vcard" />
-                <span>Profile</span>
+                <span>Profil saya</span>
               </button>
 
               <button
@@ -76,10 +76,21 @@
                 class="admin-header-user-dropdown-item"
                 type="button"
                 role="menuitem"
-                @click="openCompanyDialog"
+                @click="navigateToCompany"
               >
                 <i class="bi bi-building-gear" />
-                <span>Ubah perusahaan</span>
+                <span>Data perusahaan</span>
+              </button>
+
+              <button
+                v-if="canEditCompany"
+                class="admin-header-user-dropdown-item"
+                type="button"
+                role="menuitem"
+                @click="navigateToSettings"
+              >
+                <i class="bi bi-cpu" />
+                <span>Pengaturan sistem</span>
               </button>
 
               <div class="admin-header-user-dropdown-divider" />
@@ -112,402 +123,10 @@
       </main>
     </div>
   </div>
-
-  <div
-    v-if="currentSession && isProfileDialogOpen"
-    class="admin-profile-backdrop"
-    @click.self="closeProfileDialog"
-  >
-    <section
-      class="admin-profile-modal"
-      role="dialog"
-      aria-modal="true"
-      aria-labelledby="admin-profile-title"
-    >
-      <div class="admin-profile-modal-head">
-        <div class="admin-profile-title-wrap">
-          <div class="admin-profile-avatar">
-            <i class="bi bi-person-circle" />
-          </div>
-
-          <div class="admin-profile-title-copy">
-            <span class="admin-profile-kicker">Profile</span>
-            <h2
-              id="admin-profile-title"
-              class="admin-profile-title"
-            >
-              {{ currentSession.user.fullName }}
-            </h2>
-            <p class="admin-profile-subtitle">
-              {{ currentSession.company.name }}
-            </p>
-          </div>
-        </div>
-
-        <button
-          class="admin-profile-close"
-          type="button"
-          aria-label="Tutup profile"
-          @click="closeProfileDialog"
-        >
-          <i class="bi bi-x-lg" />
-        </button>
-      </div>
-
-      <div class="admin-profile-grid">
-        <section class="admin-profile-section">
-          <div class="admin-profile-section-head">
-            <h3 class="admin-profile-section-title">
-              Informasi Pengguna
-            </h3>
-            <button
-              type="button"
-              class="btn btn-outline-primary btn-sm admin-profile-section-action"
-              @click="openProfileEditDialog"
-            >
-              Ubah profil
-            </button>
-          </div>
-
-          <dl class="admin-profile-list">
-            <div class="admin-profile-row">
-              <dt>Nama</dt>
-              <dd>{{ currentSession.user.fullName }}</dd>
-            </div>
-            <div class="admin-profile-row">
-              <dt>Role</dt>
-              <dd>{{ currentUserRoleLabel }}</dd>
-            </div>
-            <div class="admin-profile-row">
-              <dt>Akses Cabang</dt>
-              <dd>{{ currentUserBranchAccessLabel }}</dd>
-            </div>
-            <div class="admin-profile-row">
-              <dt>Username</dt>
-              <dd>@{{ currentSession.user.username }}</dd>
-            </div>
-            <div class="admin-profile-row">
-              <dt>Email</dt>
-              <dd>{{ formatProfileValue(currentSession.user.email) }}</dd>
-            </div>
-            <div class="admin-profile-row">
-              <dt>No. HP</dt>
-              <dd>{{ formatProfileValue(currentSession.user.phoneNumber) }}</dd>
-            </div>
-          </dl>
-        </section>
-
-        <section class="admin-profile-section">
-          <div class="admin-profile-section-head">
-            <h3 class="admin-profile-section-title">
-              Informasi Perusahaan
-            </h3>
-            <button
-              v-if="canEditCompany"
-              type="button"
-              class="btn btn-outline-primary btn-sm admin-profile-section-action"
-              @click="openCompanyDialog"
-            >
-              Ubah perusahaan
-            </button>
-          </div>
-
-          <dl class="admin-profile-list">
-            <div class="admin-profile-row">
-              <dt>Perusahaan</dt>
-              <dd>{{ currentSession.company.name }}</dd>
-            </div>
-            <div class="admin-profile-row">
-              <dt>Legal Name</dt>
-              <dd>{{ formatProfileValue(currentSession.company.legalName) }}</dd>
-            </div>
-            <div class="admin-profile-row">
-              <dt>Jenis Usaha</dt>
-              <dd>{{ formatProfileValue(currentSession.company.businessType) }}</dd>
-            </div>
-            <div class="admin-profile-row">
-              <dt>Kota</dt>
-              <dd>{{ formatProfileValue(currentSession.company.city) }}</dd>
-            </div>
-            <div class="admin-profile-row">
-              <dt>Email</dt>
-              <dd>{{ formatProfileValue(currentSession.company.email) }}</dd>
-            </div>
-            <div class="admin-profile-row">
-              <dt>No. Telepon</dt>
-              <dd>{{ formatProfileValue(currentSession.company.phoneNumber) }}</dd>
-            </div>
-            <div class="admin-profile-row admin-profile-row--stacked">
-              <dt>Alamat</dt>
-              <dd>{{ formatProfileValue(currentSession.company.address) }}</dd>
-            </div>
-          </dl>
-        </section>
-      </div>
-    </section>
-  </div>
-
-  <div
-    v-if="currentSession && isProfileEditDialogOpen"
-    class="admin-profile-backdrop"
-    @click.self="closeProfileEditDialog"
-  >
-    <section
-      class="admin-profile-modal admin-company-modal"
-      role="dialog"
-      aria-modal="true"
-      aria-labelledby="admin-profile-edit-title"
-    >
-      <div class="admin-profile-modal-head">
-        <div class="admin-profile-title-wrap">
-          <div class="admin-profile-avatar">
-            <i class="bi bi-pencil-square" />
-          </div>
-
-          <div class="admin-profile-title-copy">
-            <span class="admin-profile-kicker">Pengguna</span>
-            <h2
-              id="admin-profile-edit-title"
-              class="admin-profile-title"
-            >
-              Ubah profil pengguna
-            </h2>
-            <p class="admin-profile-subtitle">
-              Perubahan ini langsung dipakai pada akun yang sedang login.
-            </p>
-          </div>
-        </div>
-
-        <button
-          class="admin-profile-close"
-          type="button"
-          aria-label="Tutup ubah profil"
-          :disabled="isSubmitting"
-          @click="closeProfileEditDialog"
-        >
-          <i class="bi bi-x-lg" />
-        </button>
-      </div>
-
-      <div class="admin-company-form-grid">
-        <label class="admin-company-field admin-company-field--full">
-          <span>Nama lengkap</span>
-          <input
-            v-model.trim="profileForm.fullName"
-            type="text"
-            class="form-control"
-            placeholder="Nama lengkap pengguna"
-          >
-        </label>
-
-        <label class="admin-company-field">
-          <span>Username</span>
-          <input
-            v-model.trim="profileForm.username"
-            type="text"
-            class="form-control"
-            placeholder="Username"
-          >
-        </label>
-
-        <label class="admin-company-field">
-          <span>Email</span>
-          <input
-            v-model.trim="profileForm.email"
-            type="email"
-            class="form-control"
-            placeholder="Email pengguna"
-          >
-        </label>
-
-        <label class="admin-company-field admin-company-field--full">
-          <span>No. telepon</span>
-          <input
-            v-model.trim="profileForm.phoneNumber"
-            type="text"
-            class="form-control"
-            placeholder="No. telepon pengguna"
-          >
-        </label>
-      </div>
-
-      <div class="admin-company-actions">
-        <button
-          type="button"
-          class="btn btn-outline-secondary"
-          :disabled="isSubmitting"
-          @click="closeProfileEditDialog"
-        >
-          Batal
-        </button>
-        <button
-          type="button"
-          class="btn btn-primary"
-          :disabled="isSubmitting"
-          @click="handleProfileUpdate"
-        >
-          <span
-            v-if="isSubmitting"
-            class="spinner-border spinner-border-sm"
-            aria-hidden="true"
-          />
-          <i
-            v-else
-            class="bi bi-check2-circle"
-          />
-          <span>{{ isSubmitting ? 'Menyimpan...' : 'Simpan profil' }}</span>
-        </button>
-      </div>
-    </section>
-  </div>
-
-  <div
-    v-if="currentSession && isCompanyDialogOpen"
-    class="admin-profile-backdrop"
-    @click.self="closeCompanyDialog"
-  >
-    <section
-      class="admin-profile-modal admin-company-modal"
-      role="dialog"
-      aria-modal="true"
-      aria-labelledby="admin-company-title"
-    >
-      <div class="admin-profile-modal-head">
-        <div class="admin-profile-title-wrap">
-          <div class="admin-profile-avatar">
-            <i class="bi bi-building" />
-          </div>
-
-          <div class="admin-profile-title-copy">
-            <span class="admin-profile-kicker">Perusahaan</span>
-            <h2
-              id="admin-company-title"
-              class="admin-profile-title"
-            >
-              Ubah profil perusahaan
-            </h2>
-            <p class="admin-profile-subtitle">
-              Perubahan ini langsung dipakai pada perusahaan aktif.
-            </p>
-          </div>
-        </div>
-
-        <button
-          class="admin-profile-close"
-          type="button"
-          aria-label="Tutup ubah perusahaan"
-          :disabled="isSubmitting"
-          @click="closeCompanyDialog"
-        >
-          <i class="bi bi-x-lg" />
-        </button>
-      </div>
-
-      <div class="admin-company-form-grid">
-        <label class="admin-company-field admin-company-field--full">
-          <span>Nama perusahaan</span>
-          <input
-            v-model.trim="companyForm.name"
-            type="text"
-            class="form-control"
-            placeholder="Nama perusahaan"
-          >
-        </label>
-
-        <label class="admin-company-field admin-company-field--full">
-          <span>Nama legal</span>
-          <input
-            v-model.trim="companyForm.legalName"
-            type="text"
-            class="form-control"
-            placeholder="Nama legal perusahaan"
-          >
-        </label>
-
-        <label class="admin-company-field">
-          <span>Jenis usaha</span>
-          <input
-            v-model.trim="companyForm.businessType"
-            type="text"
-            class="form-control"
-            placeholder="Jenis usaha"
-          >
-        </label>
-
-        <label class="admin-company-field">
-          <span>Kota</span>
-          <input
-            v-model.trim="companyForm.city"
-            type="text"
-            class="form-control"
-            placeholder="Kota"
-          >
-        </label>
-
-        <label class="admin-company-field">
-          <span>Email</span>
-          <input
-            v-model.trim="companyForm.email"
-            type="email"
-            class="form-control"
-            placeholder="Email perusahaan"
-          >
-        </label>
-
-        <label class="admin-company-field">
-          <span>No. telepon</span>
-          <input
-            v-model.trim="companyForm.phoneNumber"
-            type="text"
-            class="form-control"
-            placeholder="No. telepon perusahaan"
-          >
-        </label>
-
-        <label class="admin-company-field admin-company-field--full">
-          <span>Alamat</span>
-          <textarea
-            v-model.trim="companyForm.address"
-            class="form-control"
-            rows="3"
-            placeholder="Alamat perusahaan"
-          />
-        </label>
-      </div>
-
-      <div class="admin-company-actions">
-        <button
-          type="button"
-          class="btn btn-outline-secondary"
-          :disabled="isSubmitting"
-          @click="closeCompanyDialog"
-        >
-          Batal
-        </button>
-        <button
-          type="button"
-          class="btn btn-primary"
-          :disabled="isSubmitting"
-          @click="handleCompanyUpdate"
-        >
-          <span
-            v-if="isSubmitting"
-            class="spinner-border spinner-border-sm"
-            aria-hidden="true"
-          />
-          <i
-            v-else
-            class="bi bi-check2-circle"
-          />
-          <span>{{ isSubmitting ? 'Menyimpan...' : 'Simpan perusahaan' }}</span>
-        </button>
-      </div>
-    </section>
-  </div>
 </template>
 
 <script setup lang="ts">
-import { computed, onBeforeUnmount, onMounted, reactive, ref, watch } from 'vue';
+import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue';
 import { storeToRefs } from 'pinia';
 import { RouterView, useRoute, useRouter } from 'vue-router';
 
@@ -522,9 +141,6 @@ const baseNavigationItems = getAppNavigationItems();
 const isSidebarOpen = ref(false);
 const isSidebarCollapsed = ref(false);
 const isUserMenuOpen = ref(false);
-const isProfileDialogOpen = ref(false);
-const isProfileEditDialogOpen = ref(false);
-const isCompanyDialogOpen = ref(false);
 const userMenuRef = ref<HTMLElement | null>(null);
 const mobileSidebarBreakpoint = 920;
 const authVm = authPortalViewModel();
@@ -574,105 +190,21 @@ const toggleUserMenu = (): void => {
   isUserMenuOpen.value = !isUserMenuOpen.value;
 };
 
-const companyForm = reactive({
-  name: '',
-  legalName: '',
-  businessType: '',
-  email: '',
-  phoneNumber: '',
-  city: '',
-  address: '',
-});
-
-const profileForm = reactive({
-  fullName: '',
-  username: '',
-  email: '',
-  phoneNumber: '',
-});
-
 const canEditCompany = computed<boolean>(() => currentSession.value?.user.role === 'owner');
 
-const syncProfileForm = (): void => {
-  const user = currentSession.value?.user;
-  if (!user) {
-    return;
-  }
-
-  profileForm.fullName = user.fullName;
-  profileForm.username = user.username;
-  profileForm.email = user.email ?? '';
-  profileForm.phoneNumber = user.phoneNumber ?? '';
-};
-
-const syncCompanyForm = (): void => {
-  const company = currentSession.value?.company;
-  if (!company) {
-    return;
-  }
-
-  companyForm.name = company.name;
-  companyForm.legalName = company.legalName ?? '';
-  companyForm.businessType = company.businessType ?? '';
-  companyForm.email = company.email ?? '';
-  companyForm.phoneNumber = company.phoneNumber ?? '';
-  companyForm.city = company.city ?? '';
-  companyForm.address = company.address ?? '';
-};
-
-const openProfileDialog = (): void => {
-  syncProfileForm();
-  isProfileDialogOpen.value = true;
+const navigateToProfile = (): void => {
   closeUserMenu();
+  router.push('/settings/profile');
 };
 
-const closeProfileDialog = (): void => {
-  isProfileDialogOpen.value = false;
-};
-
-const openProfileEditDialog = (): void => {
-  if (!currentSession.value) {
-    return;
-  }
-
-  syncProfileForm();
+const navigateToCompany = (): void => {
   closeUserMenu();
-  closeProfileDialog();
-  isCompanyDialogOpen.value = false;
-  isProfileEditDialogOpen.value = true;
+  router.push('/settings/company');
 };
 
-const closeProfileEditDialog = (): void => {
-  if (isSubmitting.value) {
-    return;
-  }
-
-  isProfileEditDialogOpen.value = false;
-};
-
-const openCompanyDialog = (): void => {
-  if (!canEditCompany.value || !currentSession.value) {
-    return;
-  }
-
-  syncCompanyForm();
+const navigateToSettings = (): void => {
   closeUserMenu();
-  closeProfileDialog();
-  isProfileEditDialogOpen.value = false;
-  isCompanyDialogOpen.value = true;
-};
-
-const closeCompanyDialog = (): void => {
-  if (isSubmitting.value) {
-    return;
-  }
-
-  isCompanyDialogOpen.value = false;
-};
-
-const formatProfileValue = (value: string | null | undefined): string => {
-  const normalizedValue = value?.trim();
-  return normalizedValue && normalizedValue.length > 0 ? normalizedValue : '-';
+  router.push('/settings/system');
 };
 
 const sidebarToggleTitle = computed<string>(() =>
@@ -695,86 +227,6 @@ const sidebarToggleIcon = computed<string>(() =>
       : 'bi-layout-sidebar'
 );
 
-const currentUserRoleLabel = computed<string>(() => {
-  const role = currentSession.value?.user.role ?? '';
-
-  if (!role) {
-    return '-';
-  }
-
-  const normalizedRole = role.toLowerCase();
-  const roleLabels: Record<string, string> = {
-    owner: 'Owner',
-    admin: 'Admin',
-    staff: 'Staff',
-  };
-
-  return roleLabels[normalizedRole] ?? `${normalizedRole.charAt(0).toUpperCase()}${normalizedRole.slice(1)}`;
-});
-
-const currentUserBranchAccessLabel = computed<string>(() => {
-  const session = currentSession.value;
-  if (!session) {
-    return '-';
-  }
-
-  if (session.user.role === 'owner') {
-    return 'Semua cabang';
-  }
-
-  return session.user.assignedBranchName ??
-    (session.user.assignedBranchId !== null ? `Cabang #${session.user.assignedBranchId}` : 'Belum diatur');
-});
-
-const handleCompanyUpdate = async (): Promise<void> => {
-  try {
-    await authVm.updateCompany({
-      name: companyForm.name,
-      legalName: companyForm.legalName,
-      businessType: companyForm.businessType,
-      email: companyForm.email,
-      phoneNumber: companyForm.phoneNumber,
-      city: companyForm.city,
-      address: companyForm.address,
-    });
-
-    closeCompanyDialog();
-    await showSuccessMessage('Perusahaan diperbarui', 'Profil perusahaan aktif sudah disimpan.', {
-      toast: true,
-      timer: 1600,
-      position: 'top-end',
-    });
-  } catch (error) {
-    await showErrorMessage(
-      'Perbarui perusahaan gagal',
-      error instanceof Error ? error.message : String(error)
-    );
-  }
-};
-
-const handleProfileUpdate = async (): Promise<void> => {
-  try {
-    await authVm.updateProfile({
-      fullName: profileForm.fullName,
-      username: profileForm.username,
-      email: profileForm.email,
-      phoneNumber: profileForm.phoneNumber,
-    });
-
-    closeProfileEditDialog();
-    await showSuccessMessage('Profil diperbarui', 'Profil pengguna aktif sudah disimpan.', {
-      toast: true,
-      timer: 1600,
-      position: 'top-end',
-    });
-  } catch (error) {
-    await showErrorMessage(
-      'Perbarui profil gagal',
-      error instanceof Error ? error.message : String(error)
-    );
-  }
-};
-
 const handleDocumentPointerDown = (event: MouseEvent): void => {
   if (!isUserMenuOpen.value || !userMenuRef.value) {
     return;
@@ -791,15 +243,10 @@ const handleWindowKeydown = (event: KeyboardEvent): void => {
   }
 
   closeUserMenu();
-  closeProfileDialog();
-  closeProfileEditDialog();
-  closeCompanyDialog();
 };
 
 const handleLogout = async (): Promise<void> => {
   closeUserMenu();
-  closeProfileDialog();
-  closeProfileEditDialog();
 
   try {
     await authVm.logout();
@@ -819,39 +266,8 @@ watch(
   () => {
     closeSidebar();
     closeUserMenu();
-    closeProfileDialog();
-    isProfileEditDialogOpen.value = false;
-    isCompanyDialogOpen.value = false;
   }
 );
-
-watch(
-  () => currentSession.value?.company,
-  () => {
-    if (!isCompanyDialogOpen.value) {
-      syncCompanyForm();
-    }
-  },
-  { immediate: true, deep: true }
-);
-
-watch(
-  () => currentSession.value?.user,
-  () => {
-    if (!isProfileEditDialogOpen.value) {
-      syncProfileForm();
-    }
-  },
-  { immediate: true, deep: true }
-);
-
-watch([isProfileDialogOpen, isProfileEditDialogOpen, isCompanyDialogOpen], ([profileOpen, profileEditOpen, companyOpen]) => {
-  if (typeof document === 'undefined') {
-    return;
-  }
-
-  document.body.classList.toggle('modal-open', profileOpen || profileEditOpen || companyOpen);
-});
 
 onMounted(() => {
   if (typeof document !== 'undefined') {
@@ -868,7 +284,6 @@ onMounted(() => {
 onBeforeUnmount(() => {
   if (typeof document !== 'undefined') {
     document.removeEventListener('mousedown', handleDocumentPointerDown);
-    document.body.classList.remove('modal-open');
   }
 
   if (typeof window !== 'undefined') {

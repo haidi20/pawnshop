@@ -38,9 +38,25 @@ const globalRoutes: RouteRecordRaw[] = [
     redirect: '/dashboard',
   },
   {
+    path: '/settings/profile',
+    name: 'Profile',
+    component: () => import('@core/presentation/views/ProfileView.vue'),
+  },
+  {
+    path: '/settings/company',
+    name: 'Company',
+    component: () => import('@core/presentation/views/CompanyView.vue'),
+    meta: { ownerOnly: true },
+  },
+  {
+    path: '/settings/system',
+    name: 'Settings',
+    component: () => import('@core/presentation/views/SettingsView.vue'),
+  },
+  {
     path: '/:pathMatch(.*)*', // Rute 404 (harus selalu di akhir)
     name: 'NotFound',
-    component: () => import('@core/presentation/views/NotFoundView.vue'), // Asumsi view 404 ada di core
+    component: () => import('@core/presentation/views/NotFoundView.vue'),
   }
 ];
 

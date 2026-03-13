@@ -59,7 +59,9 @@
                       #
                     </th>
                     <th>Deskripsi Periode</th>
-                    <th class="text-end">Nominal</th>
+                    <th class="text-end">
+                      Nominal
+                    </th>
                     <th
                       class="text-center"
                       style="width: 80px"
@@ -72,9 +74,14 @@
                   <tr
                     v-for="period in selectablePeriods"
                     :key="period.id"
-                    :class="{ 'table-primary-subtle': selectedPeriodIds.includes(period.id) }"
-                    class="cursor-pointer"
-                    @click="togglePeriod(period.id)"
+                    :class="[
+                      { 
+                        'table-primary-subtle': selectedPeriodIds.includes(period.id),
+                        'opacity-50 grayscale bg-light': period.isPaid 
+                      },
+                      period.isPaid ? '' : 'cursor-pointer'
+                    ]"
+                    @click="period.isPaid ? null : togglePeriod(period.id)"
                   >
                     <td class="text-center text-secondary small">
                       {{ period.id }}
@@ -94,8 +101,9 @@
                       <input
                         class="form-check-input"
                         type="checkbox"
-                        :checked="selectedPeriodIds.includes(period.id)"
-                        @click.stop="togglePeriod(period.id)"
+                        :checked="period.isPaid || selectedPeriodIds.includes(period.id)"
+                        :disabled="period.isPaid"
+                        @click.stop="period.isPaid ? null : togglePeriod(period.id)"
                       >
                     </td>
                   </tr>
@@ -216,15 +224,15 @@ const {
 
 const { togglePeriod, toggleSelectAll } = vm;
 
-const handleClose = (): void => {
+function handleClose(): void {
   emit('close');
-};
+}
 
-const handleConfirm = (): void => {
+function handleConfirm(): void {
   if (row.value && selectedPeriodIds.value.length > 0) {
     emit('confirm', row.value, selectedPeriodIds.value.length);
   }
-};
+}
 </script>
 
 <style scoped>

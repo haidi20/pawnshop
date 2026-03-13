@@ -53,6 +53,7 @@
     </div>
 
     <div class="d-grid gap-3 mt-3">
+      <!-- D:\projects\pawnshop\web\src\feature\pawn_contract\presentation\components\pawn_contract_nasabah_section.component.vue -->
       <article
         v-for="sectionTable in sectionTables"
         :key="sectionTable.key"

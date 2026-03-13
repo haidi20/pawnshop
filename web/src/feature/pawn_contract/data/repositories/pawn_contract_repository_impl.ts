@@ -15,7 +15,12 @@ import {
     pawnItemsDao
 } from '@feature/pawn_contract/data/db';
 import { PawnContractLocalDatasource } from '@feature/pawn_contract/data/datasources/pawn_contract_local_datasource';
-import { ensurePawnContractDemoDataSeed } from '@feature/pawn_contract/data/seeders/pawn_contract_demo_data.seeder';
+import { 
+    ensurePawnContractDemoDataSeed, 
+    setManualSeedVersion, 
+    clearSeedVersion 
+} from '@feature/pawn_contract/data/seeders/pawn_contract_demo_data.seeder';
+import { getTodayDateValue, calculatePawnContractMaturityDate } from '@core/util/pawn-contract-form';
 import type {
     GetPawnContractAjtTableParamsModel,
     PawnContractDataFilterModel,
@@ -330,5 +335,91 @@ export class PawnContractRepositoryImpl implements PawnContractRepository {
         } catch (error) {
             return left(toError(error));
         }
+    }
+
+    async runDefaultSeeder(): Promise<Either<Error, void>> {
+        try {
+            clearSeedVersion();
+            await this.clearAllData();
+            await ensurePawnContractDemoDataSeed(true);
+            return right(undefined);
+        } catch (error) {
+            return left(toError(error));
+        }
+    }
+
+    async runSingleActiveSeeder(): Promise<Either<Error, void>> {
+        try {
+            const [
+                dummyBranches,
+                dummyCustomers,
+                dummyItems,
+                dummyContracts
+            ] = await Promise.all([
+                this.fetchDummies('branches'),
+                this.fetchDummies('customers'),
+                this.fetchDummies('pawn_items'),
+                this.fetchDummies('pawn_contracts')
+            ]);
+
+            setManualSeedVersion();
+            await this.clearAllData();
+
+            const today = getTodayDateValue();
+            const maturityDate = calculatePawnContractMaturityDate(today, 30);
+
+            // Using hardcoded company IDs for demo as per current requirement
+            const demoCompanyIds = [1, 2];
+
+            for (const companyId of demoCompanyIds) {
+                // Seed Branch
+                const branch = { ...dummyBranches[0], company_id: companyId, id: companyId };
+                await branchesDao.upsert(branch);
+
+                // Seed Customer
+                const customer = { ...dummyCustomers[0], company_id: companyId, id: companyId };
+                await customersDao.upsert(customer);
+
+                // Seed Contract
+                const contractTemplate = dummyContracts.find(c => c.contract_status === 'active') || dummyContracts[0];
+                const contract = {
+                    ...contractTemplate,
+                    id: companyId,
+                    company_id: companyId,
+                    branch_id: branch.id,
+                    customer_id: customer.id,
+                    contract_date: today,
+                    maturity_date: maturityDate,
+                    contract_status: 'active',
+                    updated_at: `${today} 09:00:00`
+                };
+                await pawnContractsDao.upsert(contract);
+
+                // Seed Item
+                const itemTemplate = dummyItems.find(i => i.contract_id === contractTemplate.id) || dummyItems[0];
+                const item = {
+                    ...itemTemplate,
+                    id: companyId,
+                    contract_id: contract.id,
+                    created_at: `${today} 08:00:00`,
+                    updated_at: `${today} 08:00:00`
+                };
+                await pawnItemsDao.upsert(item);
+            }
+
+            return right(undefined);
+        } catch (error) {
+            return left(toError(error));
+        }
+    }
+
+    private async clearAllData(): Promise<void> {
+        await Promise.all(pawnContractDataDaos.map(dao => dao.replaceAll([])));
+    }
+
+    private async fetchDummies(name: string): Promise<any[]> {
+        const response = await fetch(`/dummies/${name}.dummy.json`);
+        if (!response.ok) throw new Error(`Failed to fetch dummy ${name}`);
+        return await response.json();
     }
 }

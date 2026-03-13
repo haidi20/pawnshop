@@ -49,7 +49,7 @@ import {
 export const PAWN_CONTRACT_DEMO_DATASET_VERSION = 'pawn-contract-demo-500-v2';
 export const PAWN_CONTRACT_DEMO_MIN_CONTRACT_COUNT = 500;
 
-const DEMO_SEED_STORAGE_KEY = 'pawnshop.demo_seed.pawn_contract.version';
+export const DEMO_SEED_STORAGE_KEY = 'pawnshop.demo_seed.pawn_contract.version';
 const ELECTRONIC_CATEGORY_ID = 2;
 const LAPTOP_ITEM_TYPE_ID = 2;
 const BRANCH_STARTING_BALANCE = 90_000_000;
@@ -1269,18 +1269,24 @@ const readStoredSeedVersion = (): string | null => {
     return localStorage.getItem(`${DEMO_SEED_STORAGE_KEY}.${getFeatureStorageScope('pawn-contract')}`);
 };
 
-const writeStoredSeedVersion = (): void => {
+const writeStoredSeedVersion = (version = PAWN_CONTRACT_DEMO_DATASET_VERSION): void => {
     if (!canUseLocalStorage()) {
         return;
     }
 
     localStorage.setItem(
         `${DEMO_SEED_STORAGE_KEY}.${getFeatureStorageScope('pawn-contract')}`,
-        PAWN_CONTRACT_DEMO_DATASET_VERSION
+        version
     );
 };
 
-export const ensurePawnContractDemoDataSeed = async (): Promise<void> => {
+export const setManualSeedVersion = () => writeStoredSeedVersion('manual');
+export const clearSeedVersion = () => {
+    if (!canUseLocalStorage()) return;
+    localStorage.removeItem(`${DEMO_SEED_STORAGE_KEY}.${getFeatureStorageScope('pawn-contract')}`);
+};
+
+export const ensurePawnContractDemoDataSeed = async (forceReseed = false): Promise<void> => {
     const currentSession = readAuthPortalStoredSession();
     if (currentSession && !isCurrentAuthPortalDemoCompany()) {
         return;
@@ -1289,7 +1295,12 @@ export const ensurePawnContractDemoDataSeed = async (): Promise<void> => {
     const contractRows = await pawnContractsDao.getAll();
     const storedSeedVersion = readStoredSeedVersion();
 
+    if (storedSeedVersion === 'manual') {
+        return;
+    }
+
     const shouldReseed =
+        forceReseed ||
         contractRows.length < PAWN_CONTRACT_DEMO_MIN_CONTRACT_COUNT ||
         storedSeedVersion !== PAWN_CONTRACT_DEMO_DATASET_VERSION;
 

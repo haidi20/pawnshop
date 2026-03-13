@@ -122,8 +122,8 @@ export class PawnContractIndexLocalDatasource {
         );
 
         return {
-            title: 'Active Contract List',
-            description: 'Group active contracts by payment schedule and contract age for faster follow-up.',
+            title: 'Daftar Kontrak Aktif',
+            description: 'Kelompokkan kontrak aktif berdasarkan jadwal pembayaran dan usia kontrak untuk tindak lanjut yang lebih cepat.',
             tabs,
             sections,
             activeSection,
@@ -335,26 +335,26 @@ export class PawnContractIndexLocalDatasource {
         return [
             this.createNasabahSection(
                 'bulan_berjalan',
-                'Current Month',
-                'Active contracts created in the current month.',
+                'Bulan Berjalan',
+                'Kontrak aktif yang dibuat pada bulan berjalan.',
                 currentMonthRows
             ),
             this.createNasabahSection(
                 'satu_bulan_lalu',
-                '1 Month Ago',
-                'Active contracts created in the previous month.',
+                '1 Bulan Lalu',
+                'Kontrak aktif yang dibuat pada bulan sebelumnya.',
                 oneMonthAgoRows
             ),
             this.createNasabahSection(
                 'dua_bulan_lalu',
-                '2 Months Ago',
-                'Active contracts created two months ago.',
+                '2 Bulan Lalu',
+                'Kontrak aktif yang dibuat dua bulan lalu.',
                 twoMonthAgoRows
             ),
             this.createNasabahSection(
                 'tiga_bulan_atau_lebih',
-                '3+ Months Ago',
-                'Older active contracts that still need follow-up.',
+                '3 Bulan atau Lebih',
+                'Kontrak aktif lama yang masih memerlukan tindak lanjut.',
                 threeMonthAgoRows
             )
         ];

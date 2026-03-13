@@ -3,7 +3,7 @@ import type { PawnContractSummaryModel } from '@feature/pawn_contract/domain/mod
 
 export interface PawnContractStorageFeeState {
     row: Ref<PawnContractSummaryModel | null>;
-    selectedPeriodIds: Ref<number[]>;
+    selectedPeriodIds: Ref<(number | string)[]>;
     isSubmitting: Ref<boolean>;
 }
 
