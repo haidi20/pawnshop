@@ -122,6 +122,12 @@ export const masterBranchViewModel = defineStore('masterBranchStore', () => {
     const isDeletingLocationIds = ref<number[]>([]);
     const branchForm = reactive<MasterBranchFormState>(emptyBranchForm());
     const locationForm = reactive<MasterLocationFormState>(emptyLocationForm());
+
+    const branchActionModal = reactive({
+        isOpen: false,
+        item: null as MasterBranchTableRow | null
+    });
+
     const branchTableService = new DataTableClientSideService<MasterBranchTableRow>([...branchTableFields], []);
     const locationTableService = new DataTableClientSideService<MasterLocationTableRow>([...locationTableFields], []);
 
@@ -302,6 +308,16 @@ export const masterBranchViewModel = defineStore('masterBranchStore', () => {
         setError(null);
     };
 
+    const openBranchActionModal = (item: MasterBranchTableRow): void => {
+        branchActionModal.isOpen = true;
+        branchActionModal.item = item;
+    };
+
+    const closeBranchActionModal = (): void => {
+        branchActionModal.isOpen = false;
+        branchActionModal.item = null;
+    };
+
     const closeBranchModal = (): void => {
         branchDialogMode.value = null;
     };
@@ -436,6 +452,7 @@ export const masterBranchViewModel = defineStore('masterBranchStore', () => {
         ...state,
         branchForm,
         locationForm,
+        branchActionModal,
         branchDialogMode,
         locationDialogMode,
         branchDialogTitle,
@@ -460,6 +477,8 @@ export const masterBranchViewModel = defineStore('masterBranchStore', () => {
         getMasterBranchData,
         openCreateBranchModal,
         openEditBranchModal,
+        openBranchActionModal,
+        closeBranchActionModal,
         closeBranchModal,
         saveBranch,
         deleteBranch,

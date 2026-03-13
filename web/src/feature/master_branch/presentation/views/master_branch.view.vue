@@ -1,26 +1,13 @@
 <template>
-  <LocalDbFeedbackStateComponent
-    v-if="isLoading && !data"
-    state="loading"
-    title="Memuat master cabang"
+  <LocalDbFeedbackStateComponent v-if="isLoading && !data" state="loading" title="Memuat master cabang"
     description="Mengambil data cabang dari database lokal perusahaan aktif."
-    note="Tabel cabang akan siap dipakai setelah pembacaan data lokal selesai."
-  />
+    note="Tabel cabang akan siap dipakai setelah pembacaan data lokal selesai." />
 
-  <LocalDbFeedbackStateComponent
-    v-else-if="error && !data"
-    state="error"
-    title="Gagal memuat master cabang"
-    :description="error"
-    note="Coba muat ulang agar data cabang dari DB lokal dibaca kembali."
-    action-label="Muat ulang"
-    @action="vm.getMasterBranchData()"
-  />
+  <LocalDbFeedbackStateComponent v-else-if="error && !data" state="error" title="Gagal memuat master cabang"
+    :description="error" note="Coba muat ulang agar data cabang dari DB lokal dibaca kembali." action-label="Muat ulang"
+    @action="vm.getMasterBranchData()" />
 
-  <section
-    v-else
-    class="feature-data-page master-data-page"
-  >
+  <section v-else class="feature-data-page master-data-page">
     <section class="master-data-page__hero">
       <div class="master-data-page__hero-head">
         <div>
@@ -35,11 +22,7 @@
           </p>
         </div>
 
-        <button
-          type="button"
-          class="btn btn-primary master-data-page__hero-action"
-          @click="vm.openCreateBranchModal()"
-        >
+        <button type="button" class="btn btn-success master-data-page__hero-action" @click="vm.openCreateBranchModal()">
           <i class="bi bi-plus-circle" />
           <span>Tambah cabang</span>
         </button>
@@ -84,10 +67,7 @@
       </div>
     </section>
 
-    <section
-      v-if="error"
-      class="master-data-page__inline-error"
-    >
+    <section v-if="error" class="master-data-page__inline-error">
       <i class="bi bi-exclamation-circle" />
       <span>{{ error }}</span>
     </section>
@@ -111,50 +91,24 @@
         </div>
       </div>
 
-      <DataTableClientSideComponent
-        :vm="branchTableVm"
-        class="master-data-page__datatable"
-      >
+      <DataTableClientSideComponent :vm="branchTableVm" class="master-data-page__datatable">
         <template #extra-actions>
           <div class="master-data-page__table-tools">
             <span class="master-data-page__filter-chip">
               {{ activeBranchCount }} aktif
             </span>
-            <span
-              v-if="inactiveBranchCount > 0"
-              class="master-data-page__filter-chip is-warning"
-            >
+            <span v-if="inactiveBranchCount > 0" class="master-data-page__filter-chip is-warning">
               {{ inactiveBranchCount }} belum aktif
             </span>
-            <button
-              type="button"
-              class="btn btn-outline-primary master-data-page__table-action"
-              @click="vm.openCreateBranchModal()"
-            >
-              <i class="bi bi-plus-circle" />
-              <span>Tambah cabang</span>
-            </button>
           </div>
         </template>
 
         <template #body="{ item }">
           <tr>
-            <td data-label="Aksi">
+            <td data-label="Aksi" style="text-align: center;">
               <div class="master-data-page__action-cell">
-                <button
-                  type="button"
-                  class="btn btn-outline-primary btn-sm"
-                  @click="vm.openEditBranchModal(item.source.id)"
-                >
-                  Ubah
-                </button>
-                <button
-                  type="button"
-                  class="btn btn-outline-danger btn-sm"
-                  :disabled="vm.isDeletingBranch(item.source.id)"
-                  @click="confirmDeleteBranch(item)"
-                >
-                  {{ vm.isDeletingBranch(item.source.id) ? 'Menghapus...' : 'Hapus' }}
+                <button type="button" class="btn btn-outline-primary btn-sm" @click="vm.openBranchActionModal(item)">
+                  Aksi
                 </button>
               </div>
             </td>
@@ -174,10 +128,7 @@
               {{ item.phoneNumberLabel }}
             </td>
             <td data-label="Status Aktif">
-              <span
-                class="master-data-page__status-badge"
-                :class="`is-${item.statusTone}`"
-              >
+              <span class="master-data-page__status-badge" :class="`is-${item.statusTone}`">
                 {{ item.statusLabel }}
               </span>
             </td>
@@ -185,20 +136,11 @@
         </template>
 
         <template #empty>
-          <LocalDbFeedbackStateComponent
-            state="empty"
-            title="Belum ada cabang"
+          <LocalDbFeedbackStateComponent state="empty" title="Belum ada cabang"
             description="Tambahkan cabang pertama agar assignment user dan operasional cabang bisa dimulai."
-            note="Data tersimpan langsung ke database lokal perusahaan aktif."
-            :framed="false"
-            compact
-          >
+            note="Data tersimpan langsung ke database lokal perusahaan aktif." :framed="false" compact>
             <template #actions>
-              <button
-                type="button"
-                class="btn btn-primary"
-                @click="vm.openCreateBranchModal()"
-              >
+              <button type="button" class="btn btn-success" @click="vm.openCreateBranchModal()">
                 Tambah cabang
               </button>
             </template>
@@ -206,23 +148,15 @@
         </template>
       </DataTableClientSideComponent>
 
-      <p
-        v-if="branchSearchKeyword"
-        class="master-data-page__search-feedback mb-0"
-      >
+      <p v-if="branchSearchKeyword" class="master-data-page__search-feedback mb-0">
         Menampilkan {{ branchRowCount }} hasil untuk "{{ branchSearchKeyword }}".
       </p>
     </article>
   </section>
 
   <template v-if="isBranchDialogOpen">
-    <section
-      class="modal fade show d-block master-data-page__modal"
-      tabindex="-1"
-      role="dialog"
-      aria-modal="true"
-      aria-labelledby="master-branch-modal-title"
-    >
+    <section class="modal fade show d-block master-data-page__modal" tabindex="-1" role="dialog" aria-modal="true"
+      aria-labelledby="master-branch-modal-title" @click.self="closeBranchModal">
       <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable master-data-page__modal-dialog">
         <div class="modal-content border-0 master-data-page__modal-content">
           <div class="modal-header master-data-page__modal-header">
@@ -230,73 +164,46 @@
               <div class="table-card-role mb-2">
                 Master Cabang
               </div>
-              <h2
-                id="master-branch-modal-title"
-                class="h5 mb-1"
-              >
+              <h2 id="master-branch-modal-title" class="h5 mb-1">
                 {{ branchDialogTitle }}
               </h2>
               <p class="mb-0 text-secondary">
                 Lengkapi identitas cabang yang akan dipakai pada operasional perusahaan.
               </p>
             </div>
-            <button
-              type="button"
-              class="btn-close"
-              aria-label="Tutup"
-              :disabled="isSavingBranch"
-              @click="closeBranchModal"
-            />
+            <button type="button" class="btn-close" aria-label="Tutup" :disabled="isSavingBranch"
+              @click="closeBranchModal" />
           </div>
 
           <div class="modal-body master-data-page__modal-body">
             <div class="master-data-page__form-grid">
               <label class="master-data-page__field">
                 <span>Kode cabang</span>
-                <input
-                  v-model.trim="branchForm.branchCode"
-                  type="text"
-                  class="form-control"
-                  placeholder="Contoh: BR-SMD-001"
-                >
+                <input v-model.trim="branchForm.branchCode" type="text" class="form-control"
+                  placeholder="Contoh: BR-SMD-001">
               </label>
 
               <label class="master-data-page__field">
                 <span>Nomor cabang</span>
-                <input
-                  v-model.trim="branchForm.branchNumber"
-                  type="text"
-                  class="form-control"
-                  placeholder="Contoh: 001"
-                >
+                <input v-model.trim="branchForm.branchNumber" type="text" class="form-control"
+                  placeholder="Contoh: 001">
               </label>
 
               <label class="master-data-page__field master-data-page__field--full">
                 <span>Nama cabang</span>
-                <input
-                  v-model.trim="branchForm.branchName"
-                  type="text"
-                  class="form-control"
-                  placeholder="Nama cabang operasional"
-                >
+                <input v-model.trim="branchForm.branchName" type="text" class="form-control"
+                  placeholder="Nama cabang operasional">
               </label>
 
               <label class="master-data-page__field">
                 <span>Nomor telepon</span>
-                <input
-                  v-model.trim="branchForm.phoneNumber"
-                  type="text"
-                  class="form-control"
-                  placeholder="No. telepon cabang"
-                >
+                <input v-model.trim="branchForm.phoneNumber" type="text" class="form-control"
+                  placeholder="No. telepon cabang">
               </label>
 
               <label class="master-data-page__field">
                 <span>Status</span>
-                <select
-                  v-model="branchForm.isActive"
-                  class="form-select"
-                >
+                <select v-model="branchForm.isActive" class="form-select">
                   <option :value="true">
                     Aktif
                   </option>
@@ -308,50 +215,67 @@
 
               <label class="master-data-page__field master-data-page__field--full">
                 <span>Alamat</span>
-                <textarea
-                  v-model.trim="branchForm.address"
-                  class="form-control"
-                  rows="3"
-                  placeholder="Alamat cabang"
-                />
+                <textarea v-model.trim="branchForm.address" class="form-control" rows="3" placeholder="Alamat cabang" />
               </label>
             </div>
           </div>
 
           <div class="modal-footer master-data-page__modal-footer">
-            <button
-              type="button"
-              class="btn btn-outline-secondary"
-              :disabled="isSavingBranch"
-              @click="closeBranchModal"
-            >
+            <button type="button" class="btn btn-outline-secondary" :disabled="isSavingBranch"
+              @click="closeBranchModal">
               Batal
             </button>
-            <button
-              type="button"
-              class="btn btn-primary"
-              :disabled="isSavingBranch"
-              @click="handleSaveBranch"
-            >
-              <span
-                v-if="isSavingBranch"
-                class="spinner-border spinner-border-sm"
-                aria-hidden="true"
-              />
-              <i
-                v-else
-                class="bi bi-check2-circle"
-              />
+            <button type="button" class="btn btn-primary" :disabled="isSavingBranch" @click="handleSaveBranch">
+              <span v-if="isSavingBranch" class="spinner-border spinner-border-sm" aria-hidden="true" />
+              <i v-else class="bi bi-check2-circle" />
               <span>{{ isSavingBranch ? 'Menyimpan...' : 'Simpan cabang' }}</span>
             </button>
           </div>
         </div>
       </div>
     </section>
-    <div
-      class="modal-backdrop fade show master-data-page__modal-backdrop"
-      @click="closeBranchModal"
-    />
+    <div class="modal-backdrop fade show master-data-page__modal-backdrop" @click="closeBranchModal" />
+  </template>
+
+  <template v-if="vm.branchActionModal.isOpen && vm.branchActionModal.item">
+    <section class="modal fade show d-block master-data-page__modal" tabindex="-1" role="dialog" aria-modal="true"
+      @click.self="vm.closeBranchActionModal()">
+      <div class="modal-dialog modal-dialog-centered modal-sm master-data-page__modal-dialog--sm">
+        <div class="modal-content border-0 master-data-page__modal-content">
+          <div class="modal-header master-data-page__modal-header">
+            <div>
+              <div class="table-card-role mb-2">
+                Aksi Cabang
+              </div>
+              <h2 class="h5 mb-1">
+                {{ vm.branchActionModal.item.branchName }}
+              </h2>
+              <p class="mb-0 text-secondary" style="font-size: 0.85rem;">
+                Pilih tindakan yang ingin dilakukan untuk cabang ini.
+              </p>
+            </div>
+            <button type="button" class="btn-close" aria-label="Tutup" @click="vm.closeBranchActionModal()" />
+          </div>
+          <div class="modal-body master-data-page__modal-body">
+            <div class="d-grid gap-2">
+              <button type="button" class="btn btn-outline-primary w-100 text-sm-start"
+                @click="vm.openEditBranchModal(vm.branchActionModal.item.source.id); vm.closeBranchActionModal()">
+                <i class="bi bi-pencil-square me-2" />
+                <span>Ubah</span>
+              </button>
+              <button type="button" class="btn btn-outline-danger w-100 text-sm-start"
+                :disabled="vm.isDeletingBranch(vm.branchActionModal.item.source.id)"
+                @click="confirmDeleteBranch(vm.branchActionModal.item); vm.closeBranchActionModal()">
+                <i class="bi bi-trash me-2" />
+                <span>{{ vm.isDeletingBranch(vm.branchActionModal.item.source.id) ? 'Menghapus...' : 'Hapus'
+                  }}</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+    <div class="modal-backdrop fade show master-data-page__modal-backdrop" @click="vm.closeBranchActionModal()" />
   </template>
 </template>
 
@@ -379,7 +303,8 @@ const {
   activeBranchCount,
   inactiveBranchCount,
   branchRowCount,
-  branchSearchKeyword
+  branchSearchKeyword,
+  branchActionModal
 } = storeToRefs(vm);
 const branchTableVm = vm.branchTableVm;
 

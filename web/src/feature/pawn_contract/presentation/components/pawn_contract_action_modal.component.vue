@@ -1,12 +1,7 @@
 <template>
   <template v-if="row">
-    <section
-      class="modal fade show d-block pawn-contract-page__action-modal"
-      tabindex="-1"
-      role="dialog"
-      aria-modal="true"
-      aria-label="Aksi gadai"
-    >
+    <section class="modal fade show d-block pawn-contract-page__action-modal" tabindex="-1" role="dialog"
+      aria-modal="true" aria-label="Aksi gadai" @click.self="emit('close')">
       <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable pawn-contract-page__action-dialog">
         <div class="modal-content border-0 pawn-contract-page__action-content">
           <div class="modal-header pawn-contract-page__action-header">
@@ -21,62 +16,34 @@
                 {{ row.contract.contractNumber }} - {{ row.itemNames }}
               </p>
             </div>
-            <button
-              type="button"
-              class="btn-close"
-              aria-label="Close"
-              @click="emit('close')"
-            />
+            <button type="button" class="btn-close" aria-label="Close" @click="emit('close')" />
           </div>
 
           <div class="modal-body pawn-contract-page__action-body">
             <div class="pawn-contract-page__action-grid">
-              <RouterLink
-                v-for="action in linkActions"
-                :key="action.key"
-                class="pawn-contract-page__action-choice"
-                :to="getActionRoute(action.key)"
-                @click="emit('close')"
-              >
-                <i
-                  :class="getActionIconClass(action.key)"
-                  aria-hidden="true"
-                />
+              <RouterLink v-for="action in linkActions" :key="action.key" class="pawn-contract-page__action-choice"
+                :to="getActionRoute(action.key)" @click="emit('close')">
+                <i :class="getActionIconClass(action.key)" aria-hidden="true" />
                 <span>{{ action.label }}</span>
               </RouterLink>
 
-              <button
-                v-for="action in buttonActions"
-                :key="action.key"
-                type="button"
-                class="pawn-contract-page__action-choice"
-                @click="handleActionClick(action.key)"
-              >
-                <i
-                  :class="getActionIconClass(action.key)"
-                  aria-hidden="true"
-                />
+              <button v-for="action in buttonActions" :key="action.key" type="button"
+                class="pawn-contract-page__action-choice" @click="handleActionClick(action.key)">
+                <i :class="getActionIconClass(action.key)" aria-hidden="true" />
                 <span>{{ action.label }}</span>
               </button>
             </div>
           </div>
 
           <div class="modal-footer pawn-contract-page__action-footer">
-            <button
-              type="button"
-              class="btn btn-outline-secondary"
-              @click="emit('close')"
-            >
+            <button type="button" class="btn btn-outline-secondary" @click="emit('close')">
               Tutup
             </button>
           </div>
         </div>
       </div>
     </section>
-    <div
-      class="modal-backdrop fade show pawn-contract-page__action-backdrop"
-      @click="emit('close')"
-    />
+    <div class="modal-backdrop fade show pawn-contract-page__action-backdrop" @click="emit('close')" />
   </template>
 </template>
 

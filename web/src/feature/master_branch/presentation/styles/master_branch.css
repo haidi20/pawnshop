@@ -160,6 +160,7 @@
   display: flex;
   flex-wrap: wrap;
   gap: 0.45rem;
+  justify-content: center;
 }
 
 .master-data-page__identity-cell {
@@ -202,7 +203,7 @@
 }
 
 .master-data-page__col-action {
-  min-width: 10rem;
+  min-width: 6rem;
 }
 
 .master-data-page__col-code,
@@ -219,6 +220,10 @@
 
 .master-data-page__modal-dialog {
   max-width: 42rem;
+}
+
+.master-data-page__modal-dialog--sm {
+  max-width: 26rem;
 }
 
 .master-data-page__modal-content {
