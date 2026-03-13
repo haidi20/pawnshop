@@ -37,6 +37,7 @@ describe('auth_portal users view model', () => {
         expect(store.employeeCount).toBe(2);
         expect(store.assignedEmployeeCount).toBe(1);
         expect(store.unassignedEmployeeCount).toBe(1);
+        expect(store.activeBranchCount).toBe(1);
         expect(store.pendingBranchChangeCount).toBe(0);
         expect(store.filteredUserCount).toBe(3);
         expect(store.branchDrafts[2]).toBe('10');
@@ -135,6 +136,7 @@ describe('auth_portal users view model', () => {
             assignedBranchId: 11,
             assignedBranchName: 'Pawnshop Balikpapan Selatan'
         });
+        expect(store.activeBranchCount).toBe(2);
         expect(store.branchDrafts[3]).toBe('11');
         expect(store.activeBranchModalUser).toBeNull();
         expect(store.pendingBranchChangeCount).toBe(0);
@@ -155,12 +157,14 @@ function createFixtureData(): AuthPortalCompanyUsersDataModel {
             {
                 id: 10,
                 branchCode: 'BPP-KOTA',
-                branchName: 'Pawnshop Balikpapan Kota'
+                branchName: 'Pawnshop Balikpapan Kota',
+                isActive: true
             },
             {
                 id: 11,
                 branchCode: 'BPP-SEL',
-                branchName: 'Pawnshop Balikpapan Selatan'
+                branchName: 'Pawnshop Balikpapan Selatan',
+                isActive: false
             }
         ],
         users: [

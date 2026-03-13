@@ -6,6 +6,7 @@ import { LoginAuthPortalUsecase } from '@feature/auth_portal/domain/usecases/log
 import { LogoutAuthPortalUsecase } from '@feature/auth_portal/domain/usecases/logout_auth_portal.usecase';
 import { RegisterAuthPortalUsecase } from '@feature/auth_portal/domain/usecases/register_auth_portal.usecase';
 import { UpdateAuthPortalCompanyUsecase } from '@feature/auth_portal/domain/usecases/update_auth_portal_company.usecase';
+import { UpdateAuthPortalProfileUsecase } from '@feature/auth_portal/domain/usecases/update_auth_portal_profile.usecase';
 import { UpdateAuthPortalUserBranchUsecase } from '@feature/auth_portal/domain/usecases/update_auth_portal_user_branch.usecase';
 
 const authPortalLocalDatasource = new AuthPortalLocalDatasource();
@@ -16,5 +17,6 @@ export const getAuthPortalCompanyUsersUsecase = new GetAuthPortalCompanyUsersUse
 export const loginAuthPortalUsecase = new LoginAuthPortalUsecase(authPortalRepository);
 export const registerAuthPortalUsecase = new RegisterAuthPortalUsecase(authPortalRepository);
 export const updateAuthPortalCompanyUsecase = new UpdateAuthPortalCompanyUsecase(authPortalRepository);
+export const updateAuthPortalProfileUsecase = new UpdateAuthPortalProfileUsecase(authPortalRepository);
 export const updateAuthPortalUserBranchUsecase = new UpdateAuthPortalUserBranchUsecase(authPortalRepository);
 export const logoutAuthPortalUsecase = new LogoutAuthPortalUsecase(authPortalRepository);

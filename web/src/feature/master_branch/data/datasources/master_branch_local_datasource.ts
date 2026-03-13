@@ -2,6 +2,10 @@ import { authPortalUsersDao } from '@feature/auth_portal/data/db';
 import { readAuthPortalStoredSession } from '@feature/auth_portal/util/auth_portal_session';
 import { getAppModuleByKey } from '@core/data/datasources/app_module_catalog';
 import { branchesDao, storageLocationsDao, type BranchesRow, type StorageLocationsRow } from '@feature/master_branch/data/db';
+import {
+    getDelegatedBranchIds,
+    syncDelegatedBranches
+} from '@feature/master_branch/data/helpers/branch_assignment_activation';
 import { createMasterBranchDataFromRows } from '@feature/master_branch/data/mappers/master_branch.mapper';
 import type {
     MasterBranchDataModel,
@@ -21,13 +25,16 @@ const normalizeIdentity = (value: string | null | undefined): string => normaliz
 
 export class MasterBranchLocalDatasource {
     async getData(): Promise<MasterBranchDataModel> {
-        const [
-            branchesRows,
-            storageLocationsRows
-        ] = await Promise.all([
+        const session = readAuthPortalStoredSession();
+        const [branchRows, storageLocationsRows, authUserRows] = await Promise.all([
             branchesDao.getAll(),
-            storageLocationsDao.getAll()
+            storageLocationsDao.getAll(),
+            authPortalUsersDao.getAll()
         ]);
+        const branchesRows =
+            session !== null
+                ? await this.syncDelegatedBranchStates(session.company.id, branchRows, authUserRows)
+                : branchRows;
 
         return createMasterBranchDataFromRows({
             module: getAppModuleByKey('master-branch'),
@@ -37,9 +44,8 @@ export class MasterBranchLocalDatasource {
     }
 
     async saveBranch(payload: MasterBranchUpsertPayloadModel): Promise<void> {
-        this.assertOwnerSession();
-
-        const rows = await branchesDao.getAll();
+        const session = this.assertOwnerSession();
+        const [rows, authUserRows] = await Promise.all([branchesDao.getAll(), authPortalUsersDao.getAll()]);
         const timestamp = createTimestamp();
         const branchCode = normalizeValue(payload.branchCode);
         const branchName = normalizeValue(payload.branchName);
@@ -64,15 +70,19 @@ export class MasterBranchLocalDatasource {
             branchNumber
         });
 
+        const delegatedBranchIds = getDelegatedBranchIds(authUserRows, session.company.id);
+        const nextBranchId = currentRow?.id ?? nextNumericId(rows);
+        const shouldStayActive = delegatedBranchIds.has(nextBranchId);
+
         const nextRow: BranchesRow = {
-            id: currentRow?.id ?? nextNumericId(rows),
+            id: nextBranchId,
             company_id: currentRow?.company_id ?? null,
             branch_code: branchCode,
             branch_number: branchNumber,
             branch_name: branchName,
             phone_number: asOptionalValue(payload.phoneNumber),
             address: asOptionalValue(payload.address),
-            is_active: payload.isActive ? 1 : 0,
+            is_active: shouldStayActive ? 1 : 0,
             created_at: currentRow?.created_at ?? timestamp,
             updated_at: timestamp
         };
@@ -232,5 +242,23 @@ export class MasterBranchLocalDatasource {
         ) {
             throw new Error('Kode lokasi sudah dipakai. Gunakan kode lain.');
         }
+    }
+
+    private async syncDelegatedBranchStates(
+        companyId: number,
+        branchRows: BranchesRow[],
+        authUserRows: Awaited<ReturnType<typeof authPortalUsersDao.getAll>>
+    ): Promise<BranchesRow[]> {
+        const { rows, hasChanges } = syncDelegatedBranches({
+            branchRows,
+            delegatedBranchIds: getDelegatedBranchIds(authUserRows, companyId),
+            timestamp: createTimestamp()
+        });
+
+        if (hasChanges) {
+            await branchesDao.replaceAll(rows);
+        }
+
+        return rows;
     }
 }

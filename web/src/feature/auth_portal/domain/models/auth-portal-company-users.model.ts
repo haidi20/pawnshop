@@ -4,6 +4,7 @@ export interface AuthPortalCompanyBranchOptionModel {
     id: number;
     branchCode: string;
     branchName: string;
+    isActive: boolean;
 }
 
 export interface AuthPortalCompanyUserItemModel {

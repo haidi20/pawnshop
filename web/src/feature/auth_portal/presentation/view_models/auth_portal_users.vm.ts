@@ -66,6 +66,7 @@ export const authPortalUsersViewModel = defineStore('authPortalUsersStore', () =
     const tableService = new DataTableClientSideService<AuthPortalUsersTableRow>([...authPortalUsersTableFields], []);
 
     const branchOptions = computed(() => data.value?.branches ?? []);
+    const activeBranchCount = computed(() => branchOptions.value.filter((item) => item.isActive).length);
     const userItems = computed(() => data.value?.users ?? []);
     const totalUserCount = computed(() => userItems.value.length);
     const employeeCount = computed(() => userItems.value.filter((item) => item.role !== 'owner').length);
@@ -211,7 +212,7 @@ export const authPortalUsersViewModel = defineStore('authPortalUsersStore', () =
         if (user.role === 'owner') {
             return {
                 statusLabel: 'Akses otomatis',
-                helpText: 'Owner selalu melihat seluruh cabang aktif tanpa perlu assignment manual.',
+                helpText: 'Owner selalu melihat seluruh cabang perusahaan tanpa perlu assignment manual.',
                 currentBranchLabel: 'Semua cabang',
                 tone: 'info',
                 needsAttention: false
@@ -230,11 +231,11 @@ export const authPortalUsersViewModel = defineStore('authPortalUsersStore', () =
         }
 
         return {
-            statusLabel: 'Cabang sinkron',
-            helpText: 'Cabang tersimpan sudah aktif dan bisa diubah melalui menu aksi.',
-            currentBranchLabel,
-            tone: 'neutral',
-            needsAttention: false
+                statusLabel: 'Cabang sinkron',
+                helpText: 'Cabang delegasi tersimpan dan bisa diubah melalui menu aksi.',
+                currentBranchLabel,
+                tone: 'neutral',
+                needsAttention: false
         };
     };
 
@@ -242,7 +243,7 @@ export const authPortalUsersViewModel = defineStore('authPortalUsersStore', () =
         if (user.role === 'owner') {
             return {
                 statusLabel: 'Akses otomatis',
-                helpText: 'Owner selalu melihat seluruh cabang aktif tanpa perlu assignment manual.',
+                helpText: 'Owner selalu melihat seluruh cabang perusahaan tanpa perlu assignment manual.',
                 currentBranchLabel: 'Semua cabang',
                 draftBranchLabel: 'Semua cabang',
                 tone: 'info',
@@ -310,6 +311,22 @@ export const authPortalUsersViewModel = defineStore('authPortalUsersStore', () =
         activeBranchModalUser.value ? getBranchModalState(activeBranchModalUser.value) : null
     );
 
+    const deriveBranchActivityMap = (users: AuthPortalCompanyUserItemModel[]): Map<number, boolean> => {
+        const activeBranchIds = new Set(
+            users
+                .filter(
+                    (item) =>
+                        item.role !== 'owner' &&
+                        item.isActive &&
+                        typeof item.assignedBranchId === 'number'
+                )
+                .map((item) => item.assignedBranchId)
+                .filter((branchId): branchId is number => typeof branchId === 'number')
+        );
+
+        return new Map(branchOptions.value.map((item) => [item.id, activeBranchIds.has(item.id)]));
+    };
+
     const loadData = async (): Promise<void> => {
         isLoading.value = true;
         setError(null);
@@ -336,17 +353,26 @@ export const authPortalUsersViewModel = defineStore('authPortalUsersStore', () =
             }
 
             const nextBranch = data.value.branches.find((item) => item.id === payload.branchId) ?? null;
+            const nextUsers = data.value.users.map((item) =>
+                item.id === payload.userId
+                    ? {
+                        ...item,
+                        assignedBranchId: payload.branchId,
+                        assignedBranchName: nextBranch?.branchName ?? null
+                    }
+                    : item
+            );
+            const branchActivityMap = deriveBranchActivityMap(nextUsers);
+
             data.value = {
                 ...data.value,
-                users: data.value.users.map((item) =>
-                    item.id === payload.userId
-                        ? {
-                            ...item,
-                            assignedBranchId: payload.branchId,
-                            assignedBranchName: nextBranch?.branchName ?? null
-                        }
-                        : item
-                )
+                branches: data.value.branches.map((item) =>
+                    ({
+                        ...item,
+                        isActive: branchActivityMap.get(item.id) ?? false
+                    })
+                ),
+                users: nextUsers
             };
         } catch (currentError) {
             setError(currentError instanceof Error ? currentError.message : String(currentError));
@@ -443,6 +469,7 @@ export const authPortalUsersViewModel = defineStore('authPortalUsersStore', () =
         isLoading,
         error,
         branchOptions,
+        activeBranchCount,
         branchDrafts,
         userItems,
         totalUserCount,

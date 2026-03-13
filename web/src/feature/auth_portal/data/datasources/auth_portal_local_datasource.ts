@@ -14,12 +14,17 @@ import {
 } from '@feature/auth_portal/data/helpers/auth_portal_password';
 import { buildAuthPortalDemoSeedDataset } from '@feature/auth_portal/data/seeders/auth_portal_demo_data.seeder';
 import { branchesDao } from '@feature/master_branch/data/db';
+import {
+    getDelegatedBranchIds,
+    syncDelegatedBranches
+} from '@feature/master_branch/data/helpers/branch_assignment_activation';
 import type {
     AuthPortalCompanyUsersDataModel,
     AuthPortalLoginPayloadModel,
     AuthPortalRegisterPayloadModel,
     AuthPortalSessionSnapshotModel,
     AuthPortalUpdateCompanyPayloadModel,
+    AuthPortalUpdateProfilePayloadModel,
     AuthPortalUpdateUserBranchPayloadModel,
     AuthPortalUserRoleModel
 } from '@feature/auth_portal/domain/models';
@@ -72,6 +77,9 @@ export class AuthPortalLocalDatasource {
             clearAuthPortalStoredSession();
             return null;
         }
+
+        await seedFeatureTablesIfEmpty('AuthPortalLocalDatasource', [branchesDao]);
+        await this.ensureDelegatedBranchesActive(companyRow.id, userRows);
 
         const snapshot = this.buildSessionSnapshot(sessionRow, userRow, companyRow);
         writeAuthPortalStoredSession(snapshot);
@@ -272,6 +280,69 @@ export class AuthPortalLocalDatasource {
         return snapshot;
     }
 
+    async updateProfile(payload: AuthPortalUpdateProfilePayloadModel): Promise<AuthPortalSessionSnapshotModel> {
+        await this.ensureDemoDataSeeded();
+
+        const session = await this.getCurrentSession();
+        if (!session) {
+            throw new Error('Sesi login tidak ditemukan.');
+        }
+
+        const normalizedFullName = normalizeValue(payload.fullName);
+        const normalizedUsername = normalizeValue(payload.username);
+
+        if (!normalizedFullName) {
+            throw new Error('Nama lengkap wajib diisi.');
+        }
+
+        if (!normalizedUsername) {
+            throw new Error('Username wajib diisi.');
+        }
+
+        const [companyRows, userRows, sessionRows] = await Promise.all([
+            authPortalCompaniesDao.getAll(),
+            authPortalUsersDao.getAll(),
+            authPortalSessionsDao.getAll()
+        ]);
+
+        const companyRow = companyRows.find((item) => item.id === session.company.id);
+        const currentUserRow = userRows.find(
+            (item) => item.id === session.user.id && item.company_id === session.company.id
+        );
+        const currentSessionRow = sessionRows.find(
+            (item) => item.session_token === session.sessionToken && item.session_status === 'active'
+        );
+
+        if (!companyRow || !currentUserRow || !currentSessionRow) {
+            throw new Error('Data profil aktif tidak ditemukan.');
+        }
+
+        this.assertIdentityUniqueness(
+            userRows.filter((item) => item.id !== currentUserRow.id),
+            normalizedUsername,
+            payload.email,
+            'profil user'
+        );
+
+        const timestamp = createTimestamp();
+        const updatedUserRow: AuthPortalUsersRow = {
+            ...currentUserRow,
+            username: normalizedUsername,
+            full_name: normalizedFullName,
+            email: asOptionalValue(payload.email),
+            phone_number: asOptionalValue(payload.phoneNumber),
+            updated_at: timestamp
+        };
+
+        await authPortalUsersDao.replaceAll(
+            userRows.map((item) => (item.id === updatedUserRow.id ? updatedUserRow : item))
+        );
+
+        const snapshot = this.buildSessionSnapshot(currentSessionRow, updatedUserRow, companyRow);
+        writeAuthPortalStoredSession(snapshot);
+        return snapshot;
+    }
+
     async logout(): Promise<void> {
         const storedSession = readAuthPortalStoredSession();
         if (!storedSession) {
@@ -302,8 +373,7 @@ export class AuthPortalLocalDatasource {
             branchesDao.getAll()
         ]);
 
-        const activeBranchRows = branchRows
-            .filter((item) => item.is_active === 1)
+        const sortedBranchRows = branchRows
             .sort((left, right) => left.branch_name.localeCompare(right.branch_name, 'id-ID'));
 
         const companyUsers = userRows
@@ -323,10 +393,11 @@ export class AuthPortalLocalDatasource {
         return {
             companyId: session.company.id,
             companyName: session.company.name,
-            branches: activeBranchRows.map((item) => ({
+            branches: sortedBranchRows.map((item) => ({
                 id: item.id,
                 branchCode: item.branch_code,
-                branchName: item.branch_name
+                branchName: item.branch_name,
+                isActive: item.is_active === 1
             })),
             users: companyUsers.map((item) => ({
                 id: item.id,
@@ -338,7 +409,7 @@ export class AuthPortalLocalDatasource {
                 isActive: item.is_active === 1,
                 assignedBranchId: item.assigned_branch_id ?? null,
                 assignedBranchName:
-                    activeBranchRows.find((branch) => branch.id === (item.assigned_branch_id ?? null))?.branch_name ??
+                    sortedBranchRows.find((branch) => branch.id === (item.assigned_branch_id ?? null))?.branch_name ??
                     null
             }))
         };
@@ -375,11 +446,8 @@ export class AuthPortalLocalDatasource {
         }
 
         const nextBranchId = typeof payload.branchId === 'number' ? payload.branchId : null;
-        if (
-            nextBranchId !== null &&
-            !branchRows.some((item) => item.id === nextBranchId && item.is_active === 1)
-        ) {
-            throw new Error('Cabang aktif yang dipilih tidak ditemukan.');
+        if (nextBranchId !== null && !branchRows.some((item) => item.id === nextBranchId)) {
+            throw new Error('Cabang yang dipilih tidak ditemukan.');
         }
 
         const timestamp = createTimestamp();
@@ -394,6 +462,7 @@ export class AuthPortalLocalDatasource {
         );
 
         await authPortalUsersDao.replaceAll(updatedRows);
+        await this.ensureDelegatedBranchesActive(session.company.id, updatedRows);
 
         const storedSession = readAuthPortalStoredSession();
         if (storedSession?.user.id === targetUser.id) {
@@ -453,6 +522,25 @@ export class AuthPortalLocalDatasource {
             created_at: input.timestamp,
             updated_at: input.timestamp
         };
+    }
+
+    private async ensureDelegatedBranchesActive(
+        companyId: number,
+        userRows: AuthPortalUsersRow[]
+    ): Promise<void> {
+        const delegatedBranchIds = getDelegatedBranchIds(userRows, companyId);
+        const branchRows = await branchesDao.getAll();
+        const { rows, hasChanges } = syncDelegatedBranches({
+            branchRows,
+            delegatedBranchIds,
+            timestamp: createTimestamp()
+        });
+
+        if (!hasChanges) {
+            return;
+        }
+
+        await branchesDao.replaceAll(rows);
     }
 
     private buildSessionSnapshot(

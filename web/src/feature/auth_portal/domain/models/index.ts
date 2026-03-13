@@ -8,3 +8,4 @@ export * from './auth-portal-register-payload.model';
 export * from './auth-portal-company-users.model';
 export * from './auth-portal-update-user-branch-payload.model';
 export * from './auth-portal-update-company-payload.model';
+export * from './auth-portal-update-profile-payload.model';

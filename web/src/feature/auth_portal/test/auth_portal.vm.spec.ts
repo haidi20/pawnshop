@@ -4,7 +4,10 @@ import { right } from 'fp-ts/Either';
 
 import type { AuthPortalSessionSnapshotModel } from '@feature/auth_portal/domain/models';
 import { authPortalViewModel } from '@feature/auth_portal/presentation/view_models/auth_portal.vm';
-import { updateAuthPortalCompanyUsecase } from '@feature/auth_portal/presentation/di/auth_portal.di';
+import {
+    updateAuthPortalCompanyUsecase,
+    updateAuthPortalProfileUsecase
+} from '@feature/auth_portal/presentation/di/auth_portal.di';
 
 vi.mock('@feature/auth_portal/presentation/di/auth_portal.di', () => ({
     getCurrentAuthPortalSessionUsecase: {
@@ -23,6 +26,9 @@ vi.mock('@feature/auth_portal/presentation/di/auth_portal.di', () => ({
         execute: vi.fn()
     },
     updateAuthPortalCompanyUsecase: {
+        execute: vi.fn()
+    },
+    updateAuthPortalProfileUsecase: {
         execute: vi.fn()
     },
     updateAuthPortalUserBranchUsecase: {
@@ -72,6 +78,44 @@ describe('auth_portal view model', () => {
         expect(result.company.name).toBe('Sentra Gadai Baru');
         expect(store.currentSession?.company.name).toBe('Sentra Gadai Baru');
         expect(store.currentSession?.company.city).toBe('Balikpapan');
+        expect(store.isSubmitting).toBe(false);
+    });
+
+    test('updates active user snapshot after saving personal profile', async () => {
+        const store = authPortalViewModel();
+        const currentSession = createSessionSnapshot();
+        const updatedSession = createSessionSnapshot({
+            user: {
+                ...currentSession.user,
+                fullName: 'Rina Permata',
+                username: 'rina.permata',
+                email: 'rina.permata@sentragadai.id',
+                phoneNumber: '081299900011'
+            }
+        });
+
+        store.currentSession = currentSession;
+        vi.mocked(updateAuthPortalProfileUsecase.execute).mockResolvedValue(right(updatedSession));
+
+        const result = await store.updateProfile({
+            fullName: 'Rina Permata',
+            username: 'rina.permata',
+            email: 'rina.permata@sentragadai.id',
+            phoneNumber: '081299900011'
+        });
+
+        expect(updateAuthPortalProfileUsecase.execute).toHaveBeenCalledWith({
+            fullName: 'Rina Permata',
+            username: 'rina.permata',
+            email: 'rina.permata@sentragadai.id',
+            phoneNumber: '081299900011'
+        });
+        expect(result.user.fullName).toBe('Rina Permata');
+        expect(result.user.username).toBe('rina.permata');
+        expect(store.currentSession?.user.fullName).toBe('Rina Permata');
+        expect(store.currentSession?.user.username).toBe('rina.permata');
+        expect(store.currentSession?.user.email).toBe('rina.permata@sentragadai.id');
+        expect(store.currentSession?.user.phoneNumber).toBe('081299900011');
         expect(store.isSubmitting).toBe(false);
     });
 });

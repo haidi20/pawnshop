@@ -1,21 +1,13 @@
 <template>
   <div v-if="isOpen">
-    <div
-      class="modal fade show d-block pawn-contract-create-page__confirm-modal"
-      tabindex="-1"
-      role="dialog"
-      aria-modal="true"
-      @click.self="emit('close')"
-    >
+    <div class="modal fade show d-block pawn-contract-create-page__confirm-modal" tabindex="-1" role="dialog"
+      aria-modal="true" @click.self="emit('close')">
       <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable pawn-contract-create-page__warning-dialog">
         <div class="modal-content pawn-contract-create-page__confirm-content border-0">
           <div class="modal-header pawn-contract-create-page__confirm-header">
             <div class="d-flex align-items-start gap-3">
               <div class="pawn-contract-create-page__confirm-panel-icon is-warning">
-                <i
-                  class="bi bi-exclamation-triangle-fill"
-                  aria-hidden="true"
-                />
+                <i class="bi bi-exclamation-triangle-fill" aria-hidden="true" />
               </div>
               <div>
                 <div class="pawn-contract-create-page__section-kicker">
@@ -29,29 +21,15 @@
                 </p>
               </div>
             </div>
-            <button
-              type="button"
-              class="btn-close"
-              aria-label="Close"
-              @click="emit('close')"
-            />
+            <button type="button" class="btn-close" aria-label="Close" @click="emit('close')" />
           </div>
 
-          <div
-            class="modal-body"
-            data-testid="pawn-contract-validation-modal"
-          >
+          <div class="modal-body" data-testid="pawn-contract-validation-modal">
             <div class="pawn-contract-create-page__confirm-panel">
               <ul class="mb-0 pawn-contract-create-page__warning-list">
-                <li
-                  v-for="(message, index) in messages"
-                  :key="`${index}-${message}`"
-                  :data-testid="`pawn-contract-validation-message-${index}`"
-                >
-                  <i
-                    class="bi bi-dot"
-                    aria-hidden="true"
-                  />
+                <li v-for="(message, index) in messages" :key="`${index}-${message}`"
+                  :data-testid="`pawn-contract-validation-message-${index}`">
+                  <i class="bi bi-dot" aria-hidden="true" />
                   <span>{{ message }}</span>
                 </li>
               </ul>
@@ -59,11 +37,7 @@
           </div>
 
           <div class="modal-footer pawn-contract-create-page__confirm-footer">
-            <button
-              type="button"
-              class="btn btn-primary"
-              @click="emit('close')"
-            >
+            <button type="button" class="btn btn-primary" @click="emit('close')">
               Saya cek lagi
             </button>
           </div>

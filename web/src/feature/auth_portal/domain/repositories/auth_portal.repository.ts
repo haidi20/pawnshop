@@ -5,6 +5,7 @@ import type {
     AuthPortalRegisterPayloadModel,
     AuthPortalSessionSnapshotModel,
     AuthPortalUpdateCompanyPayloadModel,
+    AuthPortalUpdateProfilePayloadModel,
     AuthPortalUpdateUserBranchPayloadModel
 } from '@feature/auth_portal/domain/models';
 
@@ -14,6 +15,7 @@ export interface AuthPortalRepository {
     login(payload: AuthPortalLoginPayloadModel): Promise<Either<Error, AuthPortalSessionSnapshotModel>>;
     register(payload: AuthPortalRegisterPayloadModel): Promise<Either<Error, AuthPortalSessionSnapshotModel>>;
     updateCompany(payload: AuthPortalUpdateCompanyPayloadModel): Promise<Either<Error, AuthPortalSessionSnapshotModel>>;
+    updateProfile(payload: AuthPortalUpdateProfilePayloadModel): Promise<Either<Error, AuthPortalSessionSnapshotModel>>;
     updateUserBranchAssignment(payload: AuthPortalUpdateUserBranchPayloadModel): Promise<Either<Error, void>>;
     logout(): Promise<Either<Error, void>>;
 }

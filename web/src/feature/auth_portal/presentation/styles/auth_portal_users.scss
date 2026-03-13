@@ -52,6 +52,7 @@
   border-radius: 999px;
   color: var(--primary-blue, #005eaa);
   display: inline-flex;
+  font: inherit;
   gap: 0.55rem;
   padding: 0.7rem 1rem;
 }
@@ -61,10 +62,26 @@
   color: #475569;
 }
 
+.system-users-page__hero-badge.is-actionable {
+  cursor: pointer;
+  transition: border-color 160ms ease, box-shadow 160ms ease, transform 160ms ease;
+}
+
+.system-users-page__hero-badge.is-actionable:hover {
+  border-color: #bfd8ea;
+  box-shadow: 0 10px 20px -18px rgba(0, 94, 170, 0.8);
+  transform: translateY(-1px);
+}
+
+.system-users-page__hero-badge.is-actionable:focus-visible {
+  outline: 2px solid rgba(0, 94, 170, 0.28);
+  outline-offset: 2px;
+}
+
 .system-users-page__stats {
   display: grid;
   gap: 0.75rem;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   margin-top: 0.9rem;
 }
 
@@ -118,6 +135,14 @@
   gap: 0.6rem;
 }
 
+.system-users-page__table-head-main {
+  align-items: flex-start;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.9rem;
+  justify-content: space-between;
+}
+
 .system-users-page__table-title {
   color: #1e293b;
   font-size: 1.08rem;
@@ -129,6 +154,30 @@
   color: #64748b;
   font-size: 0.88rem;
   line-height: 1.55;
+}
+
+.system-users-page__table-summary {
+  background: #f8fbfd;
+  border: 1px solid #d9e7f2;
+  border-radius: 0.95rem;
+  display: grid;
+  gap: 0.2rem;
+  min-width: 8.5rem;
+  padding: 0.75rem 0.9rem;
+}
+
+.system-users-page__table-summary span {
+  color: #64748b;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.system-users-page__table-summary strong {
+  color: #1e293b;
+  font-size: 1.18rem;
+  font-weight: 700;
 }
 
 .system-users-page__table-insights {
@@ -573,12 +622,6 @@
   background: rgba(15, 23, 42, 0.34);
 }
 
-@media (max-width: 991.98px) {
-  .system-users-page__stats {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-}
-
 @media (max-width: 767.98px) {
   .system-users-page__stats {
     grid-template-columns: 1fr;
@@ -586,6 +629,11 @@
 
   .system-users-page__hero-context {
     justify-content: flex-start;
+  }
+
+  .system-users-page__table-summary {
+    min-width: 0;
+    width: 100%;
   }
 
   .system-users-page__assignment-meta {

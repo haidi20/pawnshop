@@ -156,9 +156,18 @@
 
       <div class="admin-profile-grid">
         <section class="admin-profile-section">
-          <h3 class="admin-profile-section-title">
-            Informasi Pengguna
-          </h3>
+          <div class="admin-profile-section-head">
+            <h3 class="admin-profile-section-title">
+              Informasi Pengguna
+            </h3>
+            <button
+              type="button"
+              class="btn btn-outline-primary btn-sm admin-profile-section-action"
+              @click="openProfileEditDialog"
+            >
+              Ubah profil
+            </button>
+          </div>
 
           <dl class="admin-profile-list">
             <div class="admin-profile-row">
@@ -234,6 +243,120 @@
             </div>
           </dl>
         </section>
+      </div>
+    </section>
+  </div>
+
+  <div
+    v-if="currentSession && isProfileEditDialogOpen"
+    class="admin-profile-backdrop"
+    @click.self="closeProfileEditDialog"
+  >
+    <section
+      class="admin-profile-modal admin-company-modal"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="admin-profile-edit-title"
+    >
+      <div class="admin-profile-modal-head">
+        <div class="admin-profile-title-wrap">
+          <div class="admin-profile-avatar">
+            <i class="bi bi-pencil-square" />
+          </div>
+
+          <div class="admin-profile-title-copy">
+            <span class="admin-profile-kicker">Pengguna</span>
+            <h2
+              id="admin-profile-edit-title"
+              class="admin-profile-title"
+            >
+              Ubah profil pengguna
+            </h2>
+            <p class="admin-profile-subtitle">
+              Perubahan ini langsung dipakai pada akun yang sedang login.
+            </p>
+          </div>
+        </div>
+
+        <button
+          class="admin-profile-close"
+          type="button"
+          aria-label="Tutup ubah profil"
+          :disabled="isSubmitting"
+          @click="closeProfileEditDialog"
+        >
+          <i class="bi bi-x-lg" />
+        </button>
+      </div>
+
+      <div class="admin-company-form-grid">
+        <label class="admin-company-field admin-company-field--full">
+          <span>Nama lengkap</span>
+          <input
+            v-model.trim="profileForm.fullName"
+            type="text"
+            class="form-control"
+            placeholder="Nama lengkap pengguna"
+          >
+        </label>
+
+        <label class="admin-company-field">
+          <span>Username</span>
+          <input
+            v-model.trim="profileForm.username"
+            type="text"
+            class="form-control"
+            placeholder="Username"
+          >
+        </label>
+
+        <label class="admin-company-field">
+          <span>Email</span>
+          <input
+            v-model.trim="profileForm.email"
+            type="email"
+            class="form-control"
+            placeholder="Email pengguna"
+          >
+        </label>
+
+        <label class="admin-company-field admin-company-field--full">
+          <span>No. telepon</span>
+          <input
+            v-model.trim="profileForm.phoneNumber"
+            type="text"
+            class="form-control"
+            placeholder="No. telepon pengguna"
+          >
+        </label>
+      </div>
+
+      <div class="admin-company-actions">
+        <button
+          type="button"
+          class="btn btn-outline-secondary"
+          :disabled="isSubmitting"
+          @click="closeProfileEditDialog"
+        >
+          Batal
+        </button>
+        <button
+          type="button"
+          class="btn btn-primary"
+          :disabled="isSubmitting"
+          @click="handleProfileUpdate"
+        >
+          <span
+            v-if="isSubmitting"
+            class="spinner-border spinner-border-sm"
+            aria-hidden="true"
+          />
+          <i
+            v-else
+            class="bi bi-check2-circle"
+          />
+          <span>{{ isSubmitting ? 'Menyimpan...' : 'Simpan profil' }}</span>
+        </button>
       </div>
     </section>
   </div>
@@ -400,6 +523,7 @@ const isSidebarOpen = ref(false);
 const isSidebarCollapsed = ref(false);
 const isUserMenuOpen = ref(false);
 const isProfileDialogOpen = ref(false);
+const isProfileEditDialogOpen = ref(false);
 const isCompanyDialogOpen = ref(false);
 const userMenuRef = ref<HTMLElement | null>(null);
 const mobileSidebarBreakpoint = 920;
@@ -460,7 +584,26 @@ const companyForm = reactive({
   address: '',
 });
 
+const profileForm = reactive({
+  fullName: '',
+  username: '',
+  email: '',
+  phoneNumber: '',
+});
+
 const canEditCompany = computed<boolean>(() => currentSession.value?.user.role === 'owner');
+
+const syncProfileForm = (): void => {
+  const user = currentSession.value?.user;
+  if (!user) {
+    return;
+  }
+
+  profileForm.fullName = user.fullName;
+  profileForm.username = user.username;
+  profileForm.email = user.email ?? '';
+  profileForm.phoneNumber = user.phoneNumber ?? '';
+};
 
 const syncCompanyForm = (): void => {
   const company = currentSession.value?.company;
@@ -478,12 +621,33 @@ const syncCompanyForm = (): void => {
 };
 
 const openProfileDialog = (): void => {
+  syncProfileForm();
   isProfileDialogOpen.value = true;
   closeUserMenu();
 };
 
 const closeProfileDialog = (): void => {
   isProfileDialogOpen.value = false;
+};
+
+const openProfileEditDialog = (): void => {
+  if (!currentSession.value) {
+    return;
+  }
+
+  syncProfileForm();
+  closeUserMenu();
+  closeProfileDialog();
+  isCompanyDialogOpen.value = false;
+  isProfileEditDialogOpen.value = true;
+};
+
+const closeProfileEditDialog = (): void => {
+  if (isSubmitting.value) {
+    return;
+  }
+
+  isProfileEditDialogOpen.value = false;
 };
 
 const openCompanyDialog = (): void => {
@@ -494,6 +658,7 @@ const openCompanyDialog = (): void => {
   syncCompanyForm();
   closeUserMenu();
   closeProfileDialog();
+  isProfileEditDialogOpen.value = false;
   isCompanyDialogOpen.value = true;
 };
 
@@ -587,6 +752,29 @@ const handleCompanyUpdate = async (): Promise<void> => {
   }
 };
 
+const handleProfileUpdate = async (): Promise<void> => {
+  try {
+    await authVm.updateProfile({
+      fullName: profileForm.fullName,
+      username: profileForm.username,
+      email: profileForm.email,
+      phoneNumber: profileForm.phoneNumber,
+    });
+
+    closeProfileEditDialog();
+    await showSuccessMessage('Profil diperbarui', 'Profil pengguna aktif sudah disimpan.', {
+      toast: true,
+      timer: 1600,
+      position: 'top-end',
+    });
+  } catch (error) {
+    await showErrorMessage(
+      'Perbarui profil gagal',
+      error instanceof Error ? error.message : String(error)
+    );
+  }
+};
+
 const handleDocumentPointerDown = (event: MouseEvent): void => {
   if (!isUserMenuOpen.value || !userMenuRef.value) {
     return;
@@ -604,12 +792,14 @@ const handleWindowKeydown = (event: KeyboardEvent): void => {
 
   closeUserMenu();
   closeProfileDialog();
+  closeProfileEditDialog();
   closeCompanyDialog();
 };
 
 const handleLogout = async (): Promise<void> => {
   closeUserMenu();
   closeProfileDialog();
+  closeProfileEditDialog();
 
   try {
     await authVm.logout();
@@ -630,6 +820,7 @@ watch(
     closeSidebar();
     closeUserMenu();
     closeProfileDialog();
+    isProfileEditDialogOpen.value = false;
     isCompanyDialogOpen.value = false;
   }
 );
@@ -644,12 +835,22 @@ watch(
   { immediate: true, deep: true }
 );
 
-watch([isProfileDialogOpen, isCompanyDialogOpen], ([profileOpen, companyOpen]) => {
+watch(
+  () => currentSession.value?.user,
+  () => {
+    if (!isProfileEditDialogOpen.value) {
+      syncProfileForm();
+    }
+  },
+  { immediate: true, deep: true }
+);
+
+watch([isProfileDialogOpen, isProfileEditDialogOpen, isCompanyDialogOpen], ([profileOpen, profileEditOpen, companyOpen]) => {
   if (typeof document === 'undefined') {
     return;
   }
 
-  document.body.classList.toggle('modal-open', profileOpen || companyOpen);
+  document.body.classList.toggle('modal-open', profileOpen || profileEditOpen || companyOpen);
 });
 
 onMounted(() => {
