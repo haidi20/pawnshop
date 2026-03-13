@@ -276,6 +276,19 @@ export class PawnContractRepositoryImpl implements PawnContractRepository {
     }
 
     /**
+     * Mengambil data khusus untuk tabel tab "Refund" (Cancelled).
+     */
+    getRefundTable(params: {
+        summaries: PawnContractSummaryModel[];
+    }): Either<Error, PawnContractSettlementTableModel> {
+        try {
+            return right(this.indexLocalDataSource.getRefundTable(params));
+        } catch (error) {
+            return left(toError(error));
+        }
+    }
+
+    /**
      * Menyusun data untuk tabel tab "Lokasi / Distribusi", memantau keberadaan
      * fisik barang jaminan di kantor, gudang, atau dalam proses mutasi.
      */

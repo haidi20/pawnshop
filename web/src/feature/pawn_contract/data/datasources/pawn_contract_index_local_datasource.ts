@@ -256,10 +256,19 @@ export class PawnContractIndexLocalDatasource {
 
     getAuctionTable(params: { summaries: PawnContractSummaryModel[] }): PawnContractSettlementTableModel {
         const rows = params.summaries.filter((item) => item.contract.contractStatus === 'auctioned');
-
         return {
             title: 'Lelang',
-            description: 'Daftar kontrak yang sudah masuk proses lelang.',
+            description: 'Daftar kontrak yang sudah masuk dalam proses lelang.',
+            options: [],
+            rows
+        };
+    }
+
+    getRefundTable(params: { summaries: PawnContractSummaryModel[] }): PawnContractSettlementTableModel {
+        const rows = params.summaries.filter((item) => item.contract.contractStatus === 'cancelled');
+        return {
+            title: 'Refund',
+            description: 'Daftar kontrak batal yang memerlukan proses pengembalian (refund).',
             options: [],
             rows
         };
@@ -481,12 +490,12 @@ export class PawnContractIndexLocalDatasource {
                 return params.ringkasanRowCount;
             case PawnContractIndexTabKeyEnum.DueContracts:
                 return params.ajtRowCount;
-            case PawnContractIndexTabKeyEnum.SettlementAuction:
-                return params.settlementRowCount;
             case PawnContractIndexTabKeyEnum.RedeemedContracts:
                 return params.redeemedRowCount;
             case PawnContractIndexTabKeyEnum.AuctionContracts:
                 return params.auctionRowCount;
+            case PawnContractIndexTabKeyEnum.RefundContracts:
+                return params.refundRowCount;
             case PawnContractIndexTabKeyEnum.LocationDistribution:
                 return params.locationRowCount;
             case PawnContractIndexTabKeyEnum.Maintenance:

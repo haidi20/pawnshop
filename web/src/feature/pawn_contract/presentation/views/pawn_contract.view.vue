@@ -76,20 +76,12 @@
             :format-currency="formatCurrency" :get-contract-status-label="getContractStatusLabel"
             :get-contract-status-class="getContractStatusClass" @open-filter="openFilterModal()" />
 
-          <PawnContractGjtSectionComponent v-else-if="activeIndexTab === pawnContractIndexTabKey.DueContracts"
+          <PawnContractAjtSectionComponent v-else-if="activeIndexTab === pawnContractIndexTabKey.DueContracts"
             :options="ajtOptions" :active-type="activeAjtType" :data-table-vm="ajtDataTableVm"
             :has-active-filters="hasActiveFilters" :format-count="formatCount" :format-date="formatDate"
             :get-due-state-class="getDueStateClass" :get-term-label="getTermLabel"
             :get-contract-status-label="getContractStatusLabel" :get-contract-status-class="getContractStatusClass"
             @select-type="setActiveAjtType($event)" @open-filter="openFilterModal()" />
-
-          <PawnContractSettlementSectionComponent
-            v-else-if="activeIndexTab === pawnContractIndexTabKey.SettlementAuction" :options="settlementOptions"
-            :active-type="activeSettlementType" :data-table-vm="settlementDataTableVm"
-            :has-active-filters="hasActiveFilters" :format-count="formatCount" :format-date="formatDate"
-            :format-currency="formatCurrency" :get-contract-status-label="getContractStatusLabel"
-            :get-contract-status-class="getContractStatusClass" @select-type="setActiveSettlementType($event)"
-            @open-filter="openFilterModal()" />
 
           <PawnContractRedeemedSectionComponent v-else-if="activeIndexTab === pawnContractIndexTabKey.RedeemedContracts"
             :data-table-vm="redeemedDataTableVm" :has-active-filters="hasActiveFilters" :format-date="formatDate"
@@ -98,6 +90,12 @@
 
           <PawnContractAuctionSectionComponent v-else-if="activeIndexTab === pawnContractIndexTabKey.AuctionContracts"
             :data-table-vm="auctionDataTableVm" :has-active-filters="hasActiveFilters" :format-date="formatDate"
+            :format-currency="formatCurrency" :get-contract-status-label="getContractStatusLabel"
+            :get-contract-status-class="getContractStatusClass" @open-filter="openFilterModal()" />
+
+          <PawnContractRefundSectionComponent v-else-if="activeIndexTab === pawnContractIndexTabKey.RefundContracts"
+            :data-table-vm="refundDataTableVm" :get-due-state-class="getDueStateClass"
+            :has-active-filters="hasActiveFilters" :format-date="formatDate"
             :format-currency="formatCurrency" :get-contract-status-label="getContractStatusLabel"
             :get-contract-status-class="getContractStatusClass" @open-filter="openFilterModal()" />
 
@@ -150,8 +148,8 @@ import PawnContractMaintenanceSectionComponent from '@feature/pawn_contract/pres
 import PawnContractNasabahSectionComponent from '@feature/pawn_contract/presentation/components/pawn_contract_nasabah_section.component.vue';
 import PawnContractRedeemedSectionComponent from '@feature/pawn_contract/presentation/components/pawn_contract_redeemed_section.component.vue';
 import PawnContractAuctionSectionComponent from '@feature/pawn_contract/presentation/components/pawn_contract_auction_section.component.vue';
+import PawnContractRefundSectionComponent from '@feature/pawn_contract/presentation/components/pawn_contract_refund_section.component.vue';
 import PawnContractRingkasanSectionComponent from '@feature/pawn_contract/presentation/components/pawn_contract_ringkasan_section.component.vue';
-import PawnContractSettlementSectionComponent from '@feature/pawn_contract/presentation/components/pawn_contract_settlement_section.component.vue';
 import PawnContractStorageFeeView from '@feature/pawn_contract/presentation/views/pawn_contract_storage_fee.view.vue';
 import {
   getPawnContractIndexRouteByKey,
@@ -171,7 +169,6 @@ const {
   activeIndexTab,
   activeNasabahTab,
   activeAjtType,
-  activeSettlementType,
   activeLocationTab,
   activeTableBranchFilter,
   activeTableStatusFilter,
@@ -185,10 +182,9 @@ const {
   ringkasanMetrics,
   ajtOptions,
   ajtDataTableVm,
-  settlementOptions,
-  settlementDataTableVm,
   redeemedDataTableVm,
   auctionDataTableVm,
+  refundDataTableVm,
   locationOptions,
   locationDataTableVm,
   maintenanceDataTableVm,

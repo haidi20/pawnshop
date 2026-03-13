@@ -10,6 +10,7 @@ import { GetPawnContractLocationTableUsecase } from '@feature/pawn_contract/doma
 import { GetPawnContractMaintenanceTableUsecase } from '@feature/pawn_contract/domain/usecases/get_pawn_contract_maintenance_table.usecase';
 import { GetPawnContractNasabahTableUsecase } from '@feature/pawn_contract/domain/usecases/get_pawn_contract_nasabah_table.usecase';
 import { GetPawnContractRedeemedTableUsecase } from '@feature/pawn_contract/domain/usecases/get_pawn_contract_redeemed_table.usecase';
+import { GetPawnContractRefundTableUsecase } from '@feature/pawn_contract/domain/usecases/get_pawn_contract_refund_table.usecase';
 import { GetPawnContractRingkasanTableUsecase } from '@feature/pawn_contract/domain/usecases/get_pawn_contract_ringkasan_table.usecase';
 import { GetPawnContractSettlementTableUsecase } from '@feature/pawn_contract/domain/usecases/get_pawn_contract_settlement_table.usecase';
 import { GetPawnContractSummariesUsecase } from '@feature/pawn_contract/domain/usecases/get_pawn_contract_summaries.usecase';
@@ -27,6 +28,7 @@ export const getPawnContractSummariesUsecase = new GetPawnContractSummariesUseca
 export const getPawnContractNasabahTableUsecase = new GetPawnContractNasabahTableUsecase(pawnContractRepository);
 export const getPawnContractRedeemedTableUsecase = new GetPawnContractRedeemedTableUsecase(pawnContractRepository);
 export const getPawnContractAuctionTableUsecase = new GetPawnContractAuctionTableUsecase(pawnContractRepository);
+export const getPawnContractRefundTableUsecase = new GetPawnContractRefundTableUsecase(pawnContractRepository);
 export const getPawnContractRingkasanTableUsecase = new GetPawnContractRingkasanTableUsecase(pawnContractRepository);
 export const getPawnContractAjtTableUsecase = new GetPawnContractAjtTableUsecase(pawnContractRepository);
 export const getPawnContractSettlementTableUsecase = new GetPawnContractSettlementTableUsecase(pawnContractRepository);

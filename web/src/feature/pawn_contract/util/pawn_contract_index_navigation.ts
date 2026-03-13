@@ -45,26 +45,6 @@ export const pawnContractIndexNavigationItems: PawnContractIndexNavigationItem[]
         caption: 'Kelola gadai yang mendekati jatuh tempo'
     },
     {
-        key: 'gadai-lihat-data-pelunasan',
-        label: 'Pelunasan & Lelang',
-        route: `${pawnContractIndexBaseRoute}/pelunasan-lelang`,
-        routeName: 'PawnContractSettlementAuction',
-        title: 'Data Gadai - Pelunasan dan Lelang',
-        tabKey: PawnContractIndexTabKeyEnum.SettlementAuction,
-        icon: 'bi-wallet2',
-        caption: 'Pantau pelunasan, lelang, dan refund'
-    },
-    {
-        key: 'gadai-lihat-data-lokasi',
-        label: 'Lokasi / Distribusi',
-        route: `${pawnContractIndexBaseRoute}/lokasi-distribusi`,
-        routeName: 'PawnContractLocationDistribution',
-        title: 'Data Gadai - Lokasi dan Distribusi',
-        tabKey: PawnContractIndexTabKeyEnum.LocationDistribution,
-        icon: 'bi-diagram-3',
-        caption: 'Lihat mutasi lokasi barang jaminan'
-    },
-    {
         key: 'gadai-lihat-data-lunas',
         label: 'Lunas',
         route: `${pawnContractIndexBaseRoute}/lunas`,
@@ -83,6 +63,26 @@ export const pawnContractIndexNavigationItems: PawnContractIndexNavigationItem[]
         tabKey: PawnContractIndexTabKeyEnum.AuctionContracts,
         icon: 'bi-hammer',
         caption: 'Pantau kontrak yang sudah masuk proses lelang'
+    },
+    {
+        key: 'gadai-lihat-data-refund',
+        label: 'Refund',
+        route: `${pawnContractIndexBaseRoute}/refund`,
+        routeName: 'PawnContractRefundContracts',
+        title: 'Data Gadai - Refund',
+        tabKey: PawnContractIndexTabKeyEnum.RefundContracts,
+        icon: 'bi-arrow-left-right',
+        caption: 'Pantau kontrak batal yang memerlukan refund'
+    },
+    {
+        key: 'gadai-lihat-data-lokasi',
+        label: 'Lokasi / Distribusi',
+        route: `${pawnContractIndexBaseRoute}/lokasi-distribusi`,
+        routeName: 'PawnContractLocationDistribution',
+        title: 'Data Gadai - Lokasi dan Distribusi',
+        tabKey: PawnContractIndexTabKeyEnum.LocationDistribution,
+        icon: 'bi-diagram-3',
+        caption: 'Lihat mutasi lokasi barang jaminan'
     },
     {
         key: 'gadai-lihat-data-maintenance',

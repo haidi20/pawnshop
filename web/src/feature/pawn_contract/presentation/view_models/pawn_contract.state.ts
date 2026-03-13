@@ -171,6 +171,15 @@ export const auctionTableFields: PawnContractTableField[] = [
     { key: 'statusLabel', label: 'Status' }
 ];
 
+export const refundTableFields: PawnContractTableField[] = [
+    { key: 'contractNumber', label: 'No. Gadai' },
+    { key: 'customerName', label: 'Nasabah' },
+    { key: 'itemNames', label: 'Jaminan' },
+    { key: 'refundDate', label: 'Tanggal Refund' },
+    { key: 'principalAmount', label: 'Nilai Pencairan' },
+    { key: 'statusLabel', label: 'Status' }
+];
+
 export const locationTableFields = [
     { key: 'actions', label: 'Aksi' },
     { key: 'print', label: 'Print' },
@@ -209,11 +218,6 @@ export const PAWN_CONTRACT_INDEX_TABS: Array<Omit<PawnContractIndexTabModel, 'co
         description: 'Kelompokkan gadai yang mendekati atau melewati jatuh tempo agar tindak lanjut tidak tertinggal.'
     },
     {
-        key: PawnContractIndexTabKeyEnum.SettlementAuction,
-        label: 'Pelunasan & Lelang',
-        description: 'Tinjau kontrak yang sudah lunas, masuk proses lelang, atau memerlukan refund dalam satu alur kerja.'
-    },
-    {
         key: PawnContractIndexTabKeyEnum.RedeemedContracts,
         label: 'Lunas',
         description: 'Daftar kontrak yang sudah dilunasi oleh nasabah secara penuh.'
@@ -222,6 +226,11 @@ export const PAWN_CONTRACT_INDEX_TABS: Array<Omit<PawnContractIndexTabModel, 'co
         key: PawnContractIndexTabKeyEnum.AuctionContracts,
         label: 'Lelang',
         description: 'Daftar kontrak yang sudah masuk dalam proses lelang.'
+    },
+    {
+        key: PawnContractIndexTabKeyEnum.RefundContracts,
+        label: 'Refund',
+        description: 'Daftar kontrak batal yang memerlukan proses pengembalian (refund).'
     },
     {
         key: PawnContractIndexTabKeyEnum.LocationDistribution,

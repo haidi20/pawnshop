@@ -78,6 +78,9 @@ export interface PawnContractRepository {
     getAuctionTable(params: {
         summaries: PawnContractSummaryModel[];
     }): Either<Error, PawnContractSettlementTableModel>;
+    getRefundTable(params: {
+        summaries: PawnContractSummaryModel[];
+    }): Either<Error, PawnContractSettlementTableModel>;
     getLocationTable(
         params: GetPawnContractLocationTableParamsModel & {
             locationOptions: Array<Omit<PawnContractTableOptionModel<PawnContractLocationTabModel>, 'count'>>;
