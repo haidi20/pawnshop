@@ -159,6 +159,7 @@
 .master-data-page__action-cell {
   display: flex;
   flex-wrap: wrap;
+  align-items: center;
   gap: 0.45rem;
   justify-content: center;
 }
@@ -204,6 +205,8 @@
 
 .master-data-page__col-action {
   min-width: 6rem;
+  text-align: center;
+  vertical-align: middle !important;
 }
 
 .master-data-page__col-code,

@@ -105,7 +105,7 @@
 
         <template #body="{ item }">
           <tr>
-            <td data-label="Aksi" style="text-align: center;">
+            <td data-label="Aksi" class="master-data-page__col-action">
               <div class="master-data-page__action-cell">
                 <button type="button" class="btn btn-outline-primary btn-sm" @click="vm.openBranchActionModal(item)">
                   Aksi
@@ -268,7 +268,7 @@
                 @click="confirmDeleteBranch(vm.branchActionModal.item); vm.closeBranchActionModal()">
                 <i class="bi bi-trash me-2" />
                 <span>{{ vm.isDeletingBranch(vm.branchActionModal.item.source.id) ? 'Menghapus...' : 'Hapus'
-                  }}</span>
+                }}</span>
               </button>
             </div>
           </div>
