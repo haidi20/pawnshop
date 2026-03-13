@@ -20,9 +20,10 @@ export type PawnContractIndexTabKeyModel = PawnContractIndexTabKeyEnum;
 
 export enum PawnContractNasabahTabKeyEnum {
     AllData = 'all_data',
-    Daily = 'daily',
     SevenDays = 'seven_days',
-    FifteenDays = 'fifteen_days'
+    FifteenDays = 'fifteen_days',
+    ThirtyDays = 'thirty_days',
+    SixtyDays = 'sixty_days'
 }
 
 export type PawnContractNasabahTabKeyModel = PawnContractNasabahTabKeyEnum;

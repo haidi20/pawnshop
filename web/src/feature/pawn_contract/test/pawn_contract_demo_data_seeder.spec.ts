@@ -9,6 +9,17 @@ import {
     createPawnContractDemoSeedDataset
 } from '@feature/pawn_contract/data/seeders/pawn_contract_demo_data.seeder';
 import { PawnContractNasabahTabKeyEnum } from '@feature/pawn_contract/domain/models';
+import {
+    PAWN_CONTRACT_NASABAH_TABS,
+    PAWN_CONTRACT_AJT_OPTIONS,
+    PAWN_CONTRACT_SETTLEMENT_OPTIONS,
+    PAWN_CONTRACT_LOCATION_OPTIONS,
+    PAWN_CONTRACT_INDEX_TABS,
+    RUNNING_CONTRACT_STATUSES,
+    getPawnContractAvailableActions
+} from '@feature/pawn_contract/presentation/view_models/pawn_contract.state';
+import { PawnContractCustomerGenderEnum } from '@core/domain/models/pawn-contract-form-enum.model';
+import { PawnContractIdentityTypeEnum } from '@core/domain/models/pawn-contract-form-enum.model';
 
 describe('pawn contract demo data seeder', () => {
     beforeEach(() => {
@@ -58,27 +69,44 @@ describe('pawn contract demo data seeder', () => {
                     id: customerRow.id,
                     customerCode: customerRow.customer_code,
                     fullName: customerRow.full_name,
-                    gender: customerRow.gender,
+                    gender: customerRow.gender as PawnContractCustomerGenderEnum,
                     birthDate: customerRow.birth_date ?? '2000-01-01',
                     city: customerRow.city ?? '',
                     address: customerRow.address ?? '',
-                    phoneNumber: phoneContact?.contact_value ?? '',
-                    identityType: primaryDocument?.document_type ?? null,
+                     phoneNumber: phoneContact?.contact_value ?? '',
+                    identityType: (primaryDocument?.document_type as PawnContractIdentityTypeEnum) ?? null,
                     identityNumber: primaryDocument?.document_number ?? null
                 };
             })
         });
         const datasource = new PawnContractIndexLocalDatasource();
-        const summaries = datasource.getContractSummaries(data);
+        const summaries = datasource.getContractSummaries({
+            data,
+            runningContractStatuses: RUNNING_CONTRACT_STATUSES,
+            getAvailableActions: getPawnContractAvailableActions
+        });
         const openSummaries = summaries.filter((item) => item.isOpenContract);
         const ringkasanTable = datasource.getRingkasanTable({ summaries });
-        const ajtTable = datasource.getAjtTable({ summaries: openSummaries, activeType: '30' });
-        const settlementTable = datasource.getSettlementTable({ summaries, activeType: 'lunas' });
-        const locationTable = datasource.getLocationTable({ summaries, activeTab: 'kantor' });
+        const ajtTable = datasource.getAjtTable({
+            summaries: openSummaries,
+            activeType: '30',
+            ajtOptions: PAWN_CONTRACT_AJT_OPTIONS
+        });
+        const settlementTable = datasource.getSettlementTable({
+            summaries,
+            activeType: 'lunas',
+            settlementOptions: PAWN_CONTRACT_SETTLEMENT_OPTIONS
+        });
+        const locationTable = datasource.getLocationTable({
+            summaries,
+            activeTab: 'kantor',
+            locationOptions: PAWN_CONTRACT_LOCATION_OPTIONS
+        });
         const maintenanceTable = datasource.getMaintenanceTable({ summaries });
         const nasabahTable = datasource.getNasabahTable({
             summaries: openSummaries,
-            activeTab: PawnContractNasabahTabKeyEnum.AllData
+            activeTab: PawnContractNasabahTabKeyEnum.AllData,
+            nasabahTabs: PAWN_CONTRACT_NASABAH_TABS
         });
         const indexTabs = datasource.getIndexTabs({
             openContractCount: openSummaries.length,
@@ -87,9 +115,12 @@ describe('pawn contract demo data seeder', () => {
                 0
             ),
             ajtRowCount: ajtTable.rows.length,
-            settlementRowCount: settlementTable.rows.length,
+            redeemedRowCount: settlementTable.options.find((opt) => opt.key === 'lunas')?.count ?? 0,
+            auctionRowCount: settlementTable.options.find((opt) => opt.key === 'lelang')?.count ?? 0,
+            refundRowCount: settlementTable.options.find((opt) => opt.key === 'refund')?.count ?? 0,
             locationRowCount: locationTable.rows.length,
-            maintenanceRowCount: maintenanceTable.rows.length
+            maintenanceRowCount: maintenanceTable.rows.length,
+            indexTabs: PAWN_CONTRACT_INDEX_TABS
         });
 
         expect(dataset.contracts).toHaveLength(PAWN_CONTRACT_DEMO_MIN_CONTRACT_COUNT);

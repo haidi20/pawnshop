@@ -250,22 +250,27 @@ export const PAWN_CONTRACT_NASABAH_TABS: Array<
         {
             key: PawnContractNasabahTabKeyEnum.AllData,
             label: 'Semua Data',
-            description: 'Tinjau kontrak aktif yang dikelompokkan berdasarkan bulan kontrak.'
-        },
-        {
-            key: PawnContractNasabahTabKeyEnum.Daily,
-            label: 'Harian',
-            description: 'Kontrak aktif dengan jadwal pembayaran harian.'
+            description: 'Tinjau kontrak aktif yang dikelompokkan berdasarkan durasi kontrak.'
         },
         {
             key: PawnContractNasabahTabKeyEnum.SevenDays,
             label: '7 Hari',
-            description: 'Kontrak aktif dengan jadwal pembayaran 7 harian.'
+            description: 'Kontrak aktif dengan durasi gadai 7 hari.'
         },
         {
             key: PawnContractNasabahTabKeyEnum.FifteenDays,
             label: '15 Hari',
-            description: 'Kontrak aktif dengan jadwal pembayaran 15 harian.'
+            description: 'Kontrak aktif dengan durasi gadai 15 hari.'
+        },
+        {
+            key: PawnContractNasabahTabKeyEnum.ThirtyDays,
+            label: '30 Hari',
+            description: 'Kontrak aktif dengan durasi gadai 30 hari.'
+        },
+        {
+            key: PawnContractNasabahTabKeyEnum.SixtyDays,
+            label: '60 Hari',
+            description: 'Kontrak aktif dengan durasi gadai 60 hari.'
         }
     ];
 

@@ -365,12 +365,14 @@ export class PawnContractIndexLocalDatasource {
         tab: PawnContractNasabahTabKeyModel
     ): PawnContractSummaryModel[] {
         switch (tab) {
-            case PawnContractNasabahTabKeyEnum.Daily:
-                return rows.filter((item) => item.contract.paymentOptionDays === 1);
             case PawnContractNasabahTabKeyEnum.SevenDays:
-                return rows.filter((item) => item.contract.paymentOptionDays === 7);
+                return rows.filter((item) => item.contract.termDays === 7);
             case PawnContractNasabahTabKeyEnum.FifteenDays:
-                return rows.filter((item) => item.contract.paymentOptionDays === 15);
+                return rows.filter((item) => item.contract.termDays === 15);
+            case PawnContractNasabahTabKeyEnum.ThirtyDays:
+                return rows.filter((item) => item.contract.termDays === 30);
+            case PawnContractNasabahTabKeyEnum.SixtyDays:
+                return rows.filter((item) => item.contract.termDays === 60);
             default:
                 return rows;
         }

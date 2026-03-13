@@ -10,7 +10,10 @@
                   Dashboard
                 </RouterLink>
               </li>
-              <li class="breadcrumb-item active" aria-current="page">
+              <li
+                class="breadcrumb-item active"
+                aria-current="page"
+              >
                 Pengaturan Sistem
               </li>
             </ol>
@@ -44,10 +47,16 @@
                     Mengisi data master dasar seperti cabang, kategori barang, dan beberapa transaksi contoh untuk
                     eksplorasi fitur.
                   </p>
-                  <button type="button"
+                  <button
+                    type="button"
                     class="btn btn-outline-primary mt-3 d-flex align-items-center justify-content-center gap-2"
-                    :disabled="isProcessing" @click="vm.runDefaultSeeder()">
-                    <span v-if="isProcessing" class="spinner-border spinner-border-sm" />
+                    :disabled="isProcessing"
+                    @click="vm.runDefaultSeeder()"
+                  >
+                    <span
+                      v-if="isProcessing"
+                      class="spinner-border spinner-border-sm"
+                    />
                     <span>Jalankan Default Seeder</span>
                   </button>
                 </div>
@@ -65,10 +74,16 @@
                     Menambahkan tepat satu kontrak gadai aktif dengan status <strong>Belum Lunas</strong> untuk setiap
                     perusahaan yang tersedia.
                   </p>
-                  <button type="button"
+                  <button
+                    type="button"
                     class="btn btn-outline-success mt-3 d-flex align-items-center justify-content-center gap-2"
-                    :disabled="isProcessing" @click="vm.runSingleActiveSeeder()">
-                    <span v-if="isProcessing" class="spinner-border spinner-border-sm" />
+                    :disabled="isProcessing"
+                    @click="vm.runSingleActiveSeeder()"
+                  >
+                    <span
+                      v-if="isProcessing"
+                      class="spinner-border spinner-border-sm"
+                    />
                     <span>Jalankan Seeder Aktif</span>
                   </button>
                 </div>

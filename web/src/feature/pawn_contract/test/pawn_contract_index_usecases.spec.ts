@@ -7,25 +7,34 @@ import {
     PawnContractIdentityTypeEnum,
     PawnContractPaymentOptionDaysEnum,
     PawnContractTermDaysEnum
-} from '../domain/models/pawn-contract-form.model';
+} from '@feature/pawn_contract/domain/models/pawn-contract-form.model';
 import {
     PawnContractIndexTabKeyEnum,
     PawnContractNasabahTabKeyEnum
-} from '../domain/models/pawn-contract-index.model';
+} from '@feature/pawn_contract/domain/models/pawn-contract-index.model';
 import {
     createPawnContractDataModel,
     type PawnContractDataModel
-} from '../domain/models/pawn-contract-data.model';
-import type { PawnContractRepository } from '../domain/repositories/pawn_contract.repository';
-import { PawnContractIndexLocalDatasource } from '../data/datasources/pawn_contract_index_local_datasource';
-import { GetPawnContractAjtTableUsecase } from '../domain/usecases/get_pawn_contract_ajt_table.usecase';
-import { GetPawnContractIndexTabsUsecase } from '../domain/usecases/get_pawn_contract_index_tabs.usecase';
-import { GetPawnContractLocationTableUsecase } from '../domain/usecases/get_pawn_contract_location_table.usecase';
-import { GetPawnContractMaintenanceTableUsecase } from '../domain/usecases/get_pawn_contract_maintenance_table.usecase';
-import { GetPawnContractNasabahTableUsecase } from '../domain/usecases/get_pawn_contract_nasabah_table.usecase';
-import { GetPawnContractRingkasanTableUsecase } from '../domain/usecases/get_pawn_contract_ringkasan_table.usecase';
-import { GetPawnContractSettlementTableUsecase } from '../domain/usecases/get_pawn_contract_settlement_table.usecase';
-import { GetPawnContractSummariesUsecase } from '../domain/usecases/get_pawn_contract_summaries.usecase';
+} from '@feature/pawn_contract/domain/models/pawn-contract-data.model';
+import type { PawnContractRepository } from '@feature/pawn_contract/domain/repositories/pawn_contract.repository';
+import { PawnContractIndexLocalDatasource } from '@feature/pawn_contract/data/datasources/pawn_contract_index_local_datasource';
+import { GetPawnContractAjtTableUsecase } from '@feature/pawn_contract/domain/usecases/get_pawn_contract_ajt_table.usecase';
+import { GetPawnContractIndexTabsUsecase } from '@feature/pawn_contract/domain/usecases/get_pawn_contract_index_tabs.usecase';
+import { GetPawnContractLocationTableUsecase } from '@feature/pawn_contract/domain/usecases/get_pawn_contract_location_table.usecase';
+import { GetPawnContractMaintenanceTableUsecase } from '@feature/pawn_contract/domain/usecases/get_pawn_contract_maintenance_table.usecase';
+import { GetPawnContractNasabahTableUsecase } from '@feature/pawn_contract/domain/usecases/get_pawn_contract_nasabah_table.usecase';
+import { GetPawnContractRingkasanTableUsecase } from '@feature/pawn_contract/domain/usecases/get_pawn_contract_ringkasan_table.usecase';
+import { GetPawnContractSettlementTableUsecase } from '@feature/pawn_contract/domain/usecases/get_pawn_contract_settlement_table.usecase';
+import { GetPawnContractSummariesUsecase } from '@feature/pawn_contract/domain/usecases/get_pawn_contract_summaries.usecase';
+import {
+    getPawnContractAvailableActions,
+    RUNNING_CONTRACT_STATUSES,
+    PAWN_CONTRACT_NASABAH_TABS,
+    PAWN_CONTRACT_AJT_OPTIONS,
+    PAWN_CONTRACT_SETTLEMENT_OPTIONS,
+    PAWN_CONTRACT_LOCATION_OPTIONS,
+    PAWN_CONTRACT_INDEX_TABS
+} from '@feature/pawn_contract/presentation/view_models/pawn_contract.state';
 
 describe('pawn_contract index usecases', () => {
     beforeEach(() => {
@@ -39,7 +48,11 @@ describe('pawn_contract index usecases', () => {
 
     test('builds enriched contract summaries for downstream tables', () => {
         const summaries = unwrapEitherOrThrow(
-            new GetPawnContractSummariesUsecase(createRepository()).execute(createFixtureData())
+            new GetPawnContractSummariesUsecase(createRepository()).execute({
+                data: createFixtureData(),
+                runningContractStatuses: RUNNING_CONTRACT_STATUSES,
+                getAvailableActions: getPawnContractAvailableActions
+            })
         );
         const todaySummary = summaries.find((item) => item.contract.id === 1);
         const overdueExtendedSummary = summaries.find((item) => item.contract.id === 2);
@@ -117,7 +130,11 @@ describe('pawn_contract index usecases', () => {
         });
 
         const summaries = unwrapEitherOrThrow(
-            new GetPawnContractSummariesUsecase(createRepository()).execute(dataWithDraft)
+            new GetPawnContractSummariesUsecase(createRepository()).execute({
+                data: dataWithDraft,
+                runningContractStatuses: RUNNING_CONTRACT_STATUSES,
+                getAvailableActions: getPawnContractAvailableActions
+            })
         );
         const draftSummary = summaries.find((item) => item.contract.id === 7);
 
@@ -132,32 +149,35 @@ describe('pawn_contract index usecases', () => {
         const seluruhDataTable = unwrapEitherOrThrow(
             usecase.execute({
                 summaries,
-                activeTab: PawnContractNasabahTabKeyEnum.AllData
+                activeTab: PawnContractNasabahTabKeyEnum.AllData,
+                nasabahTabs: PAWN_CONTRACT_NASABAH_TABS
             })
         );
-        const harianTable = unwrapEitherOrThrow(
+        const thirtyDaysTable = unwrapEitherOrThrow(
             usecase.execute({
                 summaries,
-                activeTab: PawnContractNasabahTabKeyEnum.Daily
+                activeTab: PawnContractNasabahTabKeyEnum.ThirtyDays,
+                nasabahTabs: PAWN_CONTRACT_NASABAH_TABS
             })
         );
 
-        expect(seluruhDataTable.title).toBe('Active Contract List');
+        expect(seluruhDataTable.title).toBe('Daftar Kontrak Aktif');
         expect(seluruhDataTable.tabs).toEqual([
             expect.objectContaining({ key: PawnContractNasabahTabKeyEnum.AllData, count: 3 }),
-            expect.objectContaining({ key: PawnContractNasabahTabKeyEnum.Daily, count: 1 }),
-            expect.objectContaining({ key: PawnContractNasabahTabKeyEnum.SevenDays, count: 1 }),
-            expect.objectContaining({ key: PawnContractNasabahTabKeyEnum.FifteenDays, count: 1 })
+            expect.objectContaining({ key: PawnContractNasabahTabKeyEnum.SevenDays, count: 0 }),
+            expect.objectContaining({ key: PawnContractNasabahTabKeyEnum.FifteenDays, count: 0 }),
+            expect.objectContaining({ key: PawnContractNasabahTabKeyEnum.ThirtyDays, count: 2 }),
+            expect.objectContaining({ key: PawnContractNasabahTabKeyEnum.SixtyDays, count: 1 })
         ]);
         expect(seluruhDataTable.sections.find((item) => item.key === 'bulan_berjalan')?.rows).toHaveLength(1);
         expect(seluruhDataTable.sections.find((item) => item.key === 'satu_bulan_lalu')?.rows).toHaveLength(1);
         expect(seluruhDataTable.sections.find((item) => item.key === 'dua_bulan_lalu')?.rows).toHaveLength(1);
         expect(seluruhDataTable.activeSection.totals.principalAmount).toBe(4100000);
-        expect(harianTable.displayedSections).toHaveLength(4);
-        expect(harianTable.displayedSections.find((item) => item.key === 'bulan_berjalan')?.rows).toHaveLength(1);
-        expect(harianTable.displayedSections.find((item) => item.key === 'satu_bulan_lalu')?.rows).toHaveLength(0);
-        expect(harianTable.activeSection.rows.map((item) => item.contract.id)).toEqual([1]);
-        expect(harianTable.activeSection.description).toContain('daily payment schedule');
+        expect(thirtyDaysTable.displayedSections).toHaveLength(4);
+        expect(thirtyDaysTable.displayedSections.find((item) => item.key === 'bulan_berjalan')?.rows).toHaveLength(1);
+        expect(thirtyDaysTable.displayedSections.find((item) => item.key === 'satu_bulan_lalu')?.rows).toHaveLength(1);
+        expect(thirtyDaysTable.activeSection.rows.map((item) => item.contract.id)).toEqual([1, 6]);
+        expect(thirtyDaysTable.activeSection.description).toContain('durasi gadai 30 hari');
     });
 
     test('builds ringkasan harian table metrics and income rows', () => {
@@ -191,7 +211,8 @@ describe('pawn_contract index usecases', () => {
         const table = unwrapEitherOrThrow(
             new GetPawnContractAjtTableUsecase(createRepository()).execute({
                 summaries: getOpenSummaries(),
-                activeType: '30'
+                activeType: '30',
+                ajtOptions: PAWN_CONTRACT_AJT_OPTIONS
             })
         );
 
@@ -209,13 +230,15 @@ describe('pawn_contract index usecases', () => {
         const settlementTable = unwrapEitherOrThrow(
             new GetPawnContractSettlementTableUsecase(repository).execute({
                 summaries,
-                activeType: 'lelang'
+                activeType: 'lelang',
+                settlementOptions: PAWN_CONTRACT_SETTLEMENT_OPTIONS
             })
         );
         const locationTable = unwrapEitherOrThrow(
             new GetPawnContractLocationTableUsecase(repository).execute({
                 summaries,
-                activeTab: 'proses'
+                activeTab: 'proses',
+                locationOptions: PAWN_CONTRACT_LOCATION_OPTIONS
             })
         );
         const maintenanceTable = unwrapEitherOrThrow(
@@ -231,7 +254,8 @@ describe('pawn_contract index usecases', () => {
         const ajtTable = unwrapEitherOrThrow(
             new GetPawnContractAjtTableUsecase(repository).execute({
                 summaries: openSummaries,
-                activeType: '30'
+                activeType: '30',
+                ajtOptions: PAWN_CONTRACT_AJT_OPTIONS
             })
         );
         const indexTabs = unwrapEitherOrThrow(
@@ -242,9 +266,12 @@ describe('pawn_contract index usecases', () => {
                     0
                 ),
                 ajtRowCount: ajtTable.rows.length,
-                settlementRowCount: settlementTable.rows.length,
+                redeemedRowCount: settlementTable.rows.length,
+                auctionRowCount: settlementTable.rows.length,
+                refundRowCount: settlementTable.rows.length,
                 locationRowCount: locationTable.rows.length,
-                maintenanceRowCount: maintenanceTable.rows.length
+                maintenanceRowCount: maintenanceTable.rows.length,
+                indexTabs: PAWN_CONTRACT_INDEX_TABS
             })
         );
 
@@ -253,7 +280,8 @@ describe('pawn_contract index usecases', () => {
             unwrapEitherOrThrow(
                 new GetPawnContractSettlementTableUsecase(repository).execute({
                     summaries,
-                    activeType: 'lunas'
+                    activeType: 'lunas',
+                    settlementOptions: PAWN_CONTRACT_SETTLEMENT_OPTIONS
                 })
             ).rows.map((item) => item.contract.id)
         ).toEqual([3]);
@@ -261,7 +289,8 @@ describe('pawn_contract index usecases', () => {
             unwrapEitherOrThrow(
                 new GetPawnContractSettlementTableUsecase(repository).execute({
                     summaries,
-                    activeType: 'refund'
+                    activeType: 'refund',
+                    settlementOptions: PAWN_CONTRACT_SETTLEMENT_OPTIONS
                 })
             ).rows.map((item) => item.contract.id)
         ).toEqual([5]);
@@ -285,7 +314,9 @@ describe('pawn_contract index usecases', () => {
             expect.objectContaining({ key: PawnContractIndexTabKeyEnum.CustomerContracts, count: 3 }),
             expect.objectContaining({ key: PawnContractIndexTabKeyEnum.DailySummary, count: 2 }),
             expect.objectContaining({ key: PawnContractIndexTabKeyEnum.DueContracts, count: 1 }),
-            expect.objectContaining({ key: PawnContractIndexTabKeyEnum.SettlementAuction, count: 1 }),
+            expect.objectContaining({ key: PawnContractIndexTabKeyEnum.RedeemedContracts, count: 1 }),
+            expect.objectContaining({ key: PawnContractIndexTabKeyEnum.AuctionContracts, count: 1 }),
+            expect.objectContaining({ key: PawnContractIndexTabKeyEnum.RefundContracts, count: 1 }),
             expect.objectContaining({ key: PawnContractIndexTabKeyEnum.LocationDistribution, count: 4 }),
             expect.objectContaining({ key: PawnContractIndexTabKeyEnum.Maintenance, count: 1 })
         ]);
@@ -295,7 +326,11 @@ describe('pawn_contract index usecases', () => {
 
 function getSummaries() {
     return unwrapEitherOrThrow(
-        new GetPawnContractSummariesUsecase(createRepository()).execute(createFixtureData())
+        new GetPawnContractSummariesUsecase(createRepository()).execute({
+            data: createFixtureData(),
+            runningContractStatuses: RUNNING_CONTRACT_STATUSES,
+            getAvailableActions: getPawnContractAvailableActions
+        })
     );
 }
 
@@ -540,25 +575,31 @@ function createRepository(): PawnContractRepository {
     const indexLocalDatasource = new PawnContractIndexLocalDatasource();
 
     return {
-        getData: async (_filters) => {
+        getData: async (_filters: Parameters<PawnContractRepository['getData']>[0]) => {
             throw new Error('not implemented for unit test');
         },
-        getFormReferenceData: async () => {
+        getFormReferenceData: async (_params: Parameters<PawnContractRepository['getFormReferenceData']>[0]) => {
             throw new Error('not implemented for unit test');
         },
-        getFormValue: async (_contractId) => {
+        getFormValue: async (_params: Parameters<PawnContractRepository['getFormValue']>[0]) => {
             throw new Error('not implemented for unit test');
         },
-        saveContract: async (_payload) => {
+        saveContract: async (_params: Parameters<PawnContractRepository['saveContract']>[0]) => {
             throw new Error('not implemented for unit test');
         },
-        getContractSummaries: (data) => right(indexLocalDatasource.getContractSummaries(data)),
-        getNasabahTable: (params) => right(indexLocalDatasource.getNasabahTable(params)),
-        getRingkasanTable: (params) => right(indexLocalDatasource.getRingkasanTable(params)),
-        getAjtTable: (params) => right(indexLocalDatasource.getAjtTable(params)),
-        getSettlementTable: (params) => right(indexLocalDatasource.getSettlementTable(params)),
-        getLocationTable: (params) => right(indexLocalDatasource.getLocationTable(params)),
-        getMaintenanceTable: (params) => right(indexLocalDatasource.getMaintenanceTable(params)),
-        getIndexTabs: (params) => right(indexLocalDatasource.getIndexTabs(params))
-    };
+        getContractSummaries: (params: Parameters<PawnContractRepository['getContractSummaries']>[0]) => right(indexLocalDatasource.getContractSummaries(params)),
+        getNasabahTable: (params: Parameters<PawnContractRepository['getNasabahTable']>[0]) => right(indexLocalDatasource.getNasabahTable(params)),
+        getRingkasanTable: (params: Parameters<PawnContractRepository['getRingkasanTable']>[0]) => right(indexLocalDatasource.getRingkasanTable(params)),
+        getAjtTable: (params: Parameters<PawnContractRepository['getAjtTable']>[0]) => right(indexLocalDatasource.getAjtTable(params)),
+        getSettlementTable: (params: Parameters<PawnContractRepository['getSettlementTable']>[0]) => right(indexLocalDatasource.getSettlementTable(params)),
+        getRedeemedTable: (params: Parameters<PawnContractRepository['getRedeemedTable']>[0]) => right(indexLocalDatasource.getRedeemedTable(params)),
+        getAuctionTable: (params: Parameters<PawnContractRepository['getAuctionTable']>[0]) => right(indexLocalDatasource.getAuctionTable(params)),
+        getRefundTable: (params: Parameters<PawnContractRepository['getRefundTable']>[0]) => right(indexLocalDatasource.getRefundTable(params)),
+        getLocationTable: (params: Parameters<PawnContractRepository['getLocationTable']>[0]) => right(indexLocalDatasource.getLocationTable(params)),
+        getMaintenanceTable: (params: Parameters<PawnContractRepository['getMaintenanceTable']>[0]) => right(indexLocalDatasource.getMaintenanceTable(params)),
+        getIndexTabs: (params: Parameters<PawnContractRepository['getIndexTabs']>[0]) => right(indexLocalDatasource.getIndexTabs(params)),
+        getHistorySummaryById: async () => right(null),
+        runDefaultSeeder: async () => right(undefined),
+        runSingleActiveSeeder: async () => right(undefined)
+    } as unknown as PawnContractRepository;
 }
