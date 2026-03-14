@@ -1,34 +1,18 @@
 <template>
-  <LocalDbFeedbackStateComponent
-    v-if="isLoading"
-    state="loading"
-    title="Memuat dashboard"
+  <LocalDbFeedbackStateComponent v-if="isLoading" state="loading" title="Memuat dashboard"
     description="Mengambil data transaksi gadai dari database lokal perusahaan aktif."
-    note="Grafik, ringkasan, dan tabel terbaru akan tampil setelah pembacaan lokal selesai."
-  />
+    note="Grafik, ringkasan, dan tabel terbaru akan tampil setelah pembacaan lokal selesai." />
 
-  <LocalDbFeedbackStateComponent
-    v-else-if="error"
-    state="error"
-    title="Gagal memuat dashboard"
-    :description="error"
-    note="Coba muat ulang agar pembacaan transaksi dari DB lokal diulang."
-    action-label="Muat ulang"
-    @action="vm.getDashboardData()"
-  />
+  <LocalDbFeedbackStateComponent v-else-if="error" state="error" title="Gagal memuat dashboard" :description="error"
+    note="Coba muat ulang agar pembacaan transaksi dari DB lokal diulang." action-label="Muat ulang"
+    @action="vm.getDashboardData()" />
 
-  <LocalDbFeedbackStateComponent
-    v-else-if="data && totalTransactionCount === 0"
-    state="empty"
+  <LocalDbFeedbackStateComponent v-else-if="data && totalTransactionCount === 0" state="empty"
     title="Belum ada transaksi untuk dashboard"
     description="Database lokal pada scope perusahaan dan cabang user aktif belum memiliki transaksi yang bisa diringkas."
-    note="Jika user ini karyawan, data hanya tampil dari cabang yang sudah diatur pada assignment user."
-  />
+    note="Jika user ini karyawan, data hanya tampil dari cabang yang sudah diatur pada assignment user." />
 
-  <section
-    v-else-if="data"
-    class="dashboard-page"
-  >
+  <section v-else-if="data" class="dashboard-page">
     <section class="dashboard-hero card">
       <div class="row g-4 align-items-stretch">
         <div class="col-12 col-xl-12">
@@ -109,13 +93,9 @@
 
     <section class="row g-4">
       <div class="col-12 col-xxl-8">
-        <article
-          class="dashboard-panel card h-100"
-          data-testid="dashboard-line-chart"
-        >
+        <article class="dashboard-panel card h-100" data-testid="dashboard-line-chart">
           <div
-            class="dashboard-section-head d-flex flex-column flex-lg-row align-items-start justify-content-between gap-3"
-          >
+            class="dashboard-section-head d-flex flex-column flex-lg-row align-items-start justify-content-between gap-3">
             <div>
               <div class="dashboard-section-eyebrow">
                 Line Chart
@@ -133,57 +113,25 @@
             </div>
           </div>
 
-          <div
-            v-if="lineSeries.length"
-            class="d-grid gap-3"
-          >
+          <div v-if="lineSeries.length" class="d-grid gap-3">
             <div class="dashboard-line-chart-shell">
               <div class="dashboard-line-chart-scroll">
-                <svg
-                  class="dashboard-line-chart-svg"
-                  viewBox="0 0 760 320"
-                  role="img"
-                  aria-label="Grafik line nominal transaksi gadai"
-                >
-                  <g
-                    v-for="gridLine in chartGridLines"
-                    :key="gridLine.key"
-                  >
-                    <line
-                      class="dashboard-line-grid"
-                      :class="{ 'is-base': gridLine.value === 0 }"
-                      :x1="chartPadding.left"
-                      :x2="chartWidth - chartPadding.right"
-                      :y1="gridLine.y"
-                      :y2="gridLine.y"
-                    />
-                    <text
-                      class="dashboard-line-grid-label"
-                      :x="chartPadding.left - 12"
-                      :y="gridLine.y + 4"
-                      text-anchor="end"
-                    >
+                <svg class="dashboard-line-chart-svg" viewBox="0 0 760 320" role="img"
+                  aria-label="Grafik line nominal transaksi gadai">
+                  <g v-for="gridLine in chartGridLines" :key="gridLine.key">
+                    <line class="dashboard-line-grid" :class="{ 'is-base': gridLine.value === 0 }"
+                      :x1="chartPadding.left" :x2="chartWidth - chartPadding.right" :y1="gridLine.y" :y2="gridLine.y" />
+                    <text class="dashboard-line-grid-label" :x="chartPadding.left - 12" :y="gridLine.y + 4"
+                      text-anchor="end">
                       {{ formatCompactCurrency(gridLine.value) }}
                     </text>
                   </g>
 
-                  <polyline
-                    v-if="linePoints.length > 1"
-                    class="dashboard-line-path"
-                    :points="linePointsString"
-                  />
+                  <polyline v-if="linePoints.length > 1" class="dashboard-line-path" :points="linePointsString" />
 
-                  <g
-                    v-for="point in linePoints"
-                    :key="point.key"
-                  >
-                    <circle
-                      class="dashboard-line-point"
-                      :class="getTransactionTypeClass(point.type)"
-                      :cx="point.x"
-                      :cy="point.y"
-                      r="7"
-                    >
+                  <g v-for="point in linePoints" :key="point.key">
+                    <circle class="dashboard-line-point" :class="getTransactionTypeClass(point.type)" :cx="point.x"
+                      :cy="point.y" r="7">
                       <title>
                         {{ point.type }} - {{ formatCurrency(point.amount) }} - {{
                           formatTransactionDate(point.transactionDate) }}
@@ -195,22 +143,14 @@
             </div>
 
             <div class="row row-cols-1 row-cols-sm-2 row-cols-lg-3 row-cols-xxl-4 g-3">
-              <div
-                v-for="point in lineSeries"
-                :key="point.key"
-                class="col"
-              >
+              <div v-for="point in lineSeries" :key="point.key" class="col">
                 <article class="dashboard-line-point-card h-100">
                   <div
-                    class="dashboard-line-point-head d-flex flex-column flex-sm-row align-items-start justify-content-between gap-2"
-                  >
+                    class="dashboard-line-point-head d-flex flex-column flex-sm-row align-items-start justify-content-between gap-2">
                     <div class="dashboard-line-point-label">
                       {{ point.label }}
                     </div>
-                    <span
-                      class="dashboard-transaction-badge"
-                      :class="getTransactionTypeClass(point.type)"
-                    >
+                    <span class="dashboard-transaction-badge" :class="getTransactionTypeClass(point.type)">
                       {{ point.type }}
                     </span>
                   </div>
@@ -225,29 +165,20 @@
             </div>
           </div>
 
-          <LocalDbFeedbackStateComponent
-            v-else
-            state="empty"
-            title="Belum ada titik transaksi"
+          <LocalDbFeedbackStateComponent v-else state="empty" title="Belum ada titik transaksi"
             description="Grafik line akan muncul setelah transaksi lokal tersedia."
-            note="Tambahkan transaksi gadai atau pilih user dengan akses cabang yang memiliki data."
-            :framed="false"
-            compact
-          />
+            note="Tambahkan transaksi gadai atau pilih user dengan akses cabang yang memiliki data." :framed="false"
+            compact />
         </article>
       </div>
 
       <div class="col-12 col-xxl-4">
-        <article
-          class="dashboard-panel card h-100"
-          data-testid="dashboard-summary"
-        >
+        <article class="dashboard-panel card h-100" data-testid="dashboard-summary">
           <div
-            class="dashboard-section-head d-flex flex-column flex-lg-row align-items-start justify-content-between gap-3"
-          >
+            class="dashboard-section-head d-flex flex-column flex-lg-row align-items-start justify-content-between gap-3">
             <div>
               <div class="dashboard-section-eyebrow">
-                Insight Angka
+                Informasi Angka
               </div>
               <h3 class="dashboard-section-title">
                 Ringkasan cepat nominal dan komposisi
@@ -293,10 +224,7 @@
                 <div class="dashboard-insight-value">
                   {{ peakPoint ? formatCurrency(peakPoint.amount) : '-' }}
                 </div>
-                <div
-                  v-if="peakPoint"
-                  class="dashboard-insight-note"
-                >
+                <div v-if="peakPoint" class="dashboard-insight-note">
                   {{ formatMiniDate(peakPoint.transactionDate) }}
                 </div>
               </article>
@@ -310,10 +238,7 @@
                 <div class="dashboard-insight-value">
                   {{ lineSeries.length > 1 ? formatSignedCurrency(amountDelta) : '-' }}
                 </div>
-                <div
-                  v-if="lineSeries.length > 1"
-                  class="dashboard-insight-note"
-                >
+                <div v-if="lineSeries.length > 1" class="dashboard-insight-note">
                   {{ formatMiniDate(lineSeries[0].transactionDate) }} ke
                   {{ formatMiniDate(lineSeries[lineSeries.length - 1].transactionDate) }}
                 </div>
@@ -322,14 +247,9 @@
           </div>
 
           <div class="dashboard-breakdown-list">
-            <article
-              v-for="item in chartItems"
-              :key="item.key"
-              class="dashboard-breakdown-item"
-            >
+            <article v-for="item in chartItems" :key="item.key" class="dashboard-breakdown-item">
               <div
-                class="dashboard-breakdown-meta d-flex flex-column flex-sm-row align-items-start justify-content-between gap-2"
-              >
+                class="dashboard-breakdown-meta d-flex flex-column flex-sm-row align-items-start justify-content-between gap-2">
                 <div>
                   <div class="dashboard-breakdown-label">
                     {{ item.label }}
@@ -344,11 +264,8 @@
               </div>
 
               <div class="dashboard-breakdown-bar">
-                <div
-                  class="dashboard-breakdown-fill"
-                  :class="getBreakdownClass(item.key)"
-                  :style="{ width: `${typePercentage(item.count)}%` }"
-                />
+                <div class="dashboard-breakdown-fill" :class="getBreakdownClass(item.key)"
+                  :style="{ width: `${typePercentage(item.count)}%` }" />
               </div>
             </article>
           </div>
@@ -356,16 +273,12 @@
       </div>
     </section>
 
-    <section
-      class="dashboard-panel card"
-      data-testid="dashboard-recent-transactions"
-    >
+    <section class="dashboard-panel card" data-testid="dashboard-recent-transactions">
       <div
-        class="dashboard-section-head d-flex flex-column flex-lg-row align-items-start justify-content-between gap-3"
-      >
+        class="dashboard-section-head d-flex flex-column flex-lg-row align-items-start justify-content-between gap-3">
         <div>
           <div class="dashboard-section-eyebrow">
-            Recent Transactions
+            Transaksi Terbaru
           </div>
           <h3 class="dashboard-section-title">
             5 transaksi gadai terbaru
@@ -375,10 +288,7 @@
           </p>
         </div>
 
-        <div
-          v-if="latestTransaction"
-          class="dashboard-section-highlight"
-        >
+        <div v-if="latestTransaction" class="dashboard-section-highlight">
           {{ formatMiniDate(latestTransaction.transactionDate) }}
         </div>
       </div>
@@ -395,10 +305,7 @@
         </div>
       </div>
 
-      <div
-        v-if="recentTransactions.length"
-        class="table-responsive dashboard-transaction-table-wrap"
-      >
+      <div v-if="recentTransactions.length" class="table-responsive dashboard-transaction-table-wrap">
         <table class="table align-middle mb-0 dashboard-transaction-table">
           <thead>
             <tr>
@@ -411,15 +318,9 @@
             </tr>
           </thead>
           <tbody>
-            <tr
-              v-for="transaction in recentTransactions"
-              :key="transaction.key"
-            >
+            <tr v-for="transaction in recentTransactions" :key="transaction.key">
               <td>
-                <span
-                  class="dashboard-transaction-badge"
-                  :class="getTransactionTypeClass(transaction.type)"
-                >
+                <span class="dashboard-transaction-badge" :class="getTransactionTypeClass(transaction.type)">
                   {{ transaction.type }}
                 </span>
               </td>
@@ -437,15 +338,9 @@
         </table>
       </div>
 
-      <LocalDbFeedbackStateComponent
-        v-else
-        state="empty"
-        title="Belum ada transaksi terbaru"
+      <LocalDbFeedbackStateComponent v-else state="empty" title="Belum ada transaksi terbaru"
         description="Tabel ini akan menampilkan lima transaksi terakhir dari database lokal."
-        note="Data akan terisi setelah pembayaran, perpanjangan, atau lelang mulai tercatat."
-        :framed="false"
-        compact
-      />
+        note="Data akan terisi setelah pembayaran, perpanjangan, atau lelang mulai tercatat." :framed="false" compact />
     </section>
   </section>
 </template>

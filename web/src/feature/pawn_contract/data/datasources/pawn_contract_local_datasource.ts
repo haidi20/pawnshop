@@ -229,6 +229,8 @@ export class PawnContractLocalDatasource {
         );
         const branches = this.buildBranchReferences(activeBranchRows, cashAccountRows);
         const defaultBranchId = branches[0]?.id ?? null;
+        const defaultBranchRow = activeBranchRows.find(b => b.id === defaultBranchId);
+
         const customers = this.buildCustomerReferences(customerRows, contactRows, documentRows);
         const itemPresets = this.buildItemPresets(
             itemTypeRows,
@@ -243,7 +245,9 @@ export class PawnContractLocalDatasource {
         return {
             nextContractNumber: createGeneratedContractNumber({
                 existingContractNumbers: contractRows.map((row) => row.contract_number),
-                contractDate: defaultContractDate
+                contractDate: defaultContractDate,
+                companyId: defaultBranchRow?.company_id ?? 1,
+                branchNumber: defaultBranchRow?.branch_number ?? '01'
             }),
             defaultBranchId,
             defaultContractDate,

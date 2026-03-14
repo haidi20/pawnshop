@@ -212,7 +212,7 @@
     <PawnContractViewModalComponent
       :is-open="selectedContractIdForView !== null"
       :contract-id="selectedContractIdForView"
-      :branch-name="selectedActionRow?.branchName"
+      :branch-name="selectedBranchNameForView"
       @close="closeViewModal()"
     />
 
@@ -314,6 +314,7 @@ const pawnContractNasabahTabKey = PawnContractNasabahTabKeyEnum;
 const isFilterModalOpen = ref(false);
 const selectedActionRow = ref<PawnContractSummaryModel | null>(null);
 const selectedContractIdForView = ref<number | null>(null);
+const selectedBranchNameForView = ref<string>('');
 
 const {
   formatCurrency,
@@ -343,10 +344,12 @@ const closeActionModal = (): void => {
 
 const openViewModal = (id: number): void => {
   selectedContractIdForView.value = id;
+  selectedBranchNameForView.value = selectedActionRow.value?.branchName ?? '';
 };
 
 const closeViewModal = (): void => {
   selectedContractIdForView.value = null;
+  selectedBranchNameForView.value = '';
 };
 
 const handleAction = (key: string): void => {

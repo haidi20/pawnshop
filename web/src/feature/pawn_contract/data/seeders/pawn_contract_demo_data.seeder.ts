@@ -51,7 +51,7 @@ import {
     readAuthPortalStoredSession
 } from '@feature/auth_portal/util/auth_portal_session';
 
-export const PAWN_CONTRACT_DEMO_DATASET_VERSION = 'pawn-contract-demo-1-v3';
+export const PAWN_CONTRACT_DEMO_DATASET_VERSION = 'pawn-contract-demo-1-v2';
 export const PAWN_CONTRACT_DEMO_MIN_CONTRACT_COUNT = 1;
 
 export const DEMO_SEED_STORAGE_KEY = 'pawnshop.demo_seed.pawn_contract.version';
@@ -1064,9 +1064,12 @@ export const createPawnContractDemoSeedDataset = (
             updated_at: updatedAt
         });
 
+        const branchNumber = padNumber(branch.id, 2);
+        const yearMonth = contractDate.slice(0, 7).replace('-', '');
+
         contracts.push({
             id: contractId,
-            contract_number: `CNTR-${contractDate.slice(0, 7).replace('-', '')}-${padNumber(contractId, 4)}`,
+            contract_number: `${companyId}-${yearMonth}-${branchNumber}-${padNumber(contractId, 4)}`,
             branch_id: branch.id,
             customer_id: customerId,
             contract_date: contractDate,

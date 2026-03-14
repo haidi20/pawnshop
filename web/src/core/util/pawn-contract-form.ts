@@ -352,13 +352,16 @@ export const formatContractSequence = (value: number): string => String(value).p
 
 /**
  * Membuat nomor kontrak baru secara otomatis berdasarkan tanggal dan urutan terakhir.
- * Format: CNTR-YYYYMM-XXXX (contoh: CNTR-202603-0001).
+ * Format: [CompanyID]-[YYYYMM]-[BranchNumber]-[Sequence] (contoh: 1-202603-01-0001).
  */
 export const createGeneratedContractNumber = (params: {
     existingContractNumbers: string[];
     contractDate: string;
+    companyId: number;
+    branchNumber: string;
 }): string => {
-    const prefix = `CNTR-${params.contractDate.slice(0, 7).replace('-', '')}-`;
+    const yearMonth = params.contractDate.slice(0, 7).replace('-', '');
+    const prefix = `${params.companyId}-${yearMonth}-${params.branchNumber}-`;
     const maxSequence = params.existingContractNumbers
         .filter((num) => num.startsWith(prefix))
         .map((num) => Number(num.slice(prefix.length)))

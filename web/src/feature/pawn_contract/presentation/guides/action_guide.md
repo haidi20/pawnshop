@@ -1,5 +1,11 @@
 # aturan tombol aksi pada tabel gadai
 
+## form gadai
+D:\projects\pawnshop\web\src\feature\pawn_contract\presentation\views\pawn_contract_form.view.vue
+
+- Format Code Gadai: Berhasil diverifikasi mengikuti format [ID Perusahaan]-[YYYYMM]-[Nomor Cabang]-[Urutan] (Contoh: 1-202603-01-0001).
+-
+
 ## aksi bayar biaya titip
 D:\projects\pawnshop\web\src\feature\pawn_contract\presentation\views\pawn_contract_storage_fee.view.vue
 

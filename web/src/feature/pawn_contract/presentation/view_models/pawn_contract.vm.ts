@@ -557,6 +557,8 @@ export const pawnContractViewModel = defineStore('pawnContractStore', () => {
         checklistLabel: row.checklistLabel
     });
 
+    const canAccessAllBranches = computed(() => branchAccess.value.canAccessAllBranches);
+
     const displayedNasabahSectionTables = createSectionTableRegistry<
         PawnContractSummaryModel,
         PawnContractNasabahSectionModel,
@@ -569,7 +571,9 @@ export const pawnContractViewModel = defineStore('pawnContractStore', () => {
     >(ringkasanSections, ringkasanTableFields, mapRingkasanTableRow);
     const ringkasanPendapatanTableVm = createClientTableVm(
         ringkasanPendapatanRows,
-        ringkasanPendapatanTableFields,
+        canAccessAllBranches.value
+            ? ringkasanPendapatanTableFields
+            : ringkasanPendapatanTableFields.filter((f) => f.key !== 'branchName'),
         mapRingkasanPendapatanTableRow
     );
     const ajtDataTableVm = createClientTableVm(ajtRows, ajtTableFields, mapAjtTableRow);
@@ -590,7 +594,9 @@ export const pawnContractViewModel = defineStore('pawnContractStore', () => {
     );
     const locationDataTableVm = createClientTableVm(
         locationRows,
-        locationTableFields,
+        canAccessAllBranches.value
+            ? locationTableFields
+            : locationTableFields.filter((f) => f.key !== 'branchName'),
         mapLocationTableRow
     );
     const maintenanceDataTableVm = createClientTableVm(
@@ -598,7 +604,6 @@ export const pawnContractViewModel = defineStore('pawnContractStore', () => {
         maintenanceTableFields,
         mapMaintenanceTableRow
     );
-    const canAccessAllBranches = computed(() => branchAccess.value.canAccessAllBranches);
     const isBranchLocked = computed(() => !branchAccess.value.canAccessAllBranches);
     const activeTableFilter = computed(
         (): PawnContractIndexTabFilterModel => state.tableFilters.value[state.activeIndexTab.value]

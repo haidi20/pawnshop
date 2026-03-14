@@ -42,10 +42,10 @@
                                     {{ formValue.termDays }} Hari
                                 </div>
                             </div>
-                            <div class="col-md-4">
-                                <label class="view-modal__label">Cabang Terdaftar</label>
+                            <div v-if="isOwner" class="col-md-4">
+                                <label class="view-modal__label">Cabang</label>
                                 <div class="view-modal__value">
-                                    {{ branchName }}
+                                    {{ branchName || '-' }}
                                 </div>
                             </div>
                         </div>
@@ -199,6 +199,8 @@ import { formatCurrencyValueForHumans, formatDateValueForHumans } from '@core/ut
 import BaseModalComponent from '@core/presentation/components/base_modal.component.vue';
 import type { PawnContractFormValueModel } from '@feature/pawn_contract/domain/models';
 import { pawnContractRepository } from '@feature/pawn_contract/presentation/di/pawn_contract.di';
+import { authPortalViewModel } from '@feature/auth_portal/presentation/view_models/auth_portal.vm';
+import { storeToRefs } from 'pinia';
 
 const props = defineProps<{
     isOpen: boolean;
@@ -212,6 +214,11 @@ const emit = defineEmits<{
 
 const isLoading = ref(false);
 const formValue = ref<PawnContractFormValueModel | null>(null);
+
+const authVm = authPortalViewModel();
+const { currentSession } = storeToRefs(authVm);
+
+const isOwner = computed(() => currentSession.value?.user.role === 'owner');
 
 const formatCurrency = (val: number) => formatCurrencyValueForHumans(val);
 const formatDate = (val: string) => formatDateValueForHumans(val);
