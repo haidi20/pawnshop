@@ -2,7 +2,7 @@ import { createFeatureDbTable } from '@core/data/datasources/db/feature_db.types
 
 export interface AuctionTransactionsRow {
     id: number;
-    company_id?: number | null;
+    company_id: number | null;
     contract_id: number;
     auction_date: string;
     overdue_amount: number;
@@ -20,7 +20,6 @@ export const auctionTransactionsTable = createFeatureDbTable<AuctionTransactions
     tableName: 'auction_transactions',
     collectionName: 'auction_transactions',
     primaryKey: 'id',
-    seedPath: '/dummies/auction_transactions.dummy.json',
     columns: [
         { name: 'id', dataType: 'number', nullable: false, sqlType: 'BIGINT UNSIGNED' },
         { name: 'company_id', dataType: 'number', nullable: true, sqlType: 'BIGINT UNSIGNED' },

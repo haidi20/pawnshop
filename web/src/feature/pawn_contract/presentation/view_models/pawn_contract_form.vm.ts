@@ -856,7 +856,8 @@ export const pawnContractFormViewModel = defineStore('pawnContractFormStore', ()
      * Navigasi kembali ke daftar data gadai.
      */
     const goToList = async (): Promise<void> => {
-        await router.push('/pawn-contracts/list');
+        // Redirection to the actual list section default route
+        await router.push('/pawn-contracts/list/nasabah-gadai');
     };
 
     /**
@@ -882,7 +883,12 @@ export const pawnContractFormViewModel = defineStore('pawnContractFormStore', ()
                 result
             });
 
-            await showSuccessMessage(successMessage.title, successMessage.message);
+            // Trigger non-blocking toast and immediately go back to list
+            void showSuccessMessage(successMessage.title, successMessage.message, { 
+                timer: 2000,
+                position: 'top-end'
+            });
+            
             await goToList();
         } catch (error) {
             const failureMessage = buildSaveFailureMessage({

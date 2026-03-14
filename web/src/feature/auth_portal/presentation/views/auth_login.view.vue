@@ -55,24 +55,26 @@
               </h2>
             </div>
 
-            <button
-              class="auth-portal__info-toggle"
-              type="button"
-              :aria-expanded="isDemoInfoModalOpen"
-              title="Lihat akun demo"
-              @click="openDemoInfoModal"
-            >
-              <i class="bi bi-info-lg" />
-            </button>
+            <div class="d-flex gap-2">
+              <button
+                class="auth-portal__info-toggle"
+                type="button"
+                :aria-expanded="isDemoInfoModalOpen"
+                title="Lihat akun demo"
+                @click="openDemoInfoModal"
+              >
+                <i class="bi bi-info-lg" />
+              </button>
 
-            <button
-              class="auth-portal__info-toggle"
-              type="button"
-              title="Reset database lokal"
-              @click="resetLocalDatabase"
-            >
-              <i class="bi bi-arrow-clockwise" />
-            </button>
+              <button
+                class="auth-portal__info-toggle"
+                type="button"
+                title="Reset database lokal"
+                @click="resetLocalDatabase"
+              >
+                <i class="bi bi-arrow-clockwise" />
+              </button>
+            </div>
           </div>
 
           <p class="auth-portal__subtitle">
@@ -242,6 +244,7 @@ import { RouterLink, useRoute, useRouter } from 'vue-router';
 import '@feature/auth_portal/presentation/styles/auth_portal.scss';
 import { authPortalViewModel } from '@feature/auth_portal/presentation/view_models/auth_portal.vm';
 import { AUTH_PORTAL_DEMO_PASSWORD, authPortalDemoCompanies } from '@feature/auth_portal/util/auth_portal_demo_accounts';
+import Swal from 'sweetalert2';
 
 const router = useRouter();
 const route = useRoute();
@@ -289,9 +292,21 @@ const submitLogin = async (): Promise<void> => {
     }
 };
 
-const resetLocalDatabase = (): void => {
-  localStorage.clear();
-  window.location.reload();
+const resetLocalDatabase = async (): Promise<void> => {
+  const result = await Swal.fire({
+    icon: 'warning',
+    title: 'Reset Database Lokal?',
+    text: 'Semua data lokal akan dihapus dan data demo akan dibuat ulang. Lanjutkan?',
+    showCancelButton: true,
+    confirmButtonText: 'Ya, Reset',
+    cancelButtonText: 'Batal',
+    confirmButtonColor: '#d33'
+  });
+
+  if (result.isConfirmed) {
+    localStorage.clear();
+    window.location.reload();
+  }
 };
 
 onMounted(() => {

@@ -6,7 +6,7 @@ export interface DashboardChartItemModel {
 
 export interface DashboardRecentTransactionModel {
     key: string;
-    type: 'Pembayaran' | 'Perpanjangan' | 'Lelang';
+    type: 'Gadai' | 'Pembayaran' | 'Perpanjangan' | 'Lelang';
     reference: string;
     contractId: number;
     amount: number;
@@ -16,7 +16,7 @@ export interface DashboardRecentTransactionModel {
 
 export interface DashboardLinePointModel {
     key: string;
-    type: 'Pembayaran' | 'Perpanjangan' | 'Lelang';
+    type: 'Gadai' | 'Pembayaran' | 'Perpanjangan' | 'Lelang';
     label: string;
     amount: number;
     transactionDate: string;
@@ -26,14 +26,17 @@ export interface DashboardDataModel {
     chartItems: DashboardChartItemModel[];
     lineSeries: DashboardLinePointModel[];
     recentTransactions: DashboardRecentTransactionModel[];
+    contractCount: number;
 }
 
 export const createDashboardDataModel = (params: {
     chartItems: DashboardChartItemModel[];
     lineSeries: DashboardLinePointModel[];
     recentTransactions: DashboardRecentTransactionModel[];
+    contractCount: number;
 }): DashboardDataModel => ({
     chartItems: params.chartItems,
     lineSeries: params.lineSeries,
-    recentTransactions: params.recentTransactions
+    recentTransactions: params.recentTransactions,
+    contractCount: params.contractCount
 });

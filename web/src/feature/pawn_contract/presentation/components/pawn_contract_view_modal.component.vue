@@ -163,7 +163,7 @@
                                     }}</strong>
                             </article>
                             <article class="pawn-contract-page__total-item py-0">
-                                <span class="view-modal__label mb-1">Siklus Biaya Titip</span>
+                                <span class="view-modal__label mb-1">Skema Biaya Titip</span>
                                 <strong class="text-dark">{{ formValue.paymentOptionDays }} Hari</strong>
                             </article>
                         </div>

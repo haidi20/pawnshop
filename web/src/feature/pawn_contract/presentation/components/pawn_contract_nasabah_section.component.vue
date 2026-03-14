@@ -92,6 +92,12 @@
                 </button>
               </td>
               <td
+                class="fw-semibold"
+                data-label="Code Gadai"
+              >
+                {{ item.source.contract.contractNumber }}
+              </td>
+              <td
                 class="pawn-contract-page__cell-primary"
                 data-label="Nama"
               >

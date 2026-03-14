@@ -8,7 +8,8 @@ export class DashboardLocalDatasource {
         return createDashboardDataModel({
             chartItems: snapshot.chartItems,
             lineSeries: snapshot.lineSeries,
-            recentTransactions: snapshot.recentTransactions
+            recentTransactions: snapshot.recentTransactions,
+            contractCount: snapshot.contractCount
         });
     }
 }

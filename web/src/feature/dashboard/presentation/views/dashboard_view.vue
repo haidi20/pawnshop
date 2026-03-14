@@ -36,6 +36,20 @@
             <div class="col">
               <article class="dashboard-metric-card h-100">
                 <div class="dashboard-metric-label">
+                  Gadai Aktif
+                </div>
+                <div class="dashboard-metric-value">
+                  {{ formatCount(contractCount) }}
+                </div>
+                <div class="dashboard-metric-note">
+                  Total kontrak gadai aktif saat ini.
+                </div>
+              </article>
+            </div>
+
+            <div class="col">
+              <article class="dashboard-metric-card h-100">
+                <div class="dashboard-metric-label">
                   Total Transaksi
                 </div>
                 <div class="dashboard-metric-value">
@@ -497,6 +511,7 @@ const getCountByKey = (key: string): number =>
 const totalTransactionCount = computed(() =>
   chartItems.value.reduce((total, item) => total + item.count, 0)
 );
+const contractCount = computed(() => data.value?.contractCount ?? 0);
 const paymentCount = computed(() => getCountByKey('contract_payments'));
 const extensionCount = computed(() => getCountByKey('contract_extensions'));
 const auctionCount = computed(() => getCountByKey('auction_transactions'));
@@ -611,6 +626,10 @@ const typeShare = (count: number): string => `${typePercentage(count).toFixed(1)
 const getTransactionTypeClass = (
   type: DashboardLinePointModel['type'] | DashboardRecentTransactionModel['type']
 ): string => {
+  if (type === 'Gadai') {
+    return 'is-pawn';
+  }
+
   if (type === 'Pembayaran') {
     return 'is-payment';
   }
@@ -623,6 +642,10 @@ const getTransactionTypeClass = (
 };
 
 const getBreakdownClass = (key: string): string => {
+  if (key === 'pawn_contracts') {
+    return 'is-pawn';
+  }
+
   if (key === 'contract_payments') {
     return 'is-payment';
   }

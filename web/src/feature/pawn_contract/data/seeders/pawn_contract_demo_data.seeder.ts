@@ -41,13 +41,18 @@ import {
     type PawnItemsRow
 } from '@feature/pawn_contract/data/db';
 import {
+    auctionTransactionsDao,
+    contractExtensionsDao,
+    contractPaymentsDao
+} from '@feature/pawn_transaction/data/db';
+import {
     getFeatureStorageScope,
     isCurrentAuthPortalDemoCompany,
     readAuthPortalStoredSession
 } from '@feature/auth_portal/util/auth_portal_session';
 
-export const PAWN_CONTRACT_DEMO_DATASET_VERSION = 'pawn-contract-demo-500-v2';
-export const PAWN_CONTRACT_DEMO_MIN_CONTRACT_COUNT = 500;
+export const PAWN_CONTRACT_DEMO_DATASET_VERSION = 'pawn-contract-demo-1-v3';
+export const PAWN_CONTRACT_DEMO_MIN_CONTRACT_COUNT = 1;
 
 export const DEMO_SEED_STORAGE_KEY = 'pawnshop.demo_seed.pawn_contract.version';
 const ELECTRONIC_CATEGORY_ID = 2;
@@ -942,7 +947,8 @@ const buildContractNotes = (params: {
 
 export const createPawnContractDemoSeedDataset = (
     referenceDate = getTodayDateValue(),
-    companyId: number | null = null
+    companyId: number | null = null,
+    limit: number = PAWN_CONTRACT_DEMO_MIN_CONTRACT_COUNT
 ): PawnContractDemoSeedDataset => {
     const profile = resolveDemoCompanySeedProfile(companyId);
     const effectiveReferenceDate = addDays(referenceDate, profile.referenceDateOffsetDays);
@@ -970,7 +976,7 @@ export const createPawnContractDemoSeedDataset = (
     let nextIssueId = 1;
     let nextMovementId = 1;
 
-    for (let contractIndex = 0; contractIndex < PAWN_CONTRACT_DEMO_MIN_CONTRACT_COUNT; contractIndex += 1) {
+    for (let contractIndex = 0; contractIndex < limit; contractIndex += 1) {
         const contractId = contractIndex + 1;
         const customerId = contractId;
         const branch = resolveDemoBranch(branches, contractIndex, profile);
@@ -1321,7 +1327,10 @@ export const ensurePawnContractDemoDataSeed = async (forceReseed = false): Promi
         pawnItemsDao.replaceAll(dataset.items),
         pawnItemAccessoriesDao.replaceAll(dataset.accessories),
         pawnItemIssuesDao.replaceAll(dataset.issues),
-        pawnItemLocationMovementsDao.replaceAll(dataset.locationMovements)
+        pawnItemLocationMovementsDao.replaceAll(dataset.locationMovements),
+        contractPaymentsDao.replaceAll([]),
+        contractExtensionsDao.replaceAll([]),
+        auctionTransactionsDao.replaceAll([])
     ]);
 
     writeStoredSeedVersion();

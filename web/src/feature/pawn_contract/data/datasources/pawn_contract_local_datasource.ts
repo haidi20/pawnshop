@@ -8,7 +8,8 @@ import {
     normalizePawnContractCustomerName,
     pawnContractIdentityOptions,
     pawnContractPaymentOptions,
-    pawnContractTermOptions
+    pawnContractTermOptions,
+    createGeneratedContractNumber
 } from '@core/util/pawn-contract-form';
 import {
     branchCashAccountsDao,
@@ -110,8 +111,6 @@ const createTimestamp = (): string => new Date().toISOString().slice(0, 19).repl
 
 const getNextId = <TRow extends { id: number }>(rows: TRow[]): number =>
     rows.reduce((maxValue, row) => Math.max(maxValue, row.id), 0) + 1;
-
-const formatContractSequence = (value: number): string => String(value).padStart(4, '0');
 
 const supportedIdentityTypes = new Set<PawnContractIdentityTypeModel>([
     PawnContractIdentityTypeEnum.Ktp,
@@ -242,7 +241,10 @@ export class PawnContractLocalDatasource {
         const defaultContractDate = getTodayDateValue();
 
         return {
-            nextContractNumber: this.createGeneratedContractNumber(contractRows, defaultContractDate),
+            nextContractNumber: createGeneratedContractNumber({
+                existingContractNumbers: contractRows.map((row) => row.contract_number),
+                contractDate: defaultContractDate
+            }),
             defaultBranchId,
             defaultContractDate,
             termOptions: pawnContractTermOptions,
@@ -326,7 +328,8 @@ export class PawnContractLocalDatasource {
                 PawnContractIdentityTypeEnum.Ktp,
             customerIdentityNumber: primaryDocument?.document_number ?? '',
             customerBirthDate: customerRow.birth_date ?? DEFAULT_PAWN_CONTRACT_CUSTOMER_BIRTH_DATE,
-            hasPayments: (await contractPaymentsDao.getAll()).some(p => p.contract_id === params.contractId)
+            hasPayments: (await contractPaymentsDao.getAll()).some(p => p.contract_id === params.contractId),
+            storageFeePaymentCount: (await contractPaymentsDao.getAll()).filter(p => p.contract_id === params.contractId && p.payment_type === 'storage_fee').length
         };
     }
 
@@ -930,17 +933,6 @@ export class PawnContractLocalDatasource {
         });
 
         return result;
-    }
-
-    private createGeneratedContractNumber(contractRows: PawnContractsRow[], currentDate: string): string {
-        const prefix = `CNTR-${currentDate.slice(0, 7).replace('-', '')}-`;
-        const maxSequence = contractRows
-            .filter((row) => row.contract_number.startsWith(prefix))
-            .map((row) => Number(row.contract_number.slice(prefix.length)))
-            .filter((value) => Number.isFinite(value))
-            .reduce((maxValue, value) => Math.max(maxValue, value), 0);
-
-        return `${prefix}${formatContractSequence(maxSequence + 1)}`;
     }
 
     private buildContractNote(payload: SavePawnContractPayloadModel): string {

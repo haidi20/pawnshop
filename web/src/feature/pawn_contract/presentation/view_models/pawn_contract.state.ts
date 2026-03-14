@@ -111,6 +111,7 @@ export type PawnContractTableField = {
 
 export const nasabahTableFields = [
     { key: 'actions', label: 'Aksi' },
+    { key: 'contractNumber', label: 'Code Gadai' },
     { key: 'customerName', label: 'Nama' },
     { key: 'customerPhone', label: 'No. Telp' },
     { key: 'customerIdentity', label: 'ID' },

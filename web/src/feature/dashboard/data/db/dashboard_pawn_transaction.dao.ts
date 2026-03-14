@@ -13,13 +13,14 @@ import type {
     DashboardLinePointModel,
     DashboardRecentTransactionModel
 } from '@feature/dashboard/domain/models';
-import { pawnContractsDao } from '@feature/pawn_contract/data/db';
+import { pawnContractsDao, type PawnContractsRow } from '@feature/pawn_contract/data/db';
 import { ensurePawnContractDemoDataSeed } from '@feature/pawn_contract/data/seeders/pawn_contract_demo_data.seeder';
 
 interface DashboardPawnTransactionSnapshot {
     chartItems: DashboardChartItemModel[];
     lineSeries: DashboardLinePointModel[];
     recentTransactions: DashboardRecentTransactionModel[];
+    contractCount: number;
 }
 
 const toTimestamp = (value: string): number => {
@@ -28,10 +29,21 @@ const toTimestamp = (value: string): number => {
 };
 
 const buildTransactions = (params: {
+    pawnContractsRows: PawnContractsRow[];
     contractPaymentsRows: ContractPaymentsRow[];
     contractExtensionsRows: ContractExtensionsRow[];
     auctionTransactionsRows: AuctionTransactionsRow[];
 }): DashboardRecentTransactionModel[] => {
+    const contracts = params.pawnContractsRows.map<DashboardRecentTransactionModel>((row) => ({
+        key: `contract-${row.id}`,
+        type: 'Gadai',
+        reference: row.contract_number,
+        contractId: row.id,
+        amount: row.disbursed_value,
+        transactionDate: row.contract_date,
+        description: `Pencairan gadai baru`
+    }));
+
     const contractPayments = params.contractPaymentsRows.map<DashboardRecentTransactionModel>((row) => ({
         key: `payment-${row.id}`,
         type: 'Pembayaran',
@@ -62,57 +74,44 @@ const buildTransactions = (params: {
         description: `Refund ${row.refund_amount}`
     }));
 
-    return [...contractPayments, ...contractExtensions, ...auctionTransactions].sort(
+    return [...contracts, ...contractPayments, ...contractExtensions, ...auctionTransactions].sort(
         (left, right) => toTimestamp(right.transactionDate) - toTimestamp(left.transactionDate)
     );
 };
 
 export class DashboardPawnTransactionDao {
-    private async ensureMinimumSeed(limit: number): Promise<void> {
-        await seedFeatureTablesIfEmpty('DashboardPawnTransactionDao', [
-            contractPaymentsDao,
-            contractExtensionsDao,
-            auctionTransactionsDao
-        ]);
-
-        const [contractPaymentsRows, contractExtensionsRows, auctionTransactionsRows] = await Promise.all([
-            contractPaymentsDao.getAll(),
-            contractExtensionsDao.getAll(),
-            auctionTransactionsDao.getAll()
-        ]);
-
-        const totalRows =
-            contractPaymentsRows.length + contractExtensionsRows.length + auctionTransactionsRows.length;
-
-        if (totalRows >= limit) {
-            return;
-        }
-
-        await Promise.all([
-            contractPaymentsDao.seed(),
-            contractExtensionsDao.seed(),
-            auctionTransactionsDao.seed()
-        ]);
-    }
-
     async getSnapshot(linePointLimit = 10, recentTransactionLimit = 5): Promise<DashboardPawnTransactionSnapshot> {
-        await this.ensureMinimumSeed(linePointLimit);
         await ensurePawnContractDemoDataSeed();
         await seedFeatureTablesIfEmpty('DashboardPawnTransactionDao', [pawnContractsDao]);
 
+        const branchAccess = getCurrentAuthPortalBranchAccess();
+        let allowedContracts: PawnContractsRow[] = [];
+        
+        if (branchAccess.canAccessAllBranches) {
+            allowedContracts = await pawnContractsDao.getAll();
+        } else if (branchAccess.assignedBranchId !== null) {
+            allowedContracts = await pawnContractsDao.findByFilters({ branchId: branchAccess.assignedBranchId });
+        }
+
+        const contractCount = allowedContracts.length;
+
         const [contractPaymentsRows, contractExtensionsRows, auctionTransactionsRows] = await Promise.all([
             contractPaymentsDao.getAll(),
             contractExtensionsDao.getAll(),
             auctionTransactionsDao.getAll()
         ]);
 
-        const scopedRows = await this.applyBranchAccess({
-            contractPaymentsRows,
-            contractExtensionsRows,
-            auctionTransactionsRows
-        });
+        const scopedRows = this.applyContractIdScoping(
+            new Set(allowedContracts.map((row) => row.id)),
+            {
+                contractPaymentsRows,
+                contractExtensionsRows,
+                auctionTransactionsRows
+            }
+        );
 
         const transactions = buildTransactions({
+            pawnContractsRows: allowedContracts,
             contractPaymentsRows: scopedRows.contractPaymentsRows,
             contractExtensionsRows: scopedRows.contractExtensionsRows,
             auctionTransactionsRows: scopedRows.auctionTransactionsRows
@@ -131,42 +130,29 @@ export class DashboardPawnTransactionDao {
 
         return {
             chartItems: [
+                { key: 'pawn_contracts', label: 'Gadai Baru', count: allowedContracts.length },
                 { key: 'contract_payments', label: 'Pembayaran', count: scopedRows.contractPaymentsRows.length },
                 { key: 'contract_extensions', label: 'Perpanjangan', count: scopedRows.contractExtensionsRows.length },
                 { key: 'auction_transactions', label: 'Lelang', count: scopedRows.auctionTransactionsRows.length }
             ],
             lineSeries: latestLineTransactions,
-            recentTransactions: transactions.slice(0, recentTransactionLimit)
+            recentTransactions: transactions.slice(0, recentTransactionLimit),
+            contractCount
         };
     }
 
-    private async applyBranchAccess(params: {
+    private applyContractIdScoping(
+        allowedContractIds: Set<number>,
+        params: {
+            contractPaymentsRows: ContractPaymentsRow[];
+            contractExtensionsRows: ContractExtensionsRow[];
+            auctionTransactionsRows: AuctionTransactionsRow[];
+        }
+    ): {
         contractPaymentsRows: ContractPaymentsRow[];
         contractExtensionsRows: ContractExtensionsRow[];
         auctionTransactionsRows: AuctionTransactionsRow[];
-    }): Promise<{
-        contractPaymentsRows: ContractPaymentsRow[];
-        contractExtensionsRows: ContractExtensionsRow[];
-        auctionTransactionsRows: AuctionTransactionsRow[];
-    }> {
-        const branchAccess = getCurrentAuthPortalBranchAccess();
-
-        if (branchAccess.canAccessAllBranches) {
-            return params;
-        }
-
-        if (branchAccess.assignedBranchId === null) {
-            return {
-                contractPaymentsRows: [],
-                contractExtensionsRows: [],
-                auctionTransactionsRows: []
-            };
-        }
-
-        const allowedContractIds = new Set(
-            (await pawnContractsDao.findByFilters({ branchId: branchAccess.assignedBranchId })).map((row) => row.id)
-        );
-
+    } {
         return {
             contractPaymentsRows: params.contractPaymentsRows.filter((row) => allowedContractIds.has(row.contract_id)),
             contractExtensionsRows: params.contractExtensionsRows.filter((row) => allowedContractIds.has(row.contract_id)),

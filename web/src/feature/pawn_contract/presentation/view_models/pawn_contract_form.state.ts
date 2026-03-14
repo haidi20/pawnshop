@@ -196,7 +196,8 @@ export const createInitialPawnContractFormValue = (): PawnContractFormValueModel
     customerIdentityType: PawnContractIdentityTypeEnum.Ktp,
     customerIdentityNumber: '',
     customerBirthDate: DEFAULT_PAWN_CONTRACT_CUSTOMER_BIRTH_DATE,
-    hasPayments: false
+    hasPayments: false,
+    storageFeePaymentCount: 0
 });
 
 export const createInitialPawnContractFormFieldErrors = (): PawnContractFormFieldErrorMap => ({
@@ -225,7 +226,8 @@ export const createInitialPawnContractFormFieldErrors = (): PawnContractFormFiel
     customerIdentityType: null,
     customerIdentityNumber: null,
     customerBirthDate: null,
-    hasPayments: null
+    hasPayments: null,
+    storageFeePaymentCount: null
 });
 
 export const createInitialPawnContractTouchedFields = (): PawnContractFormTouchedFieldMap => ({
@@ -254,7 +256,8 @@ export const createInitialPawnContractTouchedFields = (): PawnContractFormTouche
     customerIdentityType: false,
     customerIdentityNumber: false,
     customerBirthDate: false,
-    hasPayments: false
+    hasPayments: false,
+    storageFeePaymentCount: false
 });
 
 export const createPawnContractFormState = (): IPawnContractFormState => ({

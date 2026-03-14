@@ -344,3 +344,25 @@ export const normalizePawnContractCustomerName = (value: string): string =>
  * Memastikan input tanggal tetap dalam format YYYY-MM-DD.
  */
 export const ensureDateInputValue = (value: string): string => normalizeDateInput(value);
+
+/**
+ * Memformat nomor urut kontrak menjadi 4 digit (misal: 1 -> 0001).
+ */
+export const formatContractSequence = (value: number): string => String(value).padStart(4, '0');
+
+/**
+ * Membuat nomor kontrak baru secara otomatis berdasarkan tanggal dan urutan terakhir.
+ * Format: CNTR-YYYYMM-XXXX (contoh: CNTR-202603-0001).
+ */
+export const createGeneratedContractNumber = (params: {
+    existingContractNumbers: string[];
+    contractDate: string;
+}): string => {
+    const prefix = `CNTR-${params.contractDate.slice(0, 7).replace('-', '')}-`;
+    const maxSequence = params.existingContractNumbers
+        .filter((num) => num.startsWith(prefix))
+        .map((num) => Number(num.slice(prefix.length)))
+        .reduce((max, current) => Math.max(max, isNaN(current) ? 0 : current), 0);
+
+    return `${prefix}${formatContractSequence(maxSequence + 1)}`;
+};

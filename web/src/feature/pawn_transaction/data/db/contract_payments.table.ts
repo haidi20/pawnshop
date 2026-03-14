@@ -2,7 +2,7 @@ import { createFeatureDbTable } from '@core/data/datasources/db/feature_db.types
 
 export interface ContractPaymentsRow {
     id: number;
-    company_id?: number | null;
+    company_id: number | null;
     contract_id: number;
     payment_type: string;
     payment_reference: string | null;
@@ -19,7 +19,6 @@ export const contractPaymentsTable = createFeatureDbTable<ContractPaymentsRow>({
     tableName: 'contract_payments',
     collectionName: 'contract_payments',
     primaryKey: 'id',
-    seedPath: '/dummies/contract_payments.dummy.json',
     columns: [
         { name: 'id', dataType: 'number', nullable: false, sqlType: 'BIGINT UNSIGNED' },
         { name: 'company_id', dataType: 'number', nullable: true, sqlType: 'BIGINT UNSIGNED' },
