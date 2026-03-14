@@ -30,8 +30,8 @@ export const pawnContractStorageFeeViewModel = defineStore('pawnContractStorageF
         const item = state.row.value.items[0]?.item;
         const prepaidPeriodsCount = item?.specificationJson?.prepaid_storage_periods ?? 0;
         
-        // Calculate total periods based on duration
-        const totalBasePeriods = Math.ceil(termDays / intervalDays);
+        // Calculate total periods based on duration using floor to match the 4 periods for 30/7
+        const totalBasePeriods = Math.floor(termDays / intervalDays);
 
         // Calculate max period (base + overdue)
         const currentMaxPeriod = Math.max(
@@ -66,9 +66,15 @@ export const pawnContractStorageFeeViewModel = defineStore('pawnContractStorageF
     });
 
     const totalSelectedAmount = computed(() => {
-        return selectablePeriods.value
+        const storageFeeSum = selectablePeriods.value
             .filter((p) => state.selectedPeriodIds.value.includes(p.id))
             .reduce((sum, p) => sum + p.amount, 0);
+            
+        const payoffAmount = state.isPayingOff.value && state.row.value?.contract.disbursedValue 
+            ? state.row.value.contract.disbursedValue 
+            : 0;
+
+        return storageFeeSum + payoffAmount;
     });
 
     const remainingAmount = computed(() => {
@@ -92,20 +98,42 @@ export const pawnContractStorageFeeViewModel = defineStore('pawnContractStorageF
     };
 
     const togglePeriod = (id: number | string): void => {
-        const period = selectablePeriods.value.find((p) => p.id === id);
-        if (period?.isPaid) return;
+        const targetPeriod = selectablePeriods.value.find((p) => p.id === id);
+        if (!targetPeriod || targetPeriod.isPaid) return;
 
-        const index = state.selectedPeriodIds.value.indexOf(id);
-        if (index === -1) {
-            state.selectedPeriodIds.value.push(id);
+        // Ensure id is a number for numerical comparison
+        const targetIdNum = typeof id === 'number' ? id : parseInt(id, 10);
+        const isCurrentlySelected = state.selectedPeriodIds.value.includes(id);
+
+        if (!isCurrentlySelected) {
+            // Selecting: select this item and all unpaid items before it
+            const idsToSelect = selectablePeriods.value
+                .filter(p => !p.isPaid)
+                .map(p => p.id)
+                .filter(pId => {
+                    const numId = typeof pId === 'number' ? pId : parseInt(pId as string, 10);
+                    return numId <= targetIdNum;
+                });
+            
+            idsToSelect.forEach(periodId => {
+                if (!state.selectedPeriodIds.value.includes(periodId)) {
+                    state.selectedPeriodIds.value.push(periodId);
+                }
+            });
         } else {
-            state.selectedPeriodIds.value.splice(index, 1);
+            // Unselecting: unselect this item and all items after it
+            state.selectedPeriodIds.value = state.selectedPeriodIds.value.filter(existingId => {
+                const numExistingId = typeof existingId === 'number' ? existingId : parseInt(existingId as string, 10);
+                return numExistingId < targetIdNum;
+            });
+            state.isPayingOff.value = false;
         }
     };
 
     const toggleSelectAll = (): void => {
         if (isAllSelected.value) {
             state.selectedPeriodIds.value = [];
+            state.isPayingOff.value = false;
         } else {
             state.selectedPeriodIds.value = selectablePeriods.value
                 .filter((p) => !p.isPaid)
@@ -113,8 +141,21 @@ export const pawnContractStorageFeeViewModel = defineStore('pawnContractStorageF
         }
     };
 
+    const togglePayoff = (): void => {
+        const newValue = !state.isPayingOff.value;
+        state.isPayingOff.value = newValue;
+        if (newValue) {
+            state.selectedPeriodIds.value = selectablePeriods.value
+                .filter((p) => !p.isPaid)
+                .map((p) => p.id);
+        } else {
+            state.selectedPeriodIds.value = [];
+        }
+    };
+
     const resetSelection = (): void => {
         state.selectedPeriodIds.value = [];
+        state.isPayingOff.value = false;
     };
 
     watch(() => state.row.value, (newRow) => {
@@ -134,6 +175,8 @@ export const pawnContractStorageFeeViewModel = defineStore('pawnContractStorageF
         setRow,
         togglePeriod,
         toggleSelectAll,
-        resetSelection
+        togglePayoff,
+        resetSelection,
+        isPayingOff: state.isPayingOff
     };
 });

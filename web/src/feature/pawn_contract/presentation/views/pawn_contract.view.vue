@@ -206,6 +206,14 @@
       :row="selectedActionRow"
       @close="closeActionModal()"
       @action="handleAction($event)"
+      @view-detail="openViewModal($event)"
+    />
+
+    <PawnContractViewModalComponent
+      :is-open="selectedContractIdForView !== null"
+      :contract-id="selectedContractIdForView"
+      :branch-name="selectedActionRow?.branchName"
+      @close="closeViewModal()"
     />
 
     <PawnContractStorageFeeView
@@ -256,6 +264,7 @@ import PawnContractAuctionSectionComponent from '@feature/pawn_contract/presenta
 import PawnContractRefundSectionComponent from '@feature/pawn_contract/presentation/components/pawn_contract_refund_section.component.vue';
 import PawnContractRingkasanSectionComponent from '@feature/pawn_contract/presentation/components/pawn_contract_ringkasan_section.component.vue';
 import PawnContractStorageFeeView from '@feature/pawn_contract/presentation/views/pawn_contract_storage_fee.view.vue';
+import PawnContractViewModalComponent from '@feature/pawn_contract/presentation/components/pawn_contract_view_modal.component.vue';
 import {
   getPawnContractIndexRouteByKey,
   resolvePawnContractIndexTabFromPath
@@ -304,6 +313,7 @@ const pawnContractIndexTabKey = PawnContractIndexTabKeyEnum;
 const pawnContractNasabahTabKey = PawnContractNasabahTabKeyEnum;
 const isFilterModalOpen = ref(false);
 const selectedActionRow = ref<PawnContractSummaryModel | null>(null);
+const selectedContractIdForView = ref<number | null>(null);
 
 const {
   formatCurrency,
@@ -329,6 +339,14 @@ const openActionModal = (row: PawnContractSummaryModel): void => {
 
 const closeActionModal = (): void => {
   selectedActionRow.value = null;
+};
+
+const openViewModal = (id: number): void => {
+  selectedContractIdForView.value = id;
+};
+
+const closeViewModal = (): void => {
+  selectedContractIdForView.value = null;
 };
 
 const handleAction = (key: string): void => {

@@ -83,6 +83,7 @@ const props = defineProps<{
 const emit = defineEmits<{
   close: [];
   action: [key: PawnContractActionKeyModel];
+  viewDetail: [id: number];
 }>();
 
 const LINK_ACTION_KEYS: PawnContractActionKeyModel[] = ['edit', 'history'];
@@ -100,10 +101,11 @@ const getActionRoute = (key: PawnContractActionKeyModel) => {
   }
 
   switch (key) {
-    case 'edit':
-      return { name: 'PawnContractFormEdit' as const, params: { contractId: props.row.contract.id } };
+    case 'view':
     case 'history':
       return { name: 'PawnContractHistory' as const, params: { contractId: props.row.contract.id } };
+    case 'edit':
+      return { name: 'PawnContractFormEdit' as const, params: { contractId: props.row.contract.id } };
     default:
       return { name: 'PawnContract' as const };
   }
@@ -111,6 +113,8 @@ const getActionRoute = (key: PawnContractActionKeyModel) => {
 
 const getActionIconClass = (key: PawnContractActionKeyModel): string => {
   switch (key) {
+    case 'view':
+      return 'bi bi-eye';
     case 'edit':
       return 'bi bi-pencil-square';
     case 'history':
@@ -129,7 +133,11 @@ const getActionIconClass = (key: PawnContractActionKeyModel): string => {
 };
 
 const handleActionClick = (key: PawnContractActionKeyModel): void => {
-  emit('action', key);
+  if (key === 'view' && props.row) {
+    emit('viewDetail', props.row.contract.id);
+  } else {
+    emit('action', key);
+  }
   emit('close');
 };
 </script>

@@ -38,6 +38,8 @@ export interface IPawnContractFormState {
     validationErrorMessages: Ref<string[]>;
     isStepConfirmationModalOpen: Ref<boolean>;
     isSubmitConfirmationModalOpen: Ref<boolean>;
+    isFormulaModalOpen: Ref<boolean>;
+    isVehicleDailyDisabled: Ref<boolean>;
     activeStep: Ref<1 | 2>;
     lastAutofilledCustomerId: Ref<number | null>;
     isLoading: Ref<boolean>;
@@ -193,7 +195,8 @@ export const createInitialPawnContractFormValue = (): PawnContractFormValueModel
     customerPhone: '',
     customerIdentityType: PawnContractIdentityTypeEnum.Ktp,
     customerIdentityNumber: '',
-    customerBirthDate: DEFAULT_PAWN_CONTRACT_CUSTOMER_BIRTH_DATE
+    customerBirthDate: DEFAULT_PAWN_CONTRACT_CUSTOMER_BIRTH_DATE,
+    hasPayments: false
 });
 
 export const createInitialPawnContractFormFieldErrors = (): PawnContractFormFieldErrorMap => ({
@@ -221,7 +224,8 @@ export const createInitialPawnContractFormFieldErrors = (): PawnContractFormFiel
     customerPhone: null,
     customerIdentityType: null,
     customerIdentityNumber: null,
-    customerBirthDate: null
+    customerBirthDate: null,
+    hasPayments: null
 });
 
 export const createInitialPawnContractTouchedFields = (): PawnContractFormTouchedFieldMap => ({
@@ -249,7 +253,8 @@ export const createInitialPawnContractTouchedFields = (): PawnContractFormTouche
     customerPhone: false,
     customerIdentityType: false,
     customerIdentityNumber: false,
-    customerBirthDate: false
+    customerBirthDate: false,
+    hasPayments: false
 });
 
 export const createPawnContractFormState = (): IPawnContractFormState => ({
@@ -268,6 +273,8 @@ export const createPawnContractFormState = (): IPawnContractFormState => ({
     validationErrorMessages: ref([]),
     isStepConfirmationModalOpen: ref(false),
     isSubmitConfirmationModalOpen: ref(false),
+    isFormulaModalOpen: ref(false),
+    isVehicleDailyDisabled: ref(true),
     activeStep: ref(1),
     lastAutofilledCustomerId: ref(null),
     isLoading: ref(false),

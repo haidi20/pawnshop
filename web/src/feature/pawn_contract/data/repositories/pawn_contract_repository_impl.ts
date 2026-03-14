@@ -14,6 +14,7 @@ import {
     pawnItemLocationMovementsDao,
     pawnItemsDao
 } from '@feature/pawn_contract/data/db';
+import { settingDao } from '@core/data/datasources/db/setting.dao';
 import { PawnContractLocalDatasource } from '@feature/pawn_contract/data/datasources/pawn_contract_local_datasource';
 import { 
     ensurePawnContractDemoDataSeed, 
@@ -421,5 +422,17 @@ export class PawnContractRepositoryImpl implements PawnContractRepository {
         const response = await fetch(`/dummies/${name}.dummy.json`);
         if (!response.ok) throw new Error(`Failed to fetch dummy ${name}`);
         return await response.json();
+    }
+
+    async getSettingBoolean(key: string, defaultValue: boolean): Promise<boolean> {
+        const raw = await settingDao.getValue(key);
+        if (raw === null) {
+            return defaultValue;
+        }
+        return raw === 'true' || raw === '1';
+    }
+
+    async setSettingBoolean(key: string, value: boolean): Promise<void> {
+        await settingDao.setValue(key, value ? 'true' : 'false');
     }
 }

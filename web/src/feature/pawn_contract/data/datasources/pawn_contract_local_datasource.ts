@@ -46,6 +46,8 @@ import {
     type PawnItemLocationMovementsRow,
     type PawnItemsRow
 } from '@feature/pawn_contract/data/db';
+import { DEFAULT_PAWN_CONTRACT_CUSTOMER_BIRTH_DATE } from '@feature/pawn_contract/presentation/view_models/pawn_contract_form.vm.utils';
+import { contractPaymentsDao } from '@feature/pawn_transaction/data/db';
 import { createPawnContractDataFromRows } from '@feature/pawn_contract/data/mappers/pawn_contract.mapper';
 import type {
     PawnContractDataFilterModel,
@@ -323,7 +325,8 @@ export class PawnContractLocalDatasource {
                 (primaryDocument?.document_type as PawnContractFormValueModel['customerIdentityType'] | undefined) ??
                 PawnContractIdentityTypeEnum.Ktp,
             customerIdentityNumber: primaryDocument?.document_number ?? '',
-            customerBirthDate: customerRow.birth_date ?? '2000-01-01'
+            customerBirthDate: customerRow.birth_date ?? DEFAULT_PAWN_CONTRACT_CUSTOMER_BIRTH_DATE,
+            hasPayments: (await contractPaymentsDao.getAll()).some(p => p.contract_id === params.contractId)
         };
     }
 

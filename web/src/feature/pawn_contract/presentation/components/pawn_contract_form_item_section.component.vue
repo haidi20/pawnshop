@@ -89,7 +89,17 @@
           </div>
 
           <div class="col-12 col-md-6 pawn-contract-create-page__metric-field">
-            <label class="form-label">Aturan biaya yang dipakai</label>
+            <div class="d-flex align-items-center gap-1">
+              <label class="form-label mb-0">Aturan biaya yang dipakai</label>
+              <button
+                type="button"
+                class="btn btn-link p-0 text-info lh-1"
+                title="Klik untuk melihat rumus biaya"
+                @click="isRuleModalOpen = true"
+              >
+                <i class="bi bi-info-circle fs-6"></i>
+              </button>
+            </div>
             <div class="pawn-contract-create-page__metric-box">
               <strong>{{ currentPreset?.label ?? '-' }}</strong>
               <span>
@@ -211,11 +221,98 @@
         </div>
       </div>
     </div>
+
+    <!-- Modal Rumus & Aturan Biaya -->
+    <BaseModalComponent
+      :is-open="isRuleModalOpen"
+      size="lg"
+      @close="isRuleModalOpen = false"
+    >
+      <div class="modal-header border-0 pb-0">
+        <h5 class="modal-title fw-bold text-primary">Rumus & Perhitungan Biaya Titip</h5>
+        <button type="button" class="btn-close" @click="isRuleModalOpen = false"></button>
+      </div>
+      <div class="modal-body pt-3">
+        <div class="alert alert-primary border-0 bg-primary bg-opacity-10 mb-4">
+          <div class="d-flex gap-3">
+            <i class="bi bi-calculator fs-3 text-primary"></i>
+            <div>
+              <h6 class="fw-bold mb-1">Rumus Dasar Biaya (Per 15 Hari)</h6>
+              <p class="mb-0 small text-dark">
+                <code>(Dana Pencairan × Margin%) - (Dana Pencairan × Potongan%)</code>
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <div class="row g-4">
+          <div class="col-md-6">
+            <h6 class="fw-bold fs-7 text-uppercase text-secondary mb-3">Distribusi Per Skema</h6>
+            <div class="table-responsive">
+              <table class="table table-sm table-bordered small mb-0">
+                <thead class="table-light">
+                  <tr>
+                    <th>Skema</th>
+                    <th>Pembagi Rumah</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>Harian</td>
+                    <td>Rumus / 14 / 7 Hari</td>
+                  </tr>
+                  <tr>
+                    <td>Per 7 Hari</td>
+                    <td>Rumus / 2</td>
+                  </tr>
+                  <tr>
+                    <td>Per 15 Hari</td>
+                    <td>Rumus / 1 (Tetap)</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+          <div class="col-md-6 text-dark">
+            <h6 class="fw-bold fs-7 text-uppercase text-secondary mb-3">Contoh Perhitungan</h6>
+            <div class="bg-light p-3 rounded-3 small">
+              <div class="mb-2"><strong>Input:</strong></div>
+              <ul class="list-unstyled mb-3 ps-2 border-start border-primary border-3">
+                <li>Pinjaman: 1.000.000</li>
+                <li>Margin: 10% | Potongan: 0%</li>
+                <li>Skema: Per 7 Hari</li>
+              </ul>
+              <div><strong>Langkah:</strong></div>
+              <ol class="ps-3 mb-0">
+                <li>Gross: 1jt × 10% = 100rb</li>
+                <li>Bersih: 100rb - 0rd = 100rb</li>
+                <li>Skema 7 Hari: 100rb / 2 = <strong>50.000</strong></li>
+              </ol>
+            </div>
+          </div>
+        </div>
+
+        <div class="mt-4 p-3 border rounded-3 bg-light-subtle small text-muted italic">
+          <i class="bi bi-info-circle me-1"></i> Penaksir akan membayangkan nominal ini 
+          setiap periode pembayaran berdasarkan barang <strong>{{ currentPreset?.label }}</strong> yang sedang diisi.
+        </div>
+      </div>
+      <div class="modal-footer border-0">
+        <button
+          type="button"
+          class="btn btn-primary w-100 py-2 fw-semibold shadow-sm"
+          @click="isRuleModalOpen = false"
+        >
+          Tutup Informasi
+        </button>
+      </div>
+    </BaseModalComponent>
   </section>
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue';
+import { computed, ref } from 'vue';
+import BaseModalComponent from '@core/presentation/components/base_modal.component.vue';
 import type {
   PawnContractFormValueModel,
   PawnContractItemPresetModel,
@@ -238,6 +335,8 @@ interface PawnContractFormItemSectionProps {
 }
 
 const props = defineProps<PawnContractFormItemSectionProps>();
+
+const isRuleModalOpen = ref(false);
 
 const form = computed<PawnContractFormValueModel>(() => props.form);
 const fieldErrors = computed<PawnContractFormFieldErrorMap>(() => props.fieldErrors);

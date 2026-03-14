@@ -1,7 +1,8 @@
 import { defineStore } from 'pinia';
-import { ref } from 'vue';
+import { onMounted, ref } from 'vue';
 import { isLeft } from 'fp-ts/Either';
 import { showErrorMessage, showSuccessMessage } from '@core/util/alert';
+import { SETTING_KEY_VEHICLE_DAILY_DISABLED } from '@core/data/datasources/setting_local_datasource';
 import { pawnContractRepository } from '@feature/pawn_contract/presentation/di/pawn_contract.di';
 
 export const settingsViewModel = defineStore('settingsViewModel', () => {
@@ -45,8 +46,21 @@ export const settingsViewModel = defineStore('settingsViewModel', () => {
         }
     };
 
+    const isVehicleDailyDisabled = ref(true);
+
+    const toggleVehicleDailyDisabled = async (enabled: boolean): Promise<void> => {
+        isVehicleDailyDisabled.value = enabled;
+        await pawnContractRepository.setSettingBoolean(SETTING_KEY_VEHICLE_DAILY_DISABLED, enabled);
+    };
+
+    onMounted(async () => {
+        isVehicleDailyDisabled.value = await pawnContractRepository.getSettingBoolean(SETTING_KEY_VEHICLE_DAILY_DISABLED, true);
+    });
+
     return {
         isProcessing,
+        isVehicleDailyDisabled,
+        toggleVehicleDailyDisabled,
         runDefaultSeeder,
         runSingleActiveSeeder
     };

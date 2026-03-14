@@ -41,6 +41,7 @@ export type PawnContractAjtTypeModel =
 export type PawnContractSettlementTypeModel = 'lunas' | 'lelang' | 'refund';
 export type PawnContractLocationTabModel = 'kantor' | 'proses' | 'gudang';
 export type PawnContractActionKeyModel =
+    | 'view'
     | 'edit'
     | 'history'
     | 'storage_fee'

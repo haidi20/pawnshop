@@ -76,6 +76,11 @@ const createPawnContractFormSchema = (params: PawnContractFieldValidationParams)
                     path: ['disbursedValue'],
                     message: 'Dana pencairan tidak boleh lebih dari nilai taksir.'
                 });
+                context.addIssue({
+                    code: 'custom',
+                    path: ['appraisedValue'],
+                    message: 'Nilai taksiran tidak boleh kurang dari dana pencairan.'
+                });
             }
 
             if (
@@ -132,6 +137,11 @@ const createPawnContractSavePayloadSchema = (params: { selectedBranchAvailableBa
                     code: 'custom',
                     path: ['disbursedValue'],
                     message: 'Dana pencairan tidak boleh lebih dari nilai taksir.'
+                });
+                context.addIssue({
+                    code: 'custom',
+                    path: ['appraisedValue'],
+                    message: 'Nilai taksiran tidak boleh kurang dari dana pencairan.'
                 });
             }
 

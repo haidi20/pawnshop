@@ -94,4 +94,6 @@ export interface PawnContractRepository {
     }): Either<Error, PawnContractIndexTabModel[]>;
     runDefaultSeeder(): Promise<Either<Error, void>>;
     runSingleActiveSeeder(): Promise<Either<Error, void>>;
+    getSettingBoolean(key: string, defaultValue: boolean): Promise<boolean>;
+    setSettingBoolean(key: string, value: boolean): Promise<void>;
 }

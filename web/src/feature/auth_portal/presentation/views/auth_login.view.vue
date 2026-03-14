@@ -64,6 +64,15 @@
             >
               <i class="bi bi-info-lg" />
             </button>
+
+            <button
+              class="auth-portal__info-toggle"
+              type="button"
+              title="Reset database lokal"
+              @click="resetLocalDatabase"
+            >
+              <i class="bi bi-arrow-clockwise" />
+            </button>
           </div>
 
           <p class="auth-portal__subtitle">
@@ -278,6 +287,11 @@ const submitLogin = async (): Promise<void> => {
     } catch {
         // Error state is handled in the store for inline rendering.
     }
+};
+
+const resetLocalDatabase = (): void => {
+  localStorage.clear();
+  window.location.reload();
 };
 
 onMounted(() => {

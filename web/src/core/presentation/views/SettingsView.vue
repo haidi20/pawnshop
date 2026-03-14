@@ -91,6 +91,38 @@
             </div>
           </div>
         </section>
+
+        <section class="card border-0 shadow-sm mb-4">
+          <div class="card-header bg-transparent border-0 pt-4 px-4">
+            <h2 class="h5 mb-0">
+              Pengaturan Gadai
+            </h2>
+          </div>
+          <div class="card-body p-4">
+            <p class="text-muted mb-4">
+              Konfigurasi perilaku formulir gadai secara global.
+            </p>
+
+            <div class="p-4 border rounded-3">
+              <div class="form-check form-switch mb-0">
+                <input
+                  id="settingVehicleDailyDisabled"
+                  class="form-check-input"
+                  type="checkbox"
+                  :checked="isVehicleDailyDisabled"
+                  @change="handleVehicleDailyChange"
+                >
+                <label class="form-check-label fw-semibold" for="settingVehicleDailyDisabled">
+                  Aktifkan disabled harian untuk kendaraan
+                </label>
+                <div class="form-text mt-1">
+                  Otomatis sembunyikan dan blokir skema pembayaran <strong>Harian</strong> jika barang jaminan adalah Motor atau Mobil.
+                  Pengaturan ini berlaku pada formulir gadai baru maupun edit.
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
       </div>
     </div>
   </div>
@@ -102,7 +134,14 @@ import { RouterLink } from 'vue-router';
 import { settingsViewModel } from '@core/presentation/view_models/settings.vm';
 
 const vm = settingsViewModel();
-const { isProcessing } = storeToRefs(vm);
+const { isProcessing, isVehicleDailyDisabled } = storeToRefs(vm);
+
+const handleVehicleDailyChange = (event: Event): void => {
+  const target = event.target;
+  if (target instanceof HTMLInputElement) {
+    void vm.toggleVehicleDailyDisabled(target.checked);
+  }
+};
 </script>
 
 <style scoped>

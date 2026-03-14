@@ -136,7 +136,8 @@ export const createDefaultPawnContractFormValue = (params: {
     customerPhone: '',
     customerIdentityType: PawnContractIdentityTypeEnum.Ktp,
     customerIdentityNumber: '',
-    customerBirthDate: DEFAULT_PAWN_CONTRACT_CUSTOMER_BIRTH_DATE
+    customerBirthDate: DEFAULT_PAWN_CONTRACT_CUSTOMER_BIRTH_DATE,
+    hasPayments: false
 });
 
 export const createCustomerLookupFormPatch = (

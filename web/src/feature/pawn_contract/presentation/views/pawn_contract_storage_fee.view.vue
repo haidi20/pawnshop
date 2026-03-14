@@ -1,9 +1,5 @@
 <template>
-  <BaseModalComponent
-    :is-open="row !== null"
-    size="xl"
-    @close="handleClose"
-  >
+  <BaseModalComponent :is-open="row !== null" size="xl" @close="handleClose">
     <div class="modal-header pawn-contract-page__storage-fee-header">
       <div>
         <div class="pawn-contract-page__section-eyebrow mb-2">
@@ -12,16 +8,28 @@
         <h2 class="h5 mb-1">
           {{ row?.customerName }}
         </h2>
-        <p class="mb-0 text-secondary text-sm">
-          {{ row?.contract.contractNumber }} - {{ row?.itemNames }}
-        </p>
+        <div class="text-secondary text-sm mt-2">
+          <div class="mb-2">{{ row?.contract.contractNumber }} - {{ row?.itemNames }}</div>
+          <div class="d-flex align-items-center flex-wrap gap-2">
+            <span v-if="row?.contract.disbursedValue && row?.contract.appraisedValue"
+              class="badge bg-success-subtle text-success-emphasis border border-success-subtle fw-semibold">
+              <i class="bi bi-cash-stack me-1"></i> Pinjaman: {{ formatCurrency(row.contract.appraisedValue) }} | {{
+                formatCurrency(row.contract.disbursedValue) }}
+            </span>
+            <span v-if="row?.contract.termDays"
+              class="badge bg-warning-subtle text-warning-emphasis border border-warning-subtle fw-semibold">
+              <i class="bi bi-clock me-1"></i> Durasi: {{ row.contract.termDays }} Hari
+            </span>
+            <span v-if="row?.contract.storageFeeAmount"
+              class="badge bg-info-subtle text-info-emphasis border border-info-subtle fw-semibold">
+              <i class="bi bi-receipt me-1"></i> Skema: {{ formatCurrency(row.contract.storageFeeAmount) }} / {{
+                row.contract.paymentOptionDays ||
+                row.contract.termDays }} Hari
+            </span>
+          </div>
+        </div>
       </div>
-      <button
-        type="button"
-        class="btn-close"
-        aria-label="Close"
-        @click="handleClose"
-      />
+      <button type="button" class="btn-close" aria-label="Close" @click="handleClose" />
     </div>
 
     <div class="modal-body pawn-contract-page__storage-fee-body">
@@ -32,19 +40,10 @@
               <h3 class="h6 mb-0 text-uppercase fw-bold text-muted small">
                 Pilih Periode Pembayaran
               </h3>
-              <div class="form-check form-switch small">
-                <input
-                  id="selectAll"
-                  class="form-check-input"
-                  type="checkbox"
-                  role="switch"
-                  :checked="isAllSelected"
-                  @change="toggleSelectAll"
-                >
-                <label
-                  class="form-check-label text-secondary"
-                  for="selectAll"
-                >Pilih Semua</label>
+              <div class="form-check form-switch small cursor-pointer">
+                <input id="selectAll" class="form-check-input" type="checkbox" role="switch" :checked="isAllSelected"
+                  @change="toggleSelectAll">
+                <label class="form-check-label text-secondary" for="selectAll">Pilih Semua</label>
               </div>
             </div>
 
@@ -52,82 +51,76 @@
               <table class="table table-hover mb-0 align-middle">
                 <thead class="table-light">
                   <tr>
-                    <th
-                      class="text-center"
-                      style="width: 50px"
-                    >
+                    <th class="text-center" style="width: 50px">
                       #
                     </th>
                     <th>Deskripsi Periode</th>
                     <th class="text-end">
                       Nominal
                     </th>
-                    <th
-                      class="text-center"
-                      style="width: 80px"
-                    >
+                    <th class="text-center" style="width: 80px">
                       Bayar
                     </th>
                   </tr>
                 </thead>
                 <tbody>
-                  <tr
-                    v-for="period in selectablePeriods"
-                    :key="period.id"
-                    :class="[
-                      { 
-                        'table-primary-subtle': selectedPeriodIds.includes(period.id),
-                        'opacity-50 grayscale bg-light': period.isPaid 
-                      },
-                      period.isPaid ? '' : 'cursor-pointer'
-                    ]"
-                    @click="period.isPaid ? null : togglePeriod(period.id)"
-                  >
+                  <tr v-for="period in selectablePeriods" :key="period.id" :class="[
+                    {
+                      'table-primary-subtle': selectedPeriodIds.includes(period.id),
+                      'opacity-50 grayscale bg-light': period.isPaid
+                    },
+                    period.isPaid ? '' : 'cursor-pointer'
+                  ]" @click="period.isPaid ? null : togglePeriod(period.id)">
                     <td class="text-center text-secondary small">
-                      {{ period.id }}
+                      <span v-if="typeof period.id === 'string' && period.id.startsWith('paid-')">
+                        {{ period.id.replace('paid-', '') }}
+                      </span>
+                      <span v-else>
+                        {{ period.id }}
+                      </span>
                     </td>
                     <td>
                       <div class="fw-bold">
                         {{ period.label }}
                       </div>
-                      <div class="text-secondary small">
+                      <!-- <div class="text-secondary small">
                         Batas: {{ period.dueDateLabel }}
-                      </div>
+                      </div> -->
                     </td>
                     <td class="text-end fw-medium">
                       {{ formatCurrency(period.amount) }}
                     </td>
                     <td class="text-center">
-                      <input
-                        class="form-check-input"
-                        type="checkbox"
-                        :checked="period.isPaid || selectedPeriodIds.includes(period.id)"
-                        :disabled="period.isPaid"
-                        @click.stop="period.isPaid ? null : togglePeriod(period.id)"
-                      >
+                      <input class="form-check-input" type="checkbox"
+                        :checked="period.isPaid || selectedPeriodIds.includes(period.id)" :disabled="period.isPaid"
+                        @click.stop="period.isPaid ? null : togglePeriod(period.id)">
                     </td>
                   </tr>
                 </tbody>
               </table>
             </div>
 
-            <div class="mt-4">
-              <h3 class="h6 mb-3 text-uppercase fw-bold text-muted small">
-                Sudah Dibayar (Informasi)
-              </h3>
-              <div class="p-4 border rounded-3 text-center bg-light text-secondary small italic">
-                <i class="bi bi-clock-history me-2" />
-                Daftar pembayaran sebelumnya akan muncul di sini.
+            <div
+              class="card border mt-4 border-success-subtle bg-success-subtle mb-4 cursor-pointer align-items-center flex-row p-3 gap-3 transition-all"
+              :class="{ 'shadow-sm': isPayingOff }" @click.prevent="togglePayoff">
+              <div class="form-check m-0">
+                <input class="form-check-input form-check-input-success fs-5 cursor-pointer m-0" type="checkbox"
+                  :checked="isPayingOff" readonly>
+              </div>
+              <div class="flex-grow-1">
+                <label class="form-check-label fw-bold text-success-emphasis cursor-pointer d-block mb-1">
+                  Pembayaran Pelunasan
+                </label>
+                <p class="mb-0 text-success text-sm lh-sm">
+                  Pokok Pinjaman: {{ formatCurrency(row?.contract.disbursedValue || 0) }}
+                </p>
               </div>
             </div>
           </section>
         </div>
 
         <div class="col-lg-5">
-          <div
-            class="card border-0 shadow-sm sticky-top"
-            style="top: 1rem"
-          >
+          <div class="card border-0 shadow-sm sticky-top" style="top: 1rem">
             <div class="card-body p-4">
               <h3 class="h6 mb-4 text-uppercase fw-bold text-muted small">
                 Ringkasan Pembayaran
@@ -139,16 +132,16 @@
                 </div>
                 <div class="d-flex justify-content-between mb-3 pb-3 border-bottom">
                   <span class="text-secondary">Total Bayar</span>
-                  <span class="fw-bold h4 mb-0 text-primary">{{ formatCurrency(totalSelectedAmount) }}</span>
+                  <span class="fw-bold h4 mb-0" :class="totalSelectedAmount > 0 ? 'text-success' : 'text-secondary'">
+                    {{ formatCurrency(totalSelectedAmount) }}
+                  </span>
                 </div>
-                
-                <div
-                  v-if="totalSelectedAmount > 0"
-                  class="p-3 bg-light rounded-3 mb-4 border-start border-4 border-primary"
-                >
+
+                <div class="p-3 bg-light rounded-3 mb-4 border-start border-4"
+                  :class="totalSelectedAmount > 0 ? 'border-success' : 'border-secondary'">
                   <label class="d-block text-secondary small fw-bold text-uppercase mb-1">Terbilang</label>
                   <div class="small fw-medium text-dark lh-sm">
-                    {{ amountInWords }}
+                    {{ totalSelectedAmount > 0 ? amountInWords : '-' }}
                   </div>
                 </div>
 
@@ -159,31 +152,21 @@
                   </div>
                   <div class="d-flex justify-content-between fw-bold small">
                     <span>Sisa Tunggakan</span>
-                    <span :class="remainingAmount > 0 ? 'text-danger' : 'text-success'">
+                    <span :class="remainingAmount > 0 ? 'text-warning' : 'text-success'">
                       {{ formatCurrency(remainingAmount) }}
                     </span>
                   </div>
                 </div>
               </div>
 
-              <div class="alert alert-info border-0 bg-info-subtle small mb-4">
-                <i class="bi bi-info-circle me-2" />
-                Pembayaran biaya titip akan memperbarui tanggal jatuh tempo kontrak secara otomatis sebanyak periode yang dipilih.
-              </div>
 
-              <button
-                type="button"
-                class="btn btn-primary w-100 py-3 fw-bold shadow-sm"
-                :disabled="selectedPeriodIds.length === 0"
-                @click="handleConfirm"
-              >
+
+              <button type="button" class="btn btn-primary w-100 py-3 fw-bold shadow-sm"
+                :disabled="selectedPeriodIds.length === 0" @click="handleConfirm">
                 Proses Pembayaran ({{ selectedPeriodIds.length }})
               </button>
-              <button
-                type="button"
-                class="btn btn-link w-100 mt-2 text-decoration-none text-secondary"
-                @click="handleClose"
-              >
+              <button type="button" class="btn btn-link w-100 mt-2 text-decoration-none text-secondary"
+                @click="handleClose">
                 Batalkan
               </button>
             </div>
@@ -219,10 +202,11 @@ const {
   totalSelectedAmount,
   remainingAmount,
   amountInWords,
-  isAllSelected
+  isAllSelected,
+  isPayingOff
 } = storeToRefs(vm);
 
-const { togglePeriod, toggleSelectAll } = vm;
+const { togglePeriod, toggleSelectAll, togglePayoff } = vm;
 
 function handleClose(): void {
   emit('close');

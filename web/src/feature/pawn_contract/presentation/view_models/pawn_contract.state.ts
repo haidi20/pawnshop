@@ -44,6 +44,11 @@ export interface IPawnContractState {
 
 export const pawnContractActionOptions: PawnContractActionOptionModel[] = [
     {
+        key: 'view',
+        label: 'Lihat Data',
+        description: 'Tampilkan rincian histori, timeline aktivitas, dan mutasi barang jaminan.'
+    },
+    {
         key: 'edit',
         label: 'Ubah Data',
         description: 'Buka form gadai untuk memperbarui data kontrak dan jaminan.'
@@ -79,7 +84,7 @@ export const getPawnContractAvailableActions = (params: {
     contractStatus: string;
     daysToMaturity: number;
 }): PawnContractActionOptionModel[] => {
-    const availableKeys: PawnContractActionKeyModel[] = ['edit', 'history'];
+    const availableKeys: PawnContractActionKeyModel[] = ['view', 'edit', 'history'];
 
     if (['active', 'extended', 'auctioned'].includes(params.contractStatus)) {
         availableKeys.push('storage_fee');

@@ -1,71 +1,58 @@
 <template>
   <section class="card p-4">
     <div class="pawn-contract-create-page__section-head">
-      <div>
-        <div class="pawn-contract-create-page__section-kicker">
-          Nilai dan biaya
+      <div class="row align-items-center mb-3">
+        <div class="col">
+          <h5 class="card-title mb-0">Hitungan Pencairan Otomatis</h5>
+          <p class="card-subtitle text-muted small">
+            Tentukan dana pinjaman dan skema pembayaran yang sesuai.
+          </p>
         </div>
-        <h2 class="pawn-contract-create-page__section-title">
-          Hitungan pencairan
-        </h2>
-        <p class="text-secondary mb-0">
-          Nilai terbilang, biaya titip, dan total bayar di muka dihitung otomatis.
-        </p>
+        <div class="col-auto">
+          <button type="button" class="btn btn-formula-info btn-sm rounded-pill px-3" @click="emit('showFormula')">
+            <i class="bi bi-info-circle me-1"></i> Informasi Rumus
+          </button>
+        </div>
+      </div>
+    </div>
+ 
+    <div v-if="isVehicleDailyDisabled && form.itemKind === PawnContractItemKindEnum.Vehicle" class="alert alert-info d-flex align-items-center mb-3" role="alert">
+      <i class="bi bi-info-circle-fill me-2"></i>
+      <div>
+        <strong>Info Restriksi:</strong> Khusus kategori <strong>Kendaraan</strong>, skema pembayaran <strong>Harian</strong> tidak tersedia demi keamanan transaksi.
+      </div>
+    </div>
+
+    <div v-if="hasPayments" class="alert alert-warning d-flex align-items-center mb-3" role="alert">
+      <i class="bi bi-exclamation-triangle-fill me-2"></i>
+      <div>
+        <strong>Data finansial terkunci:</strong> Kontrak ini sudah memiliki riwayat pembayaran. Nilai appraisal, pinjaman, dan skema biaya tidak dapat diubah manual.
       </div>
     </div>
 
     <div class="row g-3 mt-1">
       <div class="col-12 col-md-6">
-        <label
-          class="form-label"
-          for="appraisedValue"
-        >Nilai taksiran</label>
-        <input
-          id="appraisedValue"
-          v-model="appraisedValueInputModel"
-          class="form-control"
-          :class="{ 'is-invalid': !!fieldErrors.appraisedValue }"
-          type="text"
-          inputmode="numeric"
-          autocomplete="off"
-          placeholder="Contoh: 5.000.000"
-        >
-        <div
-          v-if="fieldErrors.appraisedValue"
-          class="invalid-feedback d-block"
-        >
+        <label class="form-label" for="appraisedValue">Nilai taksiran</label>
+        <input id="appraisedValue" v-model="appraisedValueInputModel" class="form-control"
+          :class="{ 'is-invalid': !!fieldErrors.appraisedValue }" type="text" inputmode="numeric" autocomplete="off"
+          placeholder="Contoh: 5.000.000" :disabled="hasPayments">
+        <div v-if="fieldErrors.appraisedValue" class="invalid-feedback d-block">
           {{ fieldErrors.appraisedValue }}
         </div>
-        <div class="form-text">
-          {{ formatCurrency(form.appraisedValue) }}
+        <div v-if="showAppraisedAmountInWords" class="form-text">
+          {{ appraisedValueInWords }}
         </div>
       </div>
 
       <div class="col-12 col-md-6">
-        <label
-          class="form-label"
-          for="disbursedValue"
-        >Dana pencairan</label>
-        <input
-          id="disbursedValue"
-          v-model="disbursedValueInputModel"
-          class="form-control"
-          :class="{ 'is-invalid': !!fieldErrors.disbursedValue }"
-          type="text"
-          inputmode="numeric"
-          autocomplete="off"
-          placeholder="Contoh: 3.500.000"
-        >
-        <div
-          v-if="fieldErrors.disbursedValue"
-          class="invalid-feedback d-block"
-        >
+        <label class="form-label" for="disbursedValue">Dana pencairan</label>
+        <input id="disbursedValue" v-model="disbursedValueInputModel" class="form-control"
+          :class="{ 'is-invalid': !!fieldErrors.disbursedValue }" type="text" inputmode="numeric" autocomplete="off"
+          placeholder="Contoh: 3.500.000" :disabled="hasPayments">
+        <div v-if="fieldErrors.disbursedValue" class="invalid-feedback d-block">
           {{ fieldErrors.disbursedValue }}
         </div>
-        <div
-          v-if="showAmountInWords"
-          class="form-text"
-        >
+        <div v-if="showAmountInWords" class="form-text">
           {{ amountInWords }}
         </div>
       </div>
@@ -73,17 +60,11 @@
       <div class="col-12">
         <span class="form-label d-block mb-2">Skema biaya titip</span>
         <div class="row row-cols-1 row-cols-md-3 g-3">
-          <div
-            v-for="option in availablePaymentOptions"
-            :key="option.value"
-            class="col"
-          >
-            <button
-              class="pawn-contract-create-page__payment-option w-100 text-start"
-              type="button"
+          <div v-for="option in availablePaymentOptions" :key="option.value" class="col">
+            <button class="pawn-contract-create-page__payment-option w-100 text-start" type="button"
               :class="{ 'is-active': form.paymentOptionDays === option.value }"
-              @click="updateFormField('paymentOptionDays', option.value)"
-            >
+              :disabled="hasPayments"
+              @click="updateFormField('paymentOptionDays', option.value)">
               <span class="pawn-contract-create-page__option-copy">
                 <strong>{{ option.label }}</strong>
                 <small>{{ option.helper }}</small>
@@ -102,33 +83,25 @@
       </div>
 
       <div class="col-12 col-md-4">
-        <label
-          class="form-label"
-          for="prepaidStoragePeriods"
-        >Biaya titip dibayar di muka</label>
-        <select
-          id="prepaidStoragePeriods"
-          v-model.number="prepaidStoragePeriodsModel"
-          class="form-select"
-        >
-          <option
-            v-for="option in prepaidStorageOptions"
-            :key="option"
-            :value="option"
-          >
+        <label class="form-label" for="prepaidStoragePeriods">Biaya titip dibayar di muka</label>
+        <select id="prepaidStoragePeriods" v-model.number="prepaidStoragePeriodsModel" class="form-select"
+          :disabled="hasPayments">
+          <option v-for="option in prepaidStorageOptions" :key="option" :value="option">
             {{ formatPrepaidStorageOptionLabel(option) }}
           </option>
         </select>
-        <div class="form-text">
+        <!-- <div class="form-text">
           Rentang sistem: {{ prepaidStoragePeriodLabel }}
-        </div>
+        </div> -->
       </div>
 
       <div class="col-12 col-md-4">
         <label class="form-label">Biaya admin</label>
-        <div class="pawn-contract-create-page__metric-box">
-          <strong>{{ formatCurrency(administrationFeeAmount) }}</strong>
-          <span>{{ currentPresetLabel ?? 'Jenis barang' }} memakai biaya admin tetap.</span>
+        <div class="form-control-plaintext fw-bold text-primary">
+          {{ formatCurrency(administrationFeeAmount) }}
+        </div>
+        <div class="form-text">
+          {{ currentPresetLabel ?? 'Jenis barang' }} memakai biaya admin tetap.
         </div>
       </div>
 
@@ -155,16 +128,22 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue';
-import type { PawnContractPaymentOptionDaysEnum } from '@core/domain/models/pawn-contract-form-enum.model';
+import { computed, ref, onMounted } from 'vue';
+import {
+  PawnContractPaymentOptionDaysEnum,
+  PawnContractItemKindEnum
+} from '@core/domain/models/pawn-contract-form-enum.model';
 import type {
   PawnContractFormValueModel,
-  PawnContractOptionModel
+  PawnContractOptionModel,
+  PawnContractItemPresetModel
 } from '@feature/pawn_contract/domain/models';
 import type {
   PawnContractFormFieldErrorMap,
   PawnContractFormFieldUpdater
 } from '@feature/pawn_contract/presentation/models/pawn_contract_form_ui.model';
+import { SETTING_KEY_VEHICLE_DAILY_DISABLED } from '@core/data/datasources/setting_local_datasource';
+import { pawnContractRepository } from '@feature/pawn_contract/presentation/di/pawn_contract.di';
 
 interface PawnContractFormFinanceSectionProps {
   form: PawnContractFormValueModel;
@@ -174,34 +153,52 @@ interface PawnContractFormFinanceSectionProps {
   prepaidStorageOptions: number[];
   prepaidStorageAmount: number;
   prepaidStoragePeriodLabel: string;
+  itemPresets: Record<string, PawnContractItemPresetModel>;
   administrationFeeAmount: number;
   amountInWords: string;
+  appraisedValueInWords: string;
   projectedRemainingBalance: number;
   hasEnoughBalance: boolean;
   currentPresetLabel: string | null;
+  hasPayments: boolean;
   formatCurrency: (value: number) => string;
   updateFormField: PawnContractFormFieldUpdater;
 }
+ 
+ const emit = defineEmits<{
+   (e: 'showFormula'): void;
+ }>();
 
 const props = defineProps<PawnContractFormFinanceSectionProps>();
+
+const isVehicleDailyDisabled = ref(true);
+
+onMounted(async () => {
+  isVehicleDailyDisabled.value = await pawnContractRepository.getSettingBoolean(SETTING_KEY_VEHICLE_DAILY_DISABLED, true);
+});
 
 const form = computed<PawnContractFormValueModel>(() => props.form);
 const fieldErrors = computed<PawnContractFormFieldErrorMap>(() => props.fieldErrors);
 const availablePaymentOptions = computed<Array<PawnContractOptionModel<PawnContractPaymentOptionDaysEnum>>>(
   () => props.availablePaymentOptions
 );
+const itemPresets = computed(() => props.itemPresets);
+const administrationFeeAmount = computed(() => props.administrationFeeAmount);
 const storageFeeAmount = computed<number>(() => props.storageFeeAmount);
 const prepaidStorageOptions = computed<number[]>(() => props.prepaidStorageOptions);
 const prepaidStorageAmount = computed<number>(() => props.prepaidStorageAmount);
 const prepaidStoragePeriodLabel = computed<string>(() => props.prepaidStoragePeriodLabel);
-const administrationFeeAmount = computed<number>(() => props.administrationFeeAmount);
+const administrationFeeAmountValue = computed<number>(() => props.administrationFeeAmount);
 const amountInWords = computed<string>(() => props.amountInWords);
+const appraisedValueInWords = computed<string>(() => props.appraisedValueInWords);
 const projectedRemainingBalance = computed<number>(() => props.projectedRemainingBalance);
-const hasEnoughBalance = computed<boolean>(() => props.hasEnoughBalance);
-const currentPresetLabel = computed<string | null>(() => props.currentPresetLabel);
-const showAmountInWords = computed<boolean>(() => form.value.disbursedValue > 0);
+ const hasEnoughBalance = computed<boolean>(() => props.hasEnoughBalance);
+ const currentPresetLabel = computed<string | null>(() => props.currentPresetLabel);
+ const hasPayments = computed<boolean>(() => props.hasPayments);
+ const showAmountInWords = computed<boolean>(() => form.value.disbursedValue > 0);
+const showAppraisedAmountInWords = computed<boolean>(() => form.value.appraisedValue > 0);
 const customerReceivedAmount = computed<number>(() =>
-  Math.max(0, form.value.disbursedValue - prepaidStorageAmount.value - administrationFeeAmount.value)
+  Math.max(0, form.value.disbursedValue - prepaidStorageAmount.value - administrationFeeAmountValue.value)
 );
 const formatCurrency: (value: number) => string = props.formatCurrency;
 const updateFormField: PawnContractFormFieldUpdater = props.updateFormField;

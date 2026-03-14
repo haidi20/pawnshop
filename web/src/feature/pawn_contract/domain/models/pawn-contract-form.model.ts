@@ -116,6 +116,7 @@ export interface PawnContractFormValueModel {
     customerIdentityType: PawnContractIdentityTypeModel;
     customerIdentityNumber: string;
     customerBirthDate: string;
+    hasPayments: boolean;
 }
 
 export interface SavePawnContractPayloadModel {

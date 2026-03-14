@@ -20,17 +20,9 @@
         <div class="card border-0 bg-light-subtle">
           <div class="card-body py-3 px-4">
             <div class="form-check form-switch mb-0">
-              <input
-                id="stepOneAutoInsert"
-                class="form-check-input"
-                type="checkbox"
-                :checked="isStepOneAutoInsertEnabled"
-                @change="handleStepOneAutoInsertChange"
-              >
-              <label
-                class="form-check-label fw-semibold"
-                for="stepOneAutoInsert"
-              >
+              <input id="stepOneAutoInsert" class="form-check-input" type="checkbox"
+                :checked="isStepOneAutoInsertEnabled" @change="handleStepOneAutoInsertChange">
+              <label class="form-check-label fw-semibold" for="stepOneAutoInsert">
                 Auto insert data tab 1
               </label>
               <div class="form-text mt-1">
@@ -155,13 +147,17 @@
                 :prepaid-storage-options="prepaidStorageOptions"
                 :prepaid-storage-amount="prepaidStorageAmount"
                 :prepaid-storage-period-label="prepaidStoragePeriodLabel"
+                :item-presets="referenceData.itemPresets"
                 :administration-fee-amount="administrationFeeAmount"
                 :amount-in-words="amountInWords"
+                :appraised-value-in-words="appraisedValueInWords"
                 :projected-remaining-balance="projectedRemainingBalance"
                 :has-enough-balance="hasEnoughBalance"
+                :has-payments="form.hasPayments"
                 :current-preset-label="currentPreset?.label ?? null"
                 :format-currency="formatCurrency"
                 :update-form-field="updateFormField"
+                @show-formula="vm.openFormulaModal"
               />
             </div>
           </div>
@@ -238,6 +234,12 @@
           @confirm="confirmCustomerStep"
         />
 
+        <!-- Modals -->
+        <PawnContractFormulaModalComponent
+          :is-open="vm.isFormulaModalOpen"
+          @close="vm.closeFormulaModal"
+        />
+ 
         <PawnContractFormValidation
           :is-open="isValidationModalOpen"
           :title="validationModalTitle"
@@ -262,12 +264,14 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted } from 'vue';
+import { onMounted, watch } from 'vue';
+import { useRoute } from 'vue-router';
 import { storeToRefs } from 'pinia';
 import PawnContractFormContractSection from '@feature/pawn_contract/presentation/components/pawn_contract_form_contract_section.component.vue';
 import PawnContractFormCustomerSection from '@feature/pawn_contract/presentation/components/pawn_contract_form_customer_section.component.vue';
 import PawnContractFormError from '@feature/pawn_contract/presentation/components/pawn_contract_form_error.component.vue';
 import PawnContractFormFinanceSection from '@feature/pawn_contract/presentation/components/pawn_contract_form_finance_section.component.vue';
+import PawnContractFormulaModalComponent from '@feature/pawn_contract/presentation/components/pawn_contract_formula_modal.component.vue';
 import PawnContractFormItemSection from '@feature/pawn_contract/presentation/components/pawn_contract_form_item_section.component.vue';
 import PawnContractFormLoading from '@feature/pawn_contract/presentation/components/pawn_contract_form_loading.component.vue';
 import PawnContractFormStepConfirmation from '@feature/pawn_contract/presentation/components/pawn_contract_form_step_confirmation.component.vue';
@@ -278,6 +282,7 @@ import { pawnContractFormViewModel } from '@feature/pawn_contract/presentation/v
 
 type PawnContractFormViewModel = ReturnType<typeof pawnContractFormViewModel>;
 
+const route = useRoute();
 const vm: PawnContractFormViewModel = pawnContractFormViewModel();
 const {
   referenceData,
@@ -315,6 +320,7 @@ const {
   prepaidStorageAmount,
   prepaidStoragePeriodLabel,
   amountInWords,
+  appraisedValueInWords,
   stepConfirmationData,
   submitConfirmationData,
   projectedRemainingBalance,
@@ -356,7 +362,15 @@ const handleCustomerTabClick = (): void => {
   void goToCustomerStep();
 };
 
+// Re-inisialisasi form saat ID di rute berubah (misal navigasi antaran edit ke create atau antar edit id berbeda)
+watch(
+  () => route.params.contractId,
+  (newId) => {
+    void vm.initialize(newId);
+  }
+);
+
 onMounted(() => {
-  void vm.initialize();
+  void vm.initialize(route.params.contractId);
 });
 </script>
